@@ -81,16 +81,20 @@ POSTGRES_PASSWORD=supersecret
 
 2. Start backend and database:
 
-docker compose up --build
+```
+docker compose up --build -d
+```
 
 Backend: http://localhost:8080  
 Postgres: localhost:5432
 
 3. Start frontend:
 
+```
 cd frontend  
 npm install  
 npm run dev
+```
 
 Frontend: http://localhost:5173
 
@@ -103,6 +107,8 @@ Frontend: http://localhost:5173
 Create a job application.
 
 Example JSON:
+
+```
 {
 "jobTitle": "Backend Developer",
 "companyName": "Acme Corp",
@@ -110,8 +116,9 @@ Example JSON:
 "status": "APPLIED",
 "appliedDate": "2025-12-05T00:00:00"
 }
+```
 
-### GET /api/applications
+### GET /api/applications/all
 
 List all applications.
 
