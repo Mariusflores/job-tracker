@@ -12,5 +12,5 @@ export interface ApplicationRequest {
     companyName: string;
     descriptionUrl: string;
     status: string;
-    appliedDate: Date
+    appliedDate: string
 }

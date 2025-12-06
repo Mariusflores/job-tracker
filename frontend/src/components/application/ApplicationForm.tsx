@@ -1,4 +1,36 @@
-export function ApplicationForm(props: { onClose: () => void, onSubmit: () => void }) {
+import {useState} from "react";
+import type {ApplicationRequest} from "../../types/application.ts";
+
+export function ApplicationForm(props: {
+    onClose: () => void,
+    onSubmit: (request: ApplicationRequest) => void
+}) {
+    const [jobTitle, setJobTitle] = useState("");
+    const [companyName, setCompanyName] = useState("");
+    const [descriptionUrl, setDescriptionUrl] = useState("");
+    const [status, setStatus] = useState("APPLIED");
+    const today = new Date().toISOString().split("T")[0];
+
+    const [appliedDate, setAppliedDate] = useState(today);
+
+
+    console.log("Job title", jobTitle)
+    console.log("Company name", companyName)
+    console.log(descriptionUrl)
+    console.log("status", status)
+    console.log("date", appliedDate)
+
+    function submitApplication() {
+        const request: ApplicationRequest = {
+            jobTitle,
+            companyName,
+            descriptionUrl,
+            status,
+            appliedDate
+        }
+        props.onSubmit(request)
+    }
+
     return (
         <form className="space-y-4 p-4">
             <h2 className="text-xl font-semibold mb-2">Add Application</h2>
@@ -8,6 +40,8 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
                 <label className="text-sm font-medium">Job Title</label>
                 <input
                     type="text"
+                    value={jobTitle}
+                    onChange={e => setJobTitle(e.target.value)}
                     className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
@@ -18,6 +52,8 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
                 <label className="text-sm font-medium">Company Name</label>
                 <input
                     type="text"
+                    value={companyName}
+                    onChange={e => setCompanyName(e.target.value)}
                     className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
@@ -27,6 +63,8 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
             <div className="flex flex-col space-y-1">
                 <label className="text-sm font-medium">URL to Job Description (optional)</label>
                 <input
+                    value={descriptionUrl}
+                    onChange={e => setDescriptionUrl(e.target.value)}
                     type="url"
                     className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -36,6 +74,8 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
             <div className="flex flex-col space-y-1">
                 <label className="text-sm font-medium">Status</label>
                 <select
+                    onChange={e => setStatus(e.target.value)}
+                    value={status}
                     className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 >
@@ -51,6 +91,8 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
                 <label className="text-sm font-medium">Applied Date</label>
                 <input
                     type="date"
+                    value={appliedDate}
+                    onChange={e => setAppliedDate(e.target.value)}
                     className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                 />
@@ -68,7 +110,7 @@ export function ApplicationForm(props: { onClose: () => void, onSubmit: () => vo
 
                 <button
                     type="submit"
-                    onClick={props.onSubmit}
+                    onClick={submitApplication}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
                     Save

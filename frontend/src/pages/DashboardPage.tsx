@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import type {Application} from "../types/application.ts";
-import {getApplications} from "../api/applications.ts";
+import type {Application, ApplicationRequest} from "../types/application.ts";
+import {createApplication, getApplications} from "../api/applications.ts";
 import {ApplicationCard} from "../components/application/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/AddApplicationModal.tsx";
 
@@ -17,6 +17,13 @@ export function DashboardPage() {
 
         load();
     }, []);
+
+    async function handleSubmit(request: ApplicationRequest) {
+        const newApp = await createApplication(request)
+
+        console.log(newApp)
+        setApps(prev => [...prev, newApp]);
+    }
 
     function openModal() {
         console.log("setting modalopen = true")
@@ -44,7 +51,8 @@ export function DashboardPage() {
                 {apps.map(app => (
                     <ApplicationCard key={app.id} application={app}/>
                 ))}
-                {isModalOpen && <AddApplicationModal isOpen={isModalOpen} onClose={closeModal}/>}
+                {isModalOpen &&
+                    <AddApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={handleSubmit}/>}
             </div>
         </div>
     );

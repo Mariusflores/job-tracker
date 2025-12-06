@@ -1,6 +1,11 @@
 import {ApplicationForm} from "./ApplicationForm.tsx";
+import type {ApplicationRequest} from "../../types/application.ts";
 
-export function AddApplicationModal(props: { isOpen: boolean, onClose: () => void, onSubmit: () => void }) {
+export function AddApplicationModal(props: {
+    isOpen: boolean,
+    onClose: () => void,
+    onSubmit: (request: ApplicationRequest) => void
+}) {
 
     if (props.isOpen) {
         console.log("rendering modal")

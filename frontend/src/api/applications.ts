@@ -6,7 +6,7 @@ export async function getApplications() {
     return response.data;
 }
 
-export async function createApplication(data: ApplicationRequest) {
-    const response = await api.post("/application", data);
+export async function createApplication(request: ApplicationRequest) {
+    const response = await api.post<Application>("/application", request);
     return response.data
 }
