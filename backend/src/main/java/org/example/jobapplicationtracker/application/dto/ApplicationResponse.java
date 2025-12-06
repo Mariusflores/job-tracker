@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Data
 @AllArgsConstructor
@@ -18,5 +18,5 @@ public class ApplicationResponse {
     private String companyName;
     private String descriptionUrl;
     private ApplicationStatus status;
-    private LocalDateTime appliedDate;
+    private LocalDate appliedDate;
 }

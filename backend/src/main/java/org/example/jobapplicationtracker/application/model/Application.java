@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "t_applications")
@@ -26,5 +26,5 @@ public class Application {
     @Builder.Default
     private ApplicationStatus status = ApplicationStatus.APPLIED;
     @Builder.Default
-    private LocalDateTime appliedDate = LocalDateTime.now();
+    private LocalDate appliedDate = LocalDate.now();
 }
