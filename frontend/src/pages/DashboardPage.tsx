@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
-import {createApplication, getApplications} from "../api/applications.ts";
+import {createApplication, deleteApplication, getApplications} from "../api/applications.ts";
 import {ApplicationCard} from "../components/application/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
@@ -12,15 +12,16 @@ export function DashboardPage() {
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        async function load() {
-            setIsLoading(true)
-            const data = await getApplications();
-            setApps(data)
-            setIsLoading(false)
-        }
 
-        load();
+        loadApps();
     }, []);
+
+    async function loadApps() {
+        setIsLoading(true)
+        const data = await getApplications();
+        setApps(data)
+        setIsLoading(false)
+    }
 
     async function handleSubmit(request: ApplicationRequest) {
         const newApp = await createApplication(request)
@@ -39,6 +40,18 @@ export function DashboardPage() {
     }
 
     console.log("Applications fetched: ", apps);
+
+    async function handleDelete(id: number) {
+        setApps(prev => prev.filter(app => app.id !== id));
+
+        try {
+            await deleteApplication(id);
+        } catch (error) {
+            loadApps()
+        }
+
+    }
+
     return (
         <div className="min-h-screen bg-gray-50  flex justify-center">
             <div className="bg-white shadow mt-20 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
@@ -55,7 +68,7 @@ export function DashboardPage() {
                     <Loader isLoading={isLoading}/>
                 ) : (
                     apps.map(app => (
-                        <ApplicationCard key={app.id} application={app}/>
+                        <ApplicationCard onDelete={handleDelete} key={app.id} application={app}/>
                     ))
                 )
                 }

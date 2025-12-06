@@ -3,8 +3,18 @@ import {StatusBadge} from "./StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 
-export function ApplicationCard(props: { application: Application }) {
+export function ApplicationCard(props: { application: Application, onDelete: (id: number) => void }) {
     const [open, setOpen] = useState(false)
+
+    function handleDelete() {
+        props.onDelete(props.application.id);
+        setOpen(!open)
+    }
+
+    function handleEdit() {
+
+    }
+
     return <div
         className={" relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition"}
     >
@@ -32,10 +42,12 @@ export function ApplicationCard(props: { application: Application }) {
         {/* Dropdown Menu */}
         {open && (
             <div className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
-                <button className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
+                <button onClick={handleEdit}
+                        className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
                     Edit
                 </button>
-                <button className="block px-4 py-2 hover:bg-red-50 text-red-600 w-full text-left">
+                <button onClick={handleDelete}
+                        className="block px-4 py-2 hover:bg-red-50 text-red-600 w-full text-left">
                     Delete
                 </button>
             </div>
