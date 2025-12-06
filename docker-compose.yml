@@ -15,8 +15,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: ./backend/Dockerfile
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: jobtracker-backend
     env_file:
       .env
