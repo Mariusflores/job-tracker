@@ -29,9 +29,9 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createApplication(@RequestBody ApplicationRequest request) {
+    public ApplicationResponse createApplication(@RequestBody ApplicationRequest request) {
 
-        service.createApplication(request);
+        return service.createApplication(request);
     }
 
     // PUT Requests

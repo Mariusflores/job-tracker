@@ -23,7 +23,7 @@ public class ApplicationService {
 
 
     @Transactional
-    public void createApplication(ApplicationRequest request) {
+    public ApplicationResponse createApplication(ApplicationRequest request) {
         Application application = Application.builder()
                 .jobTitle(request.getJobTitle())
                 .companyName(request.getCompanyName())
@@ -32,11 +32,8 @@ public class ApplicationService {
                 .appliedDate(request.getAppliedDate())
                 .build();
 
-        try {
-            applicationRepository.save(application);
-        } catch (Exception e) {
-            log.error("Error while saving application", e);
-        }
+        Application savedApplication = applicationRepository.save(application);
+        return mapToApplicationResponse(savedApplication);
     }
 
     public List<ApplicationResponse> getAllApplications() {
