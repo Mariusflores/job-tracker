@@ -9,27 +9,24 @@ export function ApplicationCard(props: { application: Application }) {
         className={" relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition"}
     >
         <div className={"flex flex-row justify-between"}>
-            <p className={"font-bold text-black"}>{props.application.jobTitle}</p>
+            <p className={"font-semibold text-2xl text-black"}>{props.application.jobTitle}</p>
             <div className={"flex flex-row justify-between gap-10"}>
+                <p className={"text-gray-500"}>Applied: {props.application.appliedDate}</p>
+
                 <StatusBadge status={props.application.status}/>
                 {/* Kebab Menu Button */}
                 <button
                     onClick={() => setOpen(!open)}
                     className="text-gray-400 hover:text-gray-600 rotate-90"
                 >
-                    <EllipsisVerticalIcon className="w-5 h-5"/>
+                    <EllipsisVerticalIcon className="w-7 h-7"/>
                 </button>
 
             </div>
 
         </div>
 
-        <p className={"text-gray-500"}>{props.application.companyName}</p>
-
-
-        <div className={"flex flex-row justify-between"}>
-            <p className={"text-gray-500"}>{props.application.appliedDate}</p>
-        </div>
+        <p className={"text-gray-500 text-lg"}>{props.application.companyName}</p>
 
 
         {/* Dropdown Menu */}
