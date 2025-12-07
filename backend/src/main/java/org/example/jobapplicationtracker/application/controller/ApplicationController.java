@@ -3,7 +3,6 @@ package org.example.jobapplicationtracker.application.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.jobapplicationtracker.application.dto.ApplicationRequest;
 import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
-import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.service.ApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -38,8 +37,8 @@ public class ApplicationController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateApplication(@PathVariable Long id, @RequestBody ApplicationStatus statusUpdate) {
-        service.updateApplication(id, statusUpdate);
+    public void updateApplication(@PathVariable Long id, @RequestBody ApplicationRequest applicationRequest) {
+        service.updateApplication(id, applicationRequest);
     }
 
     // DELETE Requests

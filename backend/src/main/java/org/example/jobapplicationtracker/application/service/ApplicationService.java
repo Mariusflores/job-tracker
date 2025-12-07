@@ -6,7 +6,6 @@ import org.example.jobapplicationtracker.application.dto.ApplicationRequest;
 import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
 import org.example.jobapplicationtracker.application.model.Application;
-import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,11 +59,25 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void updateApplication(Long id, ApplicationStatus statusUpdate) {
+    public void updateApplication(Long id, ApplicationRequest applicationRequest) {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
-        application.setStatus(statusUpdate);
+        if (applicationRequest.getJobTitle() != null && !applicationRequest.getJobTitle().equals(application.getJobTitle())) {
+            application.setJobTitle(applicationRequest.getJobTitle());
+        }
+        if (applicationRequest.getCompanyName() != null && !applicationRequest.getCompanyName().equals(application.getCompanyName())) {
+            application.setCompanyName(applicationRequest.getCompanyName());
+        }
+        if (applicationRequest.getDescriptionUrl() != null && !applicationRequest.getDescriptionUrl().equals(application.getDescriptionUrl())) {
+            application.setDescriptionUrl(applicationRequest.getDescriptionUrl());
+        }
+        if (applicationRequest.getStatus() != null && !applicationRequest.getStatus().equals(application.getStatus())) {
+            application.setStatus(applicationRequest.getStatus());
+        }
+        if (applicationRequest.getAppliedDate() != null && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
+            application.setAppliedDate(applicationRequest.getAppliedDate());
+        }
         try {
             applicationRepository.save(application);
         } catch (Exception e) {
