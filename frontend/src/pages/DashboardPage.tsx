@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
-import {createApplication, deleteApplication, getApplications} from "../api/applications.ts";
+import {createApplication, deleteApplication, getApplications, updateApplication} from "../api/applications.ts";
 import {ApplicationCard} from "../components/application/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
@@ -49,7 +49,15 @@ export function DashboardPage() {
         } catch (error) {
             loadApps()
         }
+    }
 
+    async function handleEdit(id: number, request: ApplicationRequest) {
+
+        try {
+            await updateApplication(id, request);
+        } catch (error) {
+            loadApps()
+        }
     }
 
     return (
@@ -68,7 +76,7 @@ export function DashboardPage() {
                     <Loader isLoading={isLoading}/>
                 ) : (
                     apps.map(app => (
-                        <ApplicationCard onDelete={handleDelete} key={app.id} application={app}/>
+                        <ApplicationCard onDelete={handleDelete} onEdit={handleEdit} key={app.id} application={app}/>
                     ))
                 )
                 }

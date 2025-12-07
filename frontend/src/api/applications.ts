@@ -8,10 +8,15 @@ export async function getApplications() {
 
 export async function createApplication(request: ApplicationRequest) {
     const response = await api.post<Application>("/application", request);
-    return response.data
+    return response.data;
 }
 
 export async function deleteApplication(id: number) {
     const response = await api.delete("/application/" + id);
-    return response.data
+    return response.data;
+}
+
+export async function updateApplication(id: number, request: ApplicationRequest) {
+    const response = await api.put("/application/" + id, request)
+    return response.data;
 }

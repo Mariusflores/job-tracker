@@ -1,18 +1,30 @@
-import type {Application} from "../../types/application.ts";
+import type {Application, ApplicationRequest} from "../../types/application.ts";
 import {StatusBadge} from "./StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
+import {EditApplicationModal} from "./EditApplicationModal.tsx";
 
-export function ApplicationCard(props: { application: Application, onDelete: (id: number) => void }) {
-    const [open, setOpen] = useState(false)
+export function ApplicationCard(props: {
+    application: Application,
+    onDelete: (id: number) => void,
+    onEdit: (id: number, request: ApplicationRequest) => void
+}) {
+    const [toolBarOpen, setToolBarOpen] = useState(false)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     function handleDelete() {
         props.onDelete(props.application.id);
-        setOpen(!open)
+        setToolBarOpen(!toolBarOpen)
     }
 
-    function handleEdit() {
+    function openModal() {
+        setIsModalOpen(true)
 
+    }
+
+    function closeModal() {
+        setIsModalOpen(false)
+        setToolBarOpen(!toolBarOpen)
     }
 
     return <div
@@ -26,7 +38,7 @@ export function ApplicationCard(props: { application: Application, onDelete: (id
                 <StatusBadge status={props.application.status}/>
                 {/* Kebab Menu Button */}
                 <button
-                    onClick={() => setOpen(!open)}
+                    onClick={() => setToolBarOpen(!toolBarOpen)}
                     className="text-gray-400 hover:text-gray-600 rotate-90"
                 >
                     <EllipsisVerticalIcon className="w-7 h-7"/>
@@ -40,9 +52,9 @@ export function ApplicationCard(props: { application: Application, onDelete: (id
 
 
         {/* Dropdown Menu */}
-        {open && (
+        {toolBarOpen && (
             <div className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
-                <button onClick={handleEdit}
+                <button onClick={openModal}
                         className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
                     Edit
                 </button>
@@ -52,6 +64,8 @@ export function ApplicationCard(props: { application: Application, onDelete: (id
                 </button>
             </div>
         )}
+        {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={props.onEdit}
+                                              application={props.application}/>}
 
     </div>;
 }
