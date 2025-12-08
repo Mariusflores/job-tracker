@@ -5,16 +5,20 @@ import {ApplicationCard} from "../components/application/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
 import {IconButton} from "../components/ui/IconButton.tsx";
-import {ArrowDownIcon, ArrowsUpDownIcon, ArrowUpIcon} from "@heroicons/react/16/solid";
+import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
 
 
 export function DashboardPage() {
-    const SORTERS = {
-        status: (a: Application, b: Application) => a.status.localeCompare(b.status),
-        date: (a: Application, b: Application) => a.appliedDate.localeCompare(b.appliedDate),
-        company: (a: Application, b: Application) => a.companyName.localeCompare(b.companyName),
-        title: (a: Application, b: Application) => a.jobTitle.localeCompare(b.jobTitle),
-    } as const;
+    const SORTERS: Record<
+        keyof typeof SORT_LABELS,
+        (a: Application, b: Application) => number
+    > = {
+        status: (a, b) => a.status.localeCompare(b.status),
+        date: (a, b) => a.appliedDate.localeCompare(b.appliedDate),
+        company: (a, b) => a.companyName.localeCompare(b.companyName),
+        title: (a, b) => a.jobTitle.localeCompare(b.jobTitle),
+    };
+
 
     const SORT_LABELS: Record<string, string> = {
         date: "Applied Date",
@@ -25,27 +29,33 @@ export function DashboardPage() {
 
 
     const [apps, setApps] = useState<Application[]>([])
+    const [allApps, setAllApps] = useState<Application[]>([])
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [isLoading, setIsLoading] = useState(false)
     const [isSortOpen, setIsSortOpen] = useState(false)
     const [sortType, setSortType] = useState("date")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
     const sortTypeLabel = SORT_LABELS[sortType] ?? "Unknown"
+    const [isFilterOpen, setIsFilterOpen] = useState(false)
+    const [filterStatus, setFilterStatus] = useState<string>("")
+
 
     useEffect(() => {
-
         loadApps();
     }, []);
 
     useEffect(() => {
-        setApps(prev => sortApps(prev, sortType, sortDirection))
-    }, [sortType, sortDirection])
+        // Apply filters before sorting
+        setApps(sortApps(applyFilters(allApps), sortType, sortDirection))
+    }, [sortType, sortDirection, filterStatus])
 
 
     async function loadApps() {
         setIsLoading(true);
         const data = await getApplications();
-        setApps(sortApps(data, sortType, sortDirection));
+        setAllApps(data)
+        const filtered = applyFilters(allApps)
+        setApps(sortApps(filtered, sortType, sortDirection));
         setIsLoading(false);
     }
 
@@ -57,21 +67,28 @@ export function DashboardPage() {
         return direction === "asc" ? sorted : sorted.reverse();
     }
 
+    function applyFilters(apps: Application[]) {
+        if (!filterStatus) {
+            return apps
+        }
+        return apps.filter(app => app.status === filterStatus)
+    }
+
 
     async function handleSubmit(request: ApplicationRequest) {
         const newApp = await createApplication(request);
 
         console.log(newApp);
-        setApps(prev => [...prev, newApp]);
+        setAllApps(prev => [...prev, newApp]);
     }
 
     async function handleDelete(id: number) {
-        setApps(prev => prev.filter(app => app.id !== id));
+        setAllApps(prev => prev.filter(app => app.id !== id));
 
         try {
             await deleteApplication(id);
         } catch (error) {
-            loadApps();
+            await loadApps();
         }
     }
 
@@ -79,7 +96,7 @@ export function DashboardPage() {
         try {
             await updateApplication(id, request);
 
-            setApps(prev =>
+            setAllApps(prev =>
                 prev.map(app =>
                     app.id === id
                         ? {...app, ...request} // merge new values into old item
@@ -88,12 +105,11 @@ export function DashboardPage() {
             );
 
         } catch (error) {
-            loadApps(); // fallback if update failed
+            await loadApps(); // fallback if update failed
         }
     }
 
     function openModal() {
-        console.log("setting modalopen = true")
         setIsModalOpen(true)
     }
 
@@ -120,45 +136,87 @@ export function DashboardPage() {
                 <p className={"text-gray-500"}>Track your job search progress at a glance</p>
 
                 <div className={"flex flex-row justify-between"}>
-                    <p className="text-gray-500">
-                        Sort by: <span
-                        className="font-medium">{sortTypeLabel}</span>
-                    </p>
-                    <div className={"relative"}>
-                        <div className={"flex items-center gap-2"}>
+                    <div className={"flex items-center gap-2"}>
+                        <p className="text-gray-500">
+                            Sort by: <span
+                            className="font-medium">{sortTypeLabel}</span>
+                        </p>
+                        <select
+                            value={sortDirection}
+                            onChange={(e) => setSortDirection(e.target.value as "asc" | "desc")}
+                            className="border rounded-md px-2 py-1 text-gray-700 ml-auto"
+                        >
+                            <option value="asc">Ascending</option>
+                            <option value="desc">Descending</option>
+                        </select>
+                    </div>
+                    <div className={"flex items-center gap-2"}>
+
+                        <div className={"relative"}>
                             <IconButton
-                                onClick={() => setSortDirection(prev => prev === "asc" ? "desc" : "asc")}
-                                icon={
-                                    sortDirection === "asc"
-                                        ? <ArrowUpIcon className="w-5 h-5"/>
-                                        : <ArrowDownIcon className="w-5 h-5"/>
+                                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                                icon={<FunnelIcon className={"w-5 h-5"}/>
                                 }
                             />
-                            <IconButton onClick={toggleSortBar} icon={<ArrowsUpDownIcon className={"w-5 h-5"}/>}/>
+
+                            {isFilterOpen && (
+                                <div
+                                    className="flex items-center right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-50">
+                                    <p className="text-gray-500">
+                                        Filter By: <span
+                                        className="font-medium">Status</span>
+                                    </p>
+                                    <select
+                                        value={filterStatus}
+                                        onChange={(e) =>
+                                            setFilterStatus(e.target.value)}
+                                        className="border rounded-md px-2 py-1 text-gray-700 ml-auto"
+                                    >
+                                        <option value="">All</option>
+                                        <option value="APPLIED">Applied</option>
+                                        <option value="INTERVIEW">Interview</option>
+                                        <option value="OFFER">Job Offer</option>
+                                        <option value="REJECTED">Rejected</option>
+                                    </select>
+                                </div>
+                            )}
 
                         </div>
-                        {isSortOpen && (
-                            <div
-                                className="absolute right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-40">
-                                {Object.keys(SORTERS).map(key => (
-                                    <button
-                                        key={key}
-                                        className={`block w-full text-black text-left px-4 py-2 
+                        <div className={"relative"}>
+                            <IconButton
+                                onClick={toggleSortBar}
+                                icon={
+                                    sortDirection == "asc"
+                                        ? <BarsArrowUpIcon className={"w-5 h-5"}/>
+                                        : <BarsArrowDownIcon className={"w-5 h-5"}/>
+                                }/>
+
+                            {isSortOpen && (
+                                <div
+                                    className="absolute right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-40">
+                                    {Object.keys(SORTERS).map(key => (
+                                        <button
+                                            key={key}
+                                            className={`block w-full text-black text-left px-4 py-2 
                                         hover:bg-gray-100
                                         ${sortType === key ? "bg-gray-100 font-semibold" : ""}
                                         `}
-                                        onClick={() => {
-                                            setSortType(key);
-                                            setIsSortOpen(false);
-                                        }}
-                                    >
-                                        {key.charAt(0).toUpperCase() + key.slice(1)}
-                                    </button>
-                                ))}
-                            </div>
-                        )}
+                                            onClick={() => {
+                                                setSortType(key);
+                                                setIsSortOpen(false);
+                                            }}
+                                        >
+                                            {key.charAt(0).toUpperCase() + key.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+
                     </div>
                 </div>
+
 
                 {isLoading ? (
                     <Loader isLoading={isLoading}/>
