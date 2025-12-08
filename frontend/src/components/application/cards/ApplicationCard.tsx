@@ -8,7 +8,7 @@ import {IconButton} from "../../ui/IconButton.tsx";
 export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
     onDelete: (id: number) => void,
-    onEdit: (id: number, request: ApplicationRequest) => void
+    onEdit: (request: ApplicationRequest, id?: number) => void
 }) {
     const [toolBarOpen, setToolBarOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);

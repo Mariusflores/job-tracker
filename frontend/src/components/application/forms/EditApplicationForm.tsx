@@ -4,7 +4,7 @@ import {ApplicationForm} from "./ApplicationForm.tsx";
 
 export function EditApplicationForm({onClose, onSubmit, application}: {
     onClose: () => void,
-    onSubmit: (id: number, request: ApplicationRequest) => void,
+    onSubmit: (request: ApplicationRequest, id?: number,) => void,
     application: Application
 }) {
     const [data, setData] = useState<ApplicationData>({

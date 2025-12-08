@@ -33,15 +33,13 @@ export function DashboardPage() {
     useEffect(() => {
         // Apply filters before sorting
         setApps(sortApps(applyFilters(allApps), sortType, sortDirection))
-    }, [sortType, sortDirection, filterStatus, searchQuery])
+    }, [sortType, sortDirection, filterStatus, searchQuery, allApps])
 
 
     async function loadApps() {
         setIsLoading(true);
         const data = await getApplications();
         setAllApps(data)
-        const filtered = applyFilters(data)
-        setApps(sortApps(filtered, sortType, sortDirection));
         setIsLoading(false);
     }
 
@@ -89,9 +87,11 @@ export function DashboardPage() {
         }
     }
 
-    async function handleEdit(id: number, request: ApplicationRequest) {
+    async function handleEdit(request: ApplicationRequest, id?: number) {
         try {
-            await updateApplication(id, request);
+            if (id !== undefined) {
+                await updateApplication(id, request);
+            }
 
             setAllApps(prev =>
                 prev.map(app =>
