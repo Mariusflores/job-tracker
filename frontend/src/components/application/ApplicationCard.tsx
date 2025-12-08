@@ -3,28 +3,33 @@ import {StatusBadge} from "./StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "./EditApplicationModal.tsx";
+import {IconButton} from "../ui/IconButton.tsx";
 
 export function ApplicationCard(props: {
     application: Application,
     onDelete: (id: number) => void,
     onEdit: (id: number, request: ApplicationRequest) => void
 }) {
-    const [toolBarOpen, setToolBarOpen] = useState(false)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [toolBarOpen, setToolBarOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleDelete() {
         props.onDelete(props.application.id);
-        setToolBarOpen(!toolBarOpen)
+        setToolBarOpen(!toolBarOpen);
     }
 
     function openModal() {
-        setIsModalOpen(true)
+        setIsModalOpen(true);
 
     }
 
     function closeModal() {
-        setIsModalOpen(false)
-        setToolBarOpen(!toolBarOpen)
+        setIsModalOpen(false);
+        setToolBarOpen(!toolBarOpen);
+    }
+
+    function toggleToolBar() {
+        setToolBarOpen(!toolBarOpen);
     }
 
     return <div
@@ -37,13 +42,7 @@ export function ApplicationCard(props: {
 
                 <StatusBadge status={props.application.status}/>
                 {/* Kebab Menu Button */}
-                <button
-                    onClick={() => setToolBarOpen(!toolBarOpen)}
-                    className="text-gray-400 hover:text-gray-600 rotate-90"
-                >
-                    <EllipsisVerticalIcon className="w-7 h-7"/>
-                </button>
-
+                <IconButton onClick={toggleToolBar} icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
             </div>
 
         </div>

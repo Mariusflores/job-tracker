@@ -39,8 +39,6 @@ export function DashboardPage() {
         setIsModalOpen(false)
     }
 
-    console.log("Applications fetched: ", apps);
-
     async function handleDelete(id: number) {
         setApps(prev => prev.filter(app => app.id !== id));
 
@@ -80,7 +78,10 @@ export function DashboardPage() {
                         + Add Application
                     </button>
                 </div>
-                <p className={"text-gray-500"}>Track your job search progress at a glance</p>
+                <div>
+                    <p className={"text-gray-500"}>Track your job search progress at a glance</p>
+
+                </div>
                 {isLoading ? (
                     <Loader isLoading={isLoading}/>
                 ) : (
