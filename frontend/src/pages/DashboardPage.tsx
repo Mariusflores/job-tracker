@@ -6,6 +6,7 @@ import {AddApplicationModal} from "../components/application/AddApplicationModal
 import Loader from "../components/ui/Loader.tsx";
 import {IconButton} from "../components/ui/IconButton.tsx";
 import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
+import {StatusCard} from "../components/application/StatusCard.tsx";
 
 
 export function DashboardPage() {
@@ -39,6 +40,10 @@ export function DashboardPage() {
     const [isFilterOpen, setIsFilterOpen] = useState(false)
     const [filterStatus, setFilterStatus] = useState<string>("")
 
+    const totalCount = allApps.length;
+    const appliedCount = allApps.filter(a => a.status == "APPLIED").length;
+    const interviewCount = allApps.filter(a => a.status == "INTERVIEW").length;
+    const offerCount = allApps.filter(a => a.status == "OFFER").length;
 
     useEffect(() => {
         loadApps();
@@ -54,7 +59,7 @@ export function DashboardPage() {
         setIsLoading(true);
         const data = await getApplications();
         setAllApps(data)
-        const filtered = applyFilters(allApps)
+        const filtered = applyFilters(data)
         setApps(sortApps(filtered, sortType, sortDirection));
         setIsLoading(false);
     }
@@ -135,6 +140,15 @@ export function DashboardPage() {
                 </div>
                 <p className={"text-gray-500"}>Track your job search progress at a glance</p>
 
+                <div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
+                        <StatusCard label="Total" count={totalCount} color="gray"/>
+                        <StatusCard label="Applied" count={appliedCount} color="blue"/>
+                        <StatusCard label="Interviews" count={interviewCount} color="yellow"/>
+                        <StatusCard label="Offers" count={offerCount} color="green"/>
+                    </div>
+                </div>
+
                 <div className={"flex flex-row justify-between"}>
                     <div className={"flex items-center gap-2"}>
                         <p className="text-gray-500">
@@ -161,16 +175,14 @@ export function DashboardPage() {
 
                             {isFilterOpen && (
                                 <div
-                                    className="flex items-center right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-50">
-                                    <p className="text-gray-500">
-                                        Filter By: <span
-                                        className="font-medium">Status</span>
-                                    </p>
+                                    className="absolute right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-48 p-3"
+                                >
+                                    <p className="text-gray-700 mb-1 font-medium">Filter by Status</p>
+
                                     <select
                                         value={filterStatus}
-                                        onChange={(e) =>
-                                            setFilterStatus(e.target.value)}
-                                        className="border rounded-md px-2 py-1 text-gray-700 ml-auto"
+                                        onChange={(e) => setFilterStatus(e.target.value)}
+                                        className="border rounded-md px-2 py-1 text-gray-700 w-full"
                                     >
                                         <option value="">All</option>
                                         <option value="APPLIED">Applied</option>
@@ -180,6 +192,7 @@ export function DashboardPage() {
                                     </select>
                                 </div>
                             )}
+
 
                         </div>
                         <div className={"relative"}>
