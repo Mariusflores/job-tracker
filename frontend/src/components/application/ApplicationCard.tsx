@@ -5,7 +5,7 @@ import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "./EditApplicationModal.tsx";
 import {IconButton} from "../ui/IconButton.tsx";
 
-export function ApplicationCard(props: {
+export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
     onDelete: (id: number) => void,
     onEdit: (id: number, request: ApplicationRequest) => void
@@ -14,7 +14,7 @@ export function ApplicationCard(props: {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     function handleDelete() {
-        props.onDelete(props.application.id);
+        onDelete(application.id);
         setToolBarOpen(!toolBarOpen);
     }
 
@@ -36,18 +36,18 @@ export function ApplicationCard(props: {
         className={" relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition"}
     >
         <div className={"flex flex-row justify-between"}>
-            <p className={"font-semibold text-2xl text-black"}>{props.application.jobTitle}</p>
+            <p className={"font-semibold text-2xl text-black"}>{application.jobTitle}</p>
             <div className={"flex flex-row justify-between gap-10"}>
-                <p className={"text-gray-500"}>Applied: {props.application.appliedDate}</p>
+                <p className={"text-gray-500"}>Applied: {application.appliedDate}</p>
 
-                <StatusBadge status={props.application.status}/>
+                <StatusBadge status={application.status}/>
                 {/* Kebab Menu Button */}
                 <IconButton onClick={toggleToolBar} icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
             </div>
 
         </div>
 
-        <p className={"text-gray-500 text-lg"}>{props.application.companyName}</p>
+        <p className={"text-gray-500 text-lg"}>{application.companyName}</p>
 
 
         {/* Dropdown Menu */}
@@ -64,8 +64,8 @@ export function ApplicationCard(props: {
             </div>
         )}
         {/* Edit Application Modal */}
-        {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={props.onEdit}
-                                              application={props.application}/>}
+        {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
+                                              application={application}/>}
 
     </div>;
 }

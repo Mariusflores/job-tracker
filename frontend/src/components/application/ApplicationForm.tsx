@@ -1,7 +1,7 @@
 import {useState} from "react";
 import type {ApplicationRequest} from "../../types/application.ts";
 
-export function ApplicationForm(props: {
+export function ApplicationForm({onClose, onSubmit}: {
     onClose: () => void,
     onSubmit: (request: ApplicationRequest) => void
 }) {
@@ -21,7 +21,7 @@ export function ApplicationForm(props: {
             status,
             appliedDate
         }
-        props.onSubmit(request)
+        onSubmit(request)
     }
 
     return (
@@ -95,7 +95,7 @@ export function ApplicationForm(props: {
             <div className="flex justify-end space-x-3 pt-4">
                 <button
                     type="button"
-                    onClick={props.onClose}
+                    onClick={onClose}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
                 >
                     Cancel

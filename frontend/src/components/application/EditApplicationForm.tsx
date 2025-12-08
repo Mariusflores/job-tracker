@@ -1,23 +1,16 @@
 import type {Application, ApplicationRequest} from "../../types/application.ts";
 import {useState} from "react";
 
-export function EditApplicationForm(props: {
+export function EditApplicationForm({onClose, onSubmit, application}: {
     onClose: () => void,
     onSubmit: (id: number, request: ApplicationRequest) => void,
     application: Application
 }) {
-    const [jobTitle, setJobTitle] = useState(props.application.jobTitle);
-    const [companyName, setCompanyName] = useState(props.application.companyName);
-    const [descriptionUrl, setDescriptionUrl] = useState(props.application.descriptionUrl);
-    const [status, setStatus] = useState(props.application.status);
-    const [appliedDate, setAppliedDate] = useState(props.application.appliedDate);
-
-
-    console.log("Job title", jobTitle)
-    console.log("Company name", companyName)
-    console.log(descriptionUrl)
-    console.log("status", status)
-    console.log("date", appliedDate)
+    const [jobTitle, setJobTitle] = useState(application.jobTitle);
+    const [companyName, setCompanyName] = useState(application.companyName);
+    const [descriptionUrl, setDescriptionUrl] = useState(application.descriptionUrl);
+    const [status, setStatus] = useState(application.status);
+    const [appliedDate, setAppliedDate] = useState(application.appliedDate);
 
     function submitApplication() {
         const request: ApplicationRequest = {
@@ -27,7 +20,7 @@ export function EditApplicationForm(props: {
             status,
             appliedDate
         }
-        props.onSubmit(props.application.id, request)
+        onSubmit(application.id, request)
     }
 
     return (
@@ -101,7 +94,7 @@ export function EditApplicationForm(props: {
             <div className="flex justify-end space-x-3 pt-4">
                 <button
                     type="button"
-                    onClick={props.onClose}
+                    onClick={onClose}
                     className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md"
                 >
                     Cancel
