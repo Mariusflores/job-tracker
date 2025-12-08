@@ -64,6 +64,7 @@ export function ApplicationCard(props: {
                 </button>
             </div>
         )}
+        {/* Edit Application Modal */}
         {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={props.onEdit}
                                               application={props.application}/>}
 

@@ -52,13 +52,22 @@ export function DashboardPage() {
     }
 
     async function handleEdit(id: number, request: ApplicationRequest) {
-
         try {
             await updateApplication(id, request);
+
+            setApps(prev =>
+                prev.map(app =>
+                    app.id === id
+                        ? {...app, ...request} // merge new values into old item
+                        : app
+                )
+            );
+
         } catch (error) {
-            loadApps()
+            loadApps(); // fallback if update failed
         }
     }
+
 
     return (
         <div className="min-h-screen bg-gray-50  flex justify-center">
