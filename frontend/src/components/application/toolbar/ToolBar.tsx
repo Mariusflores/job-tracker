@@ -1,6 +1,6 @@
-import type {ToolBarProps} from "../../types/toolbar.ts";
-import {SORT_LABELS, SORTERS} from "../../constants/sorting.ts";
-import {IconButton} from "../ui/IconButton.tsx";
+import type {ToolBarProps} from "../../../types/toolbar.ts";
+import {SORT_LABELS, SORTERS} from "../../../constants/sorting.ts";
+import {IconButton} from "../../ui/IconButton.tsx";
 import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
 
 export function ToolBar({

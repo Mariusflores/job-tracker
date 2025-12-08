@@ -1,4 +1,4 @@
-import {STATUS_UI} from "../../constants/status.ts";
+import {STATUS_UI} from "../../../constants/status.ts";
 
 export function StatusBadge(props: { status: string }) {
     const ui = STATUS_UI[props.status as keyof typeof STATUS_UI] ?? STATUS_UI.DEFAULT

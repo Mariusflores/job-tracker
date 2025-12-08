@@ -1,9 +1,9 @@
-import type {Application, ApplicationRequest} from "../../types/application.ts";
-import {StatusBadge} from "./StatusBadge.tsx";
+import type {Application, ApplicationRequest} from "../../../types/application.ts";
+import {StatusBadge} from "../badges/StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
-import {EditApplicationModal} from "./EditApplicationModal.tsx";
-import {IconButton} from "../ui/IconButton.tsx";
+import {EditApplicationModal} from "../modals/EditApplicationModal.tsx";
+import {IconButton} from "../../ui/IconButton.tsx";
 
 export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
@@ -24,6 +24,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
     }
 
     function closeModal() {
+        console.log("Closing modal")
         setIsModalOpen(false);
         setToolBarOpen(!toolBarOpen);
     }

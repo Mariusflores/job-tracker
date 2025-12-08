@@ -1,12 +1,12 @@
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
 import {createApplication, deleteApplication, getApplications, updateApplication} from "../api/applications.ts";
-import {ApplicationCard} from "../components/application/ApplicationCard.tsx";
-import {AddApplicationModal} from "../components/application/AddApplicationModal.tsx";
+import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
+import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
-import {StatusCard} from "../components/application/StatusCard.tsx";
+import {StatusCard} from "../components/application/cards/StatusCard.tsx";
 import {SORTERS} from "../constants/sorting.ts";
-import {ToolBar} from "../components/application/ToolBar.tsx";
+import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 
 
 export function DashboardPage() {
