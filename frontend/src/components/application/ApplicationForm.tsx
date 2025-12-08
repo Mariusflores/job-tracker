@@ -13,13 +13,6 @@ export function ApplicationForm(props: {
 
     const [appliedDate, setAppliedDate] = useState(today);
 
-
-    console.log("Job title", jobTitle)
-    console.log("Company name", companyName)
-    console.log(descriptionUrl)
-    console.log("status", status)
-    console.log("date", appliedDate)
-
     function submitApplication() {
         const request: ApplicationRequest = {
             jobTitle,
