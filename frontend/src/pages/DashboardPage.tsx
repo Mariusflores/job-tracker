@@ -117,8 +117,13 @@ export function DashboardPage() {
                         + Add Application
                     </button>
                 </div>
+                <p className={"text-gray-500"}>Track your job search progress at a glance</p>
+
                 <div className={"flex flex-row justify-between"}>
-                    <p className={"text-gray-500"}>Track your job search progress at a glance</p>
+                    <p className="text-gray-500">
+                        Sort by: <span
+                        className="font-medium">{sortTypeLabel}</span>
+                    </p>
                     <div className={"relative"}>
                         <div className={"flex items-center gap-2"}>
                             <IconButton
@@ -154,10 +159,6 @@ export function DashboardPage() {
                         )}
                     </div>
                 </div>
-                <p className="text-gray-500">
-                    Sort by: <span
-                    className="font-medium">{sortTypeLabel}</span>
-                </p>
 
                 {isLoading ? (
                     <Loader isLoading={isLoading}/>
