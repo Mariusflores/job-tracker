@@ -5,7 +5,7 @@ import {EditApplicationForm} from "../forms/EditApplicationForm.tsx";
 export function EditApplicationModal({isOpen, onClose, onSubmit, application}: {
     isOpen: boolean,
     onClose: () => void,
-    onSubmit: (id: number, request: ApplicationRequest) => void,
+    onSubmit: (request: ApplicationRequest, id?: number) => void,
     application: Application
 }) {
 
