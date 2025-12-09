@@ -3,6 +3,7 @@ import {StatusBadge} from "../badges/StatusBadge";
 import {useEffect, useState} from "react";
 import {IconButton} from "../../ui/IconButton.tsx";
 import {PencilSquareIcon} from "@heroicons/react/20/solid";
+import {parseDate} from "../../../utils/date.ts";
 
 export function ExpandedApplicationForm({
                                             application,
@@ -17,8 +18,11 @@ export function ExpandedApplicationForm({
     const [notes, setNotes] = useState(application.notes ?? "");
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null)
 
     useEffect(() => {
+
+        if (!isEditing) return
 
         const handler = setTimeout(() => {
             submitNotes();
@@ -28,20 +32,25 @@ export function ExpandedApplicationForm({
 
     }, [notes]);
 
-    async function submitNotes() {
-        const request: ApplicationRequest = {
-            appliedDate: application.appliedDate,
-            companyName: application.companyName,
-            descriptionUrl: application.descriptionUrl,
-            jobTitle: application.jobTitle,
-            notes: notes,
-            status: application.status
-
-        };
+    function submitNotes() {
         setIsSaving(true);
-        // Await for [saving..] display
-        await publishNotes(request, application.id);
-        setIsSaving(false)
+
+        (async () => {
+            const request: ApplicationRequest = {
+                appliedDate: application.appliedDate,
+                companyName: application.companyName,
+                descriptionUrl: application.descriptionUrl,
+                jobTitle: application.jobTitle,
+                notes: notes,
+                status: application.status
+
+            };
+            // Await for [saving..] display
+            await publishNotes(request, application.id);
+            setIsSaving(false);
+            setLastSaved(new Date());
+
+        })();
     }
 
     return (
@@ -76,7 +85,7 @@ export function ExpandedApplicationForm({
                 <div className="p-4 bg-gray-50 rounded-lg border">
                     <p className="text-sm font-medium text-gray-700">Applied Date</p>
                     <p className="text-gray-800 text-md mt-1">
-                        {application.appliedDate}
+                        {parseDate(application.appliedDate)}
                     </p>
                 </div>
 
@@ -122,8 +131,15 @@ export function ExpandedApplicationForm({
                             className="w-full p-2 border rounded-md bg-white text-gray-800 focus:ring focus:ring-blue-200"
                             rows={4}
                         />
-                            <p className="text-xs text-gray-500">
-                                {isSaving ? "Saving..." : "Saved"}
+                            <p className="text-xs text-gray-500 mt-1">
+                                {isSaving
+                                    ? "Saving..."
+                                    : lastSaved
+                                        ? `Saved at ${lastSaved.toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit"
+                                        })}`
+                                        : ""}
                             </p>
 
                         </div>

@@ -5,6 +5,7 @@ import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "../modals/EditApplicationModal.tsx";
 import {IconButton} from "../../ui/IconButton.tsx";
 import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
+import {parseDate} from "../../../utils/date.ts";
 
 export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
@@ -50,7 +51,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
             <div className={"flex flex-row justify-between"}>
                 <p className={"font-semibold text-2xl text-black"}>{application.companyName}</p>
                 <div className={"flex flex-row justify-between gap-10"}>
-                    <p className={"text-gray-500"}>Applied: {application.appliedDate}</p>
+                    <p className={"text-gray-500"}>Applied: {parseDate(application.appliedDate)}</p>
 
                     <StatusBadge status={application.status}/>
                     {/* Kebab Menu Button */}
