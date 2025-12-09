@@ -29,6 +29,7 @@ public class ApplicationService {
                 .descriptionUrl(request.getDescriptionUrl())
                 .status(request.getStatus())
                 .appliedDate(request.getAppliedDate())
+                .notes(request.getNotes())
                 .build();
 
         Application savedApplication = applicationRepository.save(application);
@@ -54,6 +55,7 @@ public class ApplicationService {
                 .descriptionUrl(application.getDescriptionUrl())
                 .appliedDate(application.getAppliedDate())
                 .status(application.getStatus())
+                .notes(application.getNotes())
                 .build();
 
     }
@@ -77,6 +79,9 @@ public class ApplicationService {
         }
         if (applicationRequest.getAppliedDate() != null && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
             application.setAppliedDate(applicationRequest.getAppliedDate());
+        }
+        if (applicationRequest.getNotes() != null && !applicationRequest.getNotes().equals(application.getNotes())) {
+            application.setNotes(applicationRequest.getNotes());
         }
         try {
             applicationRepository.save(application);

@@ -27,4 +27,6 @@ public class Application {
     private ApplicationStatus status = ApplicationStatus.APPLIED;
     @Builder.Default
     private LocalDate appliedDate = LocalDate.now();
+
+    private String notes;
 }

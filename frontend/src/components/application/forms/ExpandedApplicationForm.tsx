@@ -1,13 +1,49 @@
-import type {Application} from "../../../types/application";
+import type {Application, ApplicationRequest} from "../../../types/application";
 import {StatusBadge} from "../badges/StatusBadge";
+import {useEffect, useState} from "react";
+import {IconButton} from "../../ui/IconButton.tsx";
+import {PencilSquareIcon} from "@heroicons/react/20/solid";
 
 export function ExpandedApplicationForm({
                                             application,
-                                            onClose
+                                            onClose,
+                                            publishNotes
                                         }: {
     application: Application,
-    onClose: () => void
+    onClose: () => void,
+    publishNotes: (request: ApplicationRequest, id?: number) => void
 }) {
+
+    const [notes, setNotes] = useState(application.notes ?? "");
+    const [isEditing, setIsEditing] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+
+        const handler = setTimeout(() => {
+            submitNotes();
+        }, 1000);
+
+        return () => clearTimeout(handler)
+
+    }, [notes]);
+
+    async function submitNotes() {
+        const request: ApplicationRequest = {
+            appliedDate: application.appliedDate,
+            companyName: application.companyName,
+            descriptionUrl: application.descriptionUrl,
+            jobTitle: application.jobTitle,
+            notes: notes,
+            status: application.status
+
+        };
+        setIsSaving(true);
+        // Await for [saving..] display
+        await publishNotes(request, application.id);
+        setIsSaving(false)
+    }
+
     return (
         <div className="relative p-6 space-y-8">
 
@@ -57,19 +93,47 @@ export function ExpandedApplicationForm({
                     </a>
                 </div>
 
-                {/* Optional: Notes
-                {application.notes && (
-                    <div className="p-4 bg-gray-50 rounded-lg border space-y-1">
-                        <p className="text-sm font-medium text-gray-700">Notes</p>
-                        <p className="text-gray-800 whitespace-pre-line">
-                            {application.notes}
-                        </p>
+                {/* Optional: Notes */}
+                <div className="p-4 bg-gray-50 rounded-lg border space-y-2">
+                    <div className={"flex flex-row justify-between"}>
+                        <label
+                            htmlFor="notes"
+                            className="text-sm font-medium text-gray-700"
+                        >
+                            Notes
+                        </label>
+                        <IconButton onClick={() => setIsEditing(!isEditing)}
+                                    icon={<PencilSquareIcon className={"h-5 w-5"}/>}/>
                     </div>
-                )}
-                */}
+
+                    {!isEditing && (
+                        <p className="text-sm font-medium text-gray-700">
+                            {application.notes || "No notes yet"}
+                        </p>
+                    )}
+
+                    {isEditing && (
+                        <div>
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            value={notes}
+                            onChange={e => setNotes(e.target.value)}
+                            className="w-full p-2 border rounded-md bg-white text-gray-800 focus:ring focus:ring-blue-200"
+                            rows={4}
+                        />
+                            <p className="text-xs text-gray-500">
+                                {isSaving ? "Saving..." : "Saved"}
+                            </p>
+
+                        </div>
+                    )}
+                </div>
+
+
             </div>
 
-            {/* Optional Action Buttons (visible at bottom) */}
+            {/* Optional Action Buttons (visible at bottom)
             <div className="pt-4 border-t flex justify-end gap-3">
                 <button className="px-4 py-2 border rounded-lg text-gray-700 hover:bg-gray-100 transition">
                     Edit
@@ -78,6 +142,7 @@ export function ExpandedApplicationForm({
                     Delete
                 </button>
             </div>
+            */}
         </div>
     );
 }

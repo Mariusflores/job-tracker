@@ -19,4 +19,5 @@ public class ApplicationResponse {
     private String descriptionUrl;
     private ApplicationStatus status;
     private LocalDate appliedDate;
+    private String notes;
 }

@@ -9,7 +9,7 @@ import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
     onDelete: (id: number) => void,
-    onEdit: (request: ApplicationRequest, id?: number) => void
+    onEdit: (request: ApplicationRequest, id?: number) => void,
 }) {
     const [toolBarOpen, setToolBarOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -19,6 +19,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
         onDelete(application.id);
         setToolBarOpen(!toolBarOpen);
     }
+
 
     function openModal() {
         setIsModalOpen(true);
@@ -38,7 +39,8 @@ export function ApplicationCard({application, onDelete, onEdit}: {
     return <div className={""}>
 
         {expanded && (
-            <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}/>
+            <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}
+                                     publishNotes={onEdit}/>
         )}
 
         <div role={"button"}

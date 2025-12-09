@@ -1,12 +1,16 @@
-import type {Application} from "../../../types/application.ts";
+import type {Application, ApplicationRequest} from "../../../types/application.ts";
 import Modal from "../../ui/Modal.tsx";
 import {ExpandedApplicationForm} from "../forms/ExpandedApplicationForm.tsx";
 
-export function ExpandedApplicationCard({expanded, onClose, application}: {
-    expanded: boolean, onClose: () => void, application: Application
+export function ExpandedApplicationCard({expanded, onClose, application, publishNotes}: {
+    expanded: boolean,
+    onClose: () => void,
+    application: Application,
+    publishNotes: (request: ApplicationRequest, id?: number) => void
 }) {
     return <Modal isOpen={expanded} onClose={onClose}
-                  form={<ExpandedApplicationForm application={application} onClose={onClose}/>}
+                  form={<ExpandedApplicationForm application={application} onClose={onClose}
+                                                 publishNotes={publishNotes}/>}
                   style="h-screen overflow-y-auto w-full max-w-md ml-auto shadow-xl bg-white animate-slide-in"
     />;
 }
