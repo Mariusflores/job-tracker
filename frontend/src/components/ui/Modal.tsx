@@ -1,5 +1,6 @@
 import {useEffect} from "react";
 
+let openModalCount = 0;
 export default function Modal({isOpen, onClose, form, style}: {
     isOpen: boolean,
     onClose: () => void,
@@ -10,35 +11,43 @@ export default function Modal({isOpen, onClose, form, style}: {
 
     // Prevent Body Scroll
     useEffect(() => {
-        const prevOverFlow = document.body.style.overflow;
         if (isOpen) {
-            document.body.style.overflow = "hidden";
+            openModalCount++;
+
+            // If this is the FIRST modal opened → lock scroll
+            if (openModalCount === 1) {
+                document.body.style.overflow = "hidden";
+            }
         }
 
         return () => {
-            // Cleanup - Restore previous value
-            document.body.style.overflow = prevOverFlow
-        }
+            if (isOpen) {
+                openModalCount--;
+
+                // If this was the LAST modal → restore scroll
+                if (openModalCount === 0) {
+                    document.body.style.overflow = "";
+                }
+            }
+        };
     }, [isOpen]);
 
 
-    if (isOpen) {
-        return (
-            <div className={"z-50"}>
-                <div onClick={onClose} className={"overlay fixed inset-0 bg-black opacity-70 z-40"}>
-                </div>
+    if (!isOpen) return null;
+
+    return (
+        <div className={"z-50"}>
+            <div onClick={onClose} className={"overlay fixed inset-0 bg-black opacity-70 z-40"}>
+            </div>
+            <div
+                className="modal-container fixed inset-0 flex justify-center items-center pointer-events-none z-50">
                 <div
-                    className="modal-container fixed inset-0 flex justify-center items-center pointer-events-none z-50">
-                    <div
-                        className={`modal-box pointer-events-auto ${style}`}>
-                        {form}
-                    </div>
+                    className={`modal-box pointer-events-auto ${style}`}>
+                    {form}
                 </div>
             </div>
+        </div>
 
-        );
+    );
 
-    } else {
-        return null;
-    }
 }
