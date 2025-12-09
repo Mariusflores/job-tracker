@@ -10,10 +10,14 @@ export default function Modal({isOpen, onClose, form, style}: {
 
     // Prevent Body Scroll
     useEffect(() => {
+        const prevOverFlow = document.body.style.overflow;
         if (isOpen) {
             document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
+        }
+
+        return () => {
+            // Cleanup - Restore previous value
+            document.body.style.overflow = prevOverFlow
         }
     }, [isOpen]);
 

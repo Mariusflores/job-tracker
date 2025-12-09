@@ -1,6 +1,5 @@
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
-import {createApplication, deleteApplication, getApplications, updateApplication} from "../api/applications.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
@@ -9,11 +8,16 @@ import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 
 import {StatusBar} from "../components/application/cards/StatusBar.tsx";
 
-export function DashboardPage() {
+export function DashboardPage({allApps, handleSubmit, handleEdit, handleDelete, isLoading}: {
+    allApps: Application[],
+    handleSubmit: (request: ApplicationRequest) => void,
+    handleEdit: (request: ApplicationRequest, id?: number) => void,
+    handleDelete: (id: number) => void,
+    isLoading: boolean
+}) {
     const [apps, setApps] = useState<Application[]>([])
-    const [allApps, setAllApps] = useState<Application[]>([])
+
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [isLoading, setIsLoading] = useState(false)
     const [isSortOpen, setIsSortOpen] = useState(false)
     const [sortType, setSortType] = useState("date")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
@@ -26,22 +30,11 @@ export function DashboardPage() {
     const interviewCount = allApps.filter(a => a.status == "INTERVIEW").length;
     const offerCount = allApps.filter(a => a.status == "OFFER").length;
 
-    useEffect(() => {
-        loadApps();
-    }, []);
 
     useEffect(() => {
         // Apply filters before sorting
         setApps(sortApps(applyFilters(allApps), sortType, sortDirection))
     }, [sortType, sortDirection, filterStatus, searchQuery, allApps])
-
-
-    async function loadApps() {
-        setIsLoading(true);
-        const data = await getApplications();
-        setAllApps(data)
-        setIsLoading(false);
-    }
 
 
     function sortApps(apps: Application[], sortType: string, direction: "asc" | "desc") {
@@ -67,43 +60,6 @@ export function DashboardPage() {
         }
 
         return result;
-    }
-
-
-    async function handleSubmit(request: ApplicationRequest) {
-        const newApp = await createApplication(request);
-
-        console.log(newApp);
-        setAllApps(prev => [...prev, newApp]);
-    }
-
-    async function handleDelete(id: number) {
-        setAllApps(prev => prev.filter(app => app.id !== id));
-
-        try {
-            await deleteApplication(id);
-        } catch (error) {
-            await loadApps();
-        }
-    }
-
-    async function handleEdit(request: ApplicationRequest, id?: number) {
-        try {
-            if (id !== undefined) {
-                await updateApplication(id, request);
-            }
-
-            setAllApps(prev =>
-                prev.map(app =>
-                    app.id === id
-                        ? {...app, ...request} // merge new values into old item
-                        : app
-                )
-            );
-
-        } catch (error) {
-            await loadApps(); // fallback if update failed
-        }
     }
 
     function openModal() {
