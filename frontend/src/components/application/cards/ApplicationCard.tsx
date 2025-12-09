@@ -46,7 +46,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
              onClick={() => setExpanded(true)}
         >
             <div className={"flex flex-row justify-between"}>
-                <p className={"font-semibold text-2xl text-black"}>{application.jobTitle}</p>
+                <p className={"font-semibold text-2xl text-black"}>{application.companyName}</p>
                 <div className={"flex flex-row justify-between gap-10"}>
                     <p className={"text-gray-500"}>Applied: {application.appliedDate}</p>
 
@@ -62,7 +62,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
 
             </div>
 
-            <p className={"text-gray-500 text-lg"}>{application.companyName}</p>
+            <p className={"text-gray-500 text-lg"}>{application.jobTitle}</p>
 
 
             {/* Dropdown Menu */}

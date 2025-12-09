@@ -21,7 +21,7 @@ export default function Modal({isOpen, onClose, form, style}: {
     if (isOpen) {
         return (
             <div className={"z-50"}>
-                <div onClick={onClose} className={"overlay fixed inset-0 bg-black opacity-5 z-40"}>
+                <div onClick={onClose} className={"overlay fixed inset-0 bg-black opacity-70 z-40"}>
                 </div>
                 <div
                     className="modal-container fixed inset-0 flex justify-center items-center pointer-events-none z-50">
