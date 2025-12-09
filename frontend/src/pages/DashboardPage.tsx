@@ -4,10 +4,10 @@ import {createApplication, deleteApplication, getApplications, updateApplication
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/ui/Loader.tsx";
-import {StatusCard} from "../components/application/cards/StatusCard.tsx";
 import {SORTERS} from "../constants/sorting.ts";
 import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 
+import {StatusBar} from "../components/application/cards/StatusBar.tsx";
 
 export function DashboardPage() {
     const [apps, setApps] = useState<Application[]>([])
@@ -117,7 +117,7 @@ export function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50  flex justify-center">
-            <div className="bg-white shadow mt-20 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
+            <div className="bg-white shadow mt-15 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
                 <div className={"flex flex-row justify-between"}>
                     <h2 className="text-3xl text-black font-semibold mb-4">Dashboard</h2>
                     <button onClick={openModal}
@@ -128,14 +128,13 @@ export function DashboardPage() {
                 </div>
                 <p className={"text-gray-500"}>Track your job search progress at a glance</p>
 
-                <div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
-                        <StatusCard label="Total" count={totalCount} color="gray"/>
-                        <StatusCard label="Applied" count={appliedCount} color="blue"/>
-                        <StatusCard label="Interviews" count={interviewCount} color="yellow"/>
-                        <StatusCard label="Offers" count={offerCount} color="green"/>
-                    </div>
-                </div>
+                <StatusBar totalCount={totalCount}
+                           appliedCount={appliedCount}
+                           interviewCount={interviewCount}
+                           offerCount={offerCount}
+                           setFilterStatus={setFilterStatus}
+                           filterStatus={filterStatus}
+                />
                 <ToolBar
                     sortType={sortType}
                     sortDirection={sortDirection}
