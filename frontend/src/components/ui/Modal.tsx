@@ -19,7 +19,6 @@ export default function Modal({isOpen, onClose, form, style}: {
 
 
     if (isOpen) {
-        console.log("rendering modal")
         return (
             <div className={"z-50"}>
                 <div onClick={onClose} className={"overlay fixed inset-0 bg-black opacity-5 z-40"}>

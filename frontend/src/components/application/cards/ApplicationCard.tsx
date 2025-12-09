@@ -4,6 +4,7 @@ import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "../modals/EditApplicationModal.tsx";
 import {IconButton} from "../../ui/IconButton.tsx";
+import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 
 export function ApplicationCard({application, onDelete, onEdit}: {
     application: Application,
@@ -35,57 +36,57 @@ export function ApplicationCard({application, onDelete, onEdit}: {
     }
 
     return <div className={""}>
+
         {expanded && (
-            <div></div>
+            <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}/>
         )}
 
-        {!expanded && (
-            <div role={"button"}
-                 className={"relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition "}
-                 onClick={() => setExpanded(true)}
-            >
-                <div className={"flex flex-row justify-between"}>
-                    <p className={"font-semibold text-2xl text-black"}>{application.jobTitle}</p>
-                    <div className={"flex flex-row justify-between gap-10"}>
-                        <p className={"text-gray-500"}>Applied: {application.appliedDate}</p>
+        <div role={"button"}
+             className={"relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition "}
+             onClick={() => setExpanded(true)}
+        >
+            <div className={"flex flex-row justify-between"}>
+                <p className={"font-semibold text-2xl text-black"}>{application.jobTitle}</p>
+                <div className={"flex flex-row justify-between gap-10"}>
+                    <p className={"text-gray-500"}>Applied: {application.appliedDate}</p>
 
-                        <StatusBadge status={application.status}/>
-                        {/* Kebab Menu Button */}
+                    <StatusBadge status={application.status}/>
+                    {/* Kebab Menu Button */}
 
-                        <IconButton onClick={(e) => {
-                            e.stopPropagation()
-                            toggleToolBar()
-                        }}
-                                    icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
-                    </div>
-
+                    <IconButton onClick={(e) => {
+                        e.stopPropagation()
+                        toggleToolBar()
+                    }}
+                                icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
                 </div>
 
-                <p className={"text-gray-500 text-lg"}>{application.companyName}</p>
-
-
-                {/* Dropdown Menu */}
-                {toolBarOpen && (
-                    <div onClick={(e) => e.stopPropagation()}
-                         className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
-                        <button onClick={() => {
-                            openModal()
-                        }}
-                                className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
-                            Edit
-                        </button>
-                        <button onClick={handleDelete}
-                                className="block px-4 py-2 hover:bg-red-50 text-red-600 w-full text-left">
-                            Delete
-                        </button>
-                    </div>
-                )}
-                {/* Edit Application Modal */}
-                {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
-                                                      application={application}/>}
-
             </div>
-        )}
+
+            <p className={"text-gray-500 text-lg"}>{application.companyName}</p>
+
+
+            {/* Dropdown Menu */}
+            {toolBarOpen && (
+                <div onClick={(e) => e.stopPropagation()}
+                     className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
+                    <button onClick={() => {
+                        openModal()
+                    }}
+                            className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
+                        Edit
+                    </button>
+                    <button onClick={handleDelete}
+                            className="block px-4 py-2 hover:bg-red-50 text-red-600 w-full text-left">
+                        Delete
+                    </button>
+                </div>
+            )}
+            {/* Edit Application Modal */}
+            {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
+                                                  application={application}/>}
+
+        </div>
+
 
     </div>;
 }
