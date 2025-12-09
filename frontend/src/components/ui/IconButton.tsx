@@ -1,11 +1,11 @@
-export function IconButton(props: {
-    onClick: () => void,
+export function IconButton({onClick, icon}: {
+    onClick: (e?: any) => void,
     icon: React.ReactNode
 }) {
     return <button
-        onClick={props.onClick}
+        onClick={onClick}
         className="text-gray-400 hover:text-gray-600"
     >
-        {props.icon}
+        {icon}
     </button>
 }

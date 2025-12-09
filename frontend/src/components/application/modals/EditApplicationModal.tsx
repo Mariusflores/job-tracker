@@ -14,6 +14,9 @@ export function EditApplicationModal({isOpen, onClose, onSubmit, application}: {
                form={
                    <EditApplicationForm onClose={onClose} onSubmit={onSubmit}
                                         application={application}/>
-               }/>
+               }
+               style="max-h-[80vh] overflow-y-auto w-screen z-50
+                        max-w-md rounded-lg text-black bg-white"
+        />
     )
 }
