@@ -1,7 +1,8 @@
-import type {DragEndEvent} from "@dnd-kit/core";
-import {DndContext} from "@dnd-kit/core";
-import {Column} from "../components/pipeline/Column.tsx";
+import {DndContext, type DragEndEvent, DragOverlay, type DragStartEvent} from "@dnd-kit/core";
 import type {Application, ApplicationRequest} from "../types/application.ts";
+import {useState} from "react";
+import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
+import {Column} from "../components/pipeline/Column.tsx";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 
@@ -15,8 +16,10 @@ export function PipelinePage({applications, onStatusChange}: {
         OFFER: applications.filter(a => a.status === "OFFER"),
         REJECTED: applications.filter(a => a.status === "REJECTED"),
     } as const;
+    const [activeId, setActiveId] = useState<number | null>(null);
 
     function handleDragEnd(event: DragEndEvent) {
+        setActiveId(null)
         const {active, over} = event;
 
         if (!over) return;
@@ -42,13 +45,35 @@ export function PipelinePage({applications, onStatusChange}: {
 
     }
 
+    function handleDragStart(event: DragStartEvent) {
+        setActiveId(event.active.id as number);
+    }
+
+    const activeApp = applications.find(a => a.id === activeId);
+
     return (
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+        >
+            {/* COLUMNS */}
             <div className="grid grid-cols-4 gap-4">
                 {STATUSES.map(status => (
-                    <Column key={status} status={status} cards={columns[status as keyof typeof columns]}/>
+                    <Column
+                        key={status}
+                        status={status}
+                        cards={columns[status as keyof typeof columns]}
+                    />
                 ))}
             </div>
+
+            {/* DRAG OVERLAY */}
+            <DragOverlay>
+                {activeApp && (
+                    <PipelineCard application={activeApp}/>
+                )}
+            </DragOverlay>
         </DndContext>
     );
+
 }

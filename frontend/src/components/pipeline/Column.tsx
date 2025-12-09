@@ -8,7 +8,7 @@ export function Column({status, cards}: { status: string, cards: Application[] }
 
     return (
         <div className="bg-gray-50 p-3 rounded-lg border min-h-[400px]" ref={setNodeRef}>
-            <h3 className="font-semibold mb-2">{status}</h3>
+            <h3 className="text-black font-semibold mb-2">{status}</h3>
 
             <div className="space-y-3">
                 {cards.map(card => (
