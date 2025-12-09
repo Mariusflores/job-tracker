@@ -117,7 +117,7 @@ export function DashboardPage() {
 
     return (
         <div className="min-h-screen bg-gray-50  flex justify-center">
-            <div className="bg-white shadow mt-20 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
+            <div className="bg-white shadow mt-15 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
                 <div className={"flex flex-row justify-between"}>
                     <h2 className="text-3xl text-black font-semibold mb-4">Dashboard</h2>
                     <button onClick={openModal}
@@ -132,6 +132,8 @@ export function DashboardPage() {
                            appliedCount={appliedCount}
                            interviewCount={interviewCount}
                            offerCount={offerCount}
+                           setFilterStatus={setFilterStatus}
+                           filterStatus={filterStatus}
                 />
                 <ToolBar
                     sortType={sortType}
