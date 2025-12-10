@@ -18,5 +18,6 @@ public class ApplicationRequest {
     private String descriptionUrl;
     private ApplicationStatus status;
     private LocalDate appliedDate;
+    private String notes;
 
 }

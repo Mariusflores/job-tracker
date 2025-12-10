@@ -12,7 +12,8 @@ export function EditApplicationForm({onClose, onSubmit, application}: {
         companyName: application.companyName,
         descriptionUrl: application.descriptionUrl,
         status: application.status,
-        appliedDate: application.appliedDate
+        appliedDate: application.appliedDate,
+        notes: ""
     })
 
 

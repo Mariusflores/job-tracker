@@ -13,7 +13,8 @@ export function AddApplicationForm({onClose, onSubmit}: {
         companyName: "",
         descriptionUrl: "",
         status: "APPLIED",
-        appliedDate: today
+        appliedDate: today,
+        notes: ""
     })
 
     return (
