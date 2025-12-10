@@ -1,5 +1,5 @@
 import type {Application, ApplicationRequest} from "../../../types/application.ts";
-import Modal from "../../ui/Modal.tsx";
+import Modal from "../../shared/Modal.tsx";
 import {ExpandedApplicationForm} from "../forms/ExpandedApplicationForm.tsx";
 
 export function ExpandedApplicationCard({expanded, onClose, application, publishNotes}: {

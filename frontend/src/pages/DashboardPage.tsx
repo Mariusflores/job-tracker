@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
-import Loader from "../components/ui/Loader.tsx";
+import Loader from "../components/shared/Loader.tsx";
 import {SORTERS} from "../constants/sorting.ts";
 import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 

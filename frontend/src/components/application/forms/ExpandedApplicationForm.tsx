@@ -1,7 +1,7 @@
 import type {Application, ApplicationRequest} from "../../../types/application";
 import {StatusBadge} from "../badges/StatusBadge";
 import {useEffect, useState} from "react";
-import {IconButton} from "../../ui/IconButton.tsx";
+import {IconButton} from "../../shared/IconButton.tsx";
 import {PencilSquareIcon} from "@heroicons/react/20/solid";
 import {parseDate} from "../../../utils/date.ts";
 

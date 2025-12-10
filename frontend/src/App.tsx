@@ -1,7 +1,7 @@
 import './App.css'
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./pages/DashboardPage.tsx";
-import {Layout} from "./components/ui/Layout.tsx";
+import {Layout} from "./components/layout/Layout.tsx";
 import {PipelinePage} from "./pages/PipelinePage.tsx";
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "./types/application.ts";

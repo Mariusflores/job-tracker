@@ -1,6 +1,6 @@
 import type {ApplicationRequest} from "../../../types/application.ts";
 import {AddApplicationForm} from "../forms/AddApplicationForm.tsx";
-import Modal from "../../ui/Modal.tsx";
+import Modal from "../../shared/Modal.tsx";
 
 export function AddApplicationModal({isOpen, onClose, onSubmit}: {
     isOpen: boolean,

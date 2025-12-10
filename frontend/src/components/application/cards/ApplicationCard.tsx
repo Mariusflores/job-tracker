@@ -3,7 +3,7 @@ import {StatusBadge} from "../badges/StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "../modals/EditApplicationModal.tsx";
-import {IconButton} from "../../ui/IconButton.tsx";
+import {IconButton} from "../../shared/IconButton.tsx";
 import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 import {parseDate} from "../../../utils/date.ts";
 
