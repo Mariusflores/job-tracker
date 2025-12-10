@@ -63,7 +63,10 @@ export function PipelinePage({applications, onStatusChange}: {
                         key={status}
                         status={status}
                         cards={columns[status as keyof typeof columns]}
+                        activeId={activeId}
                     />
+
+
                 ))}
             </div>
 
