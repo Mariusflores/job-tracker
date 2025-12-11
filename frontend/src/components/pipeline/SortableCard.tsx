@@ -1,9 +1,9 @@
-import {useDraggable} from "@dnd-kit/core";
 import type {Application} from "../../types/application.ts";
 import {PipelineCard} from "./PipelineCard.tsx";
+import {useSortable} from "@dnd-kit/sortable";
 
-export function DraggableCard({application}: { application: Application }) {
-    const {attributes, listeners, setNodeRef, transform, isDragging} = useDraggable({id: application.id});
+export function SortableCard({application}: { application: Application }) {
+    const {attributes, listeners, setNodeRef, transform, isDragging} = useSortable({id: application.id});
 
     const style: React.CSSProperties | undefined =
         isDragging

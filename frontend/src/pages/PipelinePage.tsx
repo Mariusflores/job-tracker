@@ -3,6 +3,7 @@ import type {Application, ApplicationRequest} from "../types/application.ts";
 import {useState} from "react";
 import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
+import {arrayMove} from "@dnd-kit/sortable";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 
@@ -10,46 +11,66 @@ export function PipelinePage({applications, onStatusChange}: {
     applications: Application[],
     onStatusChange: (request: ApplicationRequest, id?: number) => void
 }) {
+    const [apps, setApps] = useState(applications);
+
     const columns = {
-        APPLIED: applications.filter(a => a.status === "APPLIED"),
-        INTERVIEW: applications.filter(a => a.status === "INTERVIEW"),
-        OFFER: applications.filter(a => a.status === "OFFER"),
-        REJECTED: applications.filter(a => a.status === "REJECTED"),
+        APPLIED: apps.filter(a => a.status === "APPLIED"),
+        INTERVIEW: apps.filter(a => a.status === "INTERVIEW"),
+        OFFER: apps.filter(a => a.status === "OFFER"),
+        REJECTED: apps.filter(a => a.status === "REJECTED"),
     } as const;
     const [activeId, setActiveId] = useState<number | null>(null);
 
+
     function handleDragEnd(event: DragEndEvent) {
-        setActiveId(null)
         const {active, over} = event;
+        setActiveId(null);
 
         if (!over) return;
 
-        const newStatus = over.id as string;
-        const appId = active.id as number;
+        const activeId = active.id as number;
+        const overId = over.id;
 
-        const app = applications.find(a => a.id === appId);
+        // Find active application
+        const activeApp = apps.find(a => a.id === activeId);
+        if (!activeApp) return;
 
+        const isColumnChange = typeof overId === "string";
+        if (isColumnChange) {
+            // Changing column (status)
+            setApps(prev =>
+                prev.map(a =>
+                    a.id === activeId
+                        ? {...a, status: overId}
+                        : a
+                )
+            );
 
-        if (!app) return
+            // trigger backend update
+            const request: ApplicationRequest = {...activeApp, status: overId};
+            onStatusChange(request, activeId);
+            return;
+        }
 
-        const request: ApplicationRequest = {
-            appliedDate: app.appliedDate,
-            companyName: app.companyName,
-            descriptionUrl: app.descriptionUrl,
-            jobTitle: app.jobTitle,
-            notes: app.notes,
-            status: newStatus
+        // Reordering within the same column
+        const columnApps = apps.filter(a => a.status === activeApp.status);
+        const oldIndex = columnApps.findIndex(a => a.id === activeId);
+        const newIndex = columnApps.findIndex(a => a.id === overId);
 
-        };
-        onStatusChange(request, appId)
+        const reordered = arrayMove(columnApps, oldIndex, newIndex);
 
+        setApps(prev => {
+            const others = prev.filter(a => a.status !== activeApp.status);
+            return [...others, ...reordered];
+        });
     }
+
 
     function handleDragStart(event: DragStartEvent) {
         setActiveId(event.active.id as number);
     }
 
-    const activeApp = applications.find(a => a.id === activeId);
+    const activeApp = apps.find(a => a.id === activeId);
 
     return (
         <DndContext
@@ -63,7 +84,6 @@ export function PipelinePage({applications, onStatusChange}: {
                         key={status}
                         status={status}
                         cards={columns[status as keyof typeof columns]}
-                        activeId={activeId}
                     />
 
 
