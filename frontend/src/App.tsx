@@ -39,6 +39,25 @@ export default function App() {
         }
     }
 
+    // App.tsx (or wherever you manage allApps)
+    async function handleEditOptimistic(request: ApplicationRequest, id?: number) {
+        if (id === undefined) return;
+
+        // 1) Optimistic update
+        setAllApps(prev => prev.map(a => a.id === id ? {...a, ...request} : a));
+
+        // 2) Fire-and-forget API; revert on failure
+        try {
+            await updateApplication(id, request);
+        } catch (err) {
+            console.error("Failed to update on server; reverting", err);
+            // re-load or revert: either re-fetch or store previous state to revert.
+            // simplest: re-fetch for now:
+            await loadApps();
+        }
+    }
+
+
     async function handleEdit(request: ApplicationRequest, id?: number) {
         try {
             if (id !== undefined) {
@@ -74,7 +93,7 @@ export default function App() {
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage applications={allApps}
-                                                                   onStatusChange={handleEdit}/>}/>
+                                                                   onStatusChange={handleEditOptimistic}/>}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

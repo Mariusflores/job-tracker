@@ -10,11 +10,11 @@ export function Column({status, cards, activeId}: { status: string, cards: Appli
             <h3 className="text-black font-semibold mb-2">{status}</h3>
 
             <div className="space-y-3">
-                {cards.map(card =>
+                {cards.map(card => (
                     card.id === activeId
-                        ? <div key={card.id} className="h-[80px] opacity-0"/> // keeps layout stable
+                        ? <div key={card.id} className="h-[92px] opacity-0"/> // match card height
                         : <DraggableCard key={card.id} application={card}/>
-                )}
+                ))}
             </div>
         </div>
     );
