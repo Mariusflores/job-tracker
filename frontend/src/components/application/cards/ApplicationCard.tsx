@@ -7,10 +7,11 @@ import {IconButton} from "../../shared/IconButton.tsx";
 import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 import {parseDate} from "../../../utils/date.ts";
 
-export function ApplicationCard({application, onDelete, onEdit}: {
+export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}: {
     application: Application,
     onDelete: (id: number) => void,
     onEdit: (request: ApplicationRequest, id?: number) => void,
+    onPublishNotes: (notes: string, id?: number) => void
 }) {
     const [toolBarOpen, setToolBarOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,7 +42,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
 
         {expanded && (
             <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}
-                                     publishNotes={onEdit}/>
+                                     publishNotes={onPublishNotes}/>
         )}
 
         <div role={"button"}

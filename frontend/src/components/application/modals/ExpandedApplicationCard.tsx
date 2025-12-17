@@ -1,4 +1,4 @@
-import type {Application, ApplicationRequest} from "../../../types/application.ts";
+import type {Application} from "../../../types/application.ts";
 import Modal from "../../shared/Modal.tsx";
 import {ExpandedApplicationForm} from "../forms/ExpandedApplicationForm.tsx";
 
@@ -6,7 +6,7 @@ export function ExpandedApplicationCard({expanded, onClose, application, publish
     expanded: boolean,
     onClose: () => void,
     application: Application,
-    publishNotes: (request: ApplicationRequest, id?: number) => void
+    publishNotes: (notes: string, id?: number) => void
 }) {
     return <Modal isOpen={expanded} onClose={onClose}
                   form={<ExpandedApplicationForm application={application} onClose={onClose}

@@ -5,7 +5,14 @@ import {Layout} from "./components/layout/Layout.tsx";
 import {PipelinePage} from "./pages/PipelinePage.tsx";
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "./types/application.ts";
-import {createApplication, deleteApplication, getApplications, updateApplication} from "./api/applications.ts";
+import {
+    createApplication,
+    deleteApplication,
+    getApplications,
+    updateApplication,
+    updateApplicationNotes,
+    updateApplicationStatus
+} from "./api/applications.ts";
 
 export default function App() {
     const [allApps, setAllApps] = useState<Application[]>([])
@@ -39,21 +46,26 @@ export default function App() {
         }
     }
 
-    // App.tsx (or wherever you manage allApps)
-    async function handleEditOptimistic(request: ApplicationRequest, id?: number) {
-        if (id === undefined) return;
+    async function handleUpdateStatusOptimistic(
+        status: string,
+        id: number
+    ) {
+        // Snapshot for rollback
+        const previous = allApps;
 
-        // 1) Optimistic update
-        setAllApps(prev => prev.map(a => a.id === id ? {...a, ...request} : a));
+        // 1. Optimistic update (status only)
+        setAllApps(prev =>
+            prev.map(app =>
+                app.id === id ? {...app, status} : app
+            )
+        );
 
-        // 2) Fire-and-forget API; revert on failure
+        // 2. Backend call
         try {
-            await updateApplication(id, request);
+            await updateApplicationStatus(id, status);
         } catch (err) {
-            console.error("Failed to update on server; reverting", err);
-            // re-load or revert: either re-fetch or store previous state to revert.
-            // simplest: re-fetch for now:
-            await loadApps();
+            console.error("Failed to update status, reverting", err);
+            setAllApps(previous);
         }
     }
 
@@ -77,6 +89,17 @@ export default function App() {
         }
     }
 
+    async function handlePublishNotes(notes: string, id?: number) {
+        try {
+            if (id == undefined) return;
+            console.log("updating notes: " + notes)
+            await updateApplicationNotes(id, notes)
+        } catch (error) {
+            console.error("error updating notes")
+        }
+    }
+
+
     return (
         <BrowserRouter>
             <Layout>
@@ -88,12 +111,13 @@ export default function App() {
                                handleSubmit={handleSubmit}
                                handleEdit={handleEdit}
                                handleDelete={handleDelete}
+                               handlePublishNotes={handlePublishNotes}
                                isLoading={isLoading}
                            />
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage applications={allApps}
-                                                                   onStatusChange={handleEditOptimistic}/>}/>
+                                                                   onStatusChange={handleUpdateStatusOptimistic}/>}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

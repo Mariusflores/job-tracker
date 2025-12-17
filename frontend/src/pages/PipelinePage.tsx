@@ -1,15 +1,15 @@
 import {DndContext, type DragEndEvent, DragOverlay, type DragStartEvent} from "@dnd-kit/core";
-import type {Application, ApplicationRequest} from "../types/application.ts";
 import {useState} from "react";
 import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
+import type {Application} from "../types/application.ts";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
 
 export function PipelinePage({applications, onStatusChange}: {
     applications: Application[],
-    onStatusChange: (request: ApplicationRequest, id?: number) => void
+    onStatusChange: (status: string, id: number) => void
 }) {
     const [apps, setApps] = useState(applications);
 
@@ -47,8 +47,7 @@ export function PipelinePage({applications, onStatusChange}: {
             );
 
             // trigger backend update
-            const request: ApplicationRequest = {...activeApp, status: overId};
-            onStatusChange(request, activeId);
+            onStatusChange(overId as string, activeId);
             return;
         }
 

@@ -6,6 +6,7 @@ import org.example.jobapplicationtracker.application.dto.ApplicationRequest;
 import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
 import org.example.jobapplicationtracker.application.model.Application;
+import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,5 +98,32 @@ public class ApplicationService {
         } catch (ApplicationNotFoundException e) {
             log.error("Could not find application with id: " + id);
         }
+    }
+
+    public void updateApplicationStatus(Long id, ApplicationStatus status) {
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
+
+        application.setStatus(status);
+
+        try {
+            applicationRepository.save(application);
+        } catch (Exception e) {
+            log.error("Error while saving application", e);
+        }
+    }
+
+    public void updateApplicationNotes(long id, String notes) {
+
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
+
+        application.setNotes(notes);
+        try {
+            applicationRepository.save(application);
+        } catch (Exception e) {
+            log.error("Error while saving application", e);
+        }
+
     }
 }
