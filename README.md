@@ -1,31 +1,37 @@
 # Job Application Tracker
 
-A full-stack web application for tracking job applications, visualizing progress, and staying motivated during your job
-search.
+A full-stack web application for tracking job applications, visualizing progress, and staying motivated during a job search.
 
-This project is built as a learning experience and a practical tool, with a Spring Boot backend, a React + TypeScript +
-Vite frontend, and a PostgreSQL database running in Docker.
+This project is built as a learning experience **and** a production-ready MVP, featuring a Spring Boot backend, a React + TypeScript + Vite frontend, and a PostgreSQL database. The application is deployed and runs securely in the cloud.
 
 ---
 
-## Features (MVP)
+## 🚀 Live Demo
+
+- **Frontend:** https://<your-frontend-domain>.up.railway.app  
+- **Backend API:** https://<your-backend-domain>.up.railway.app/api
+
+> The backend is not intended to be accessed directly by users, but the API is publicly reachable for the frontend.
+
+---
+
+## ✨ Features (MVP)
 
 - Add new job applications
-- Edit or update application status
+- Edit application status
 - Delete applications
-- View a list of all applications
-- Simple dashboard with basic statistics
+- View all applications
+- Dashboard with basic statistics
+- Kanban-style pipeline view
+- Editable notes with autosave
 - Default applied date (editable)
 - Clean and intuitive UI
 
-More features are planned (see the roadmap section).
-
 ---
 
-## Tech Stack
+## 🧱 Tech Stack
 
 ### Backend
-
 - Java 21
 - Spring Boot
 - Spring Web
@@ -33,19 +39,23 @@ More features are planned (see the roadmap section).
 - PostgreSQL
 - JPA Auditing
 - Lombok
-- Docker and Docker Compose
+- Maven
 
 ### Frontend
-
 - React
 - TypeScript
 - Vite
-- SWC
-- Tailwind CSS (planned)
+- Tailwind CSS
+- @dnd-kit (drag & drop)
+
+### Infrastructure
+- Railway (backend, frontend, PostgreSQL)
+- Docker & Docker Compose (local development)
 
 ---
 
-## Project Structure
+## 📂 Project Structure
+
 
 ```
 job-application-tracker/
@@ -69,16 +79,30 @@ job-application-tracker/
 
 ---
 
-## Running the Project
+## ⚙️ Configuration & Environments
 
-1. Create a .env file in the project root:
+The project uses **environment-based configuration** and **Spring profiles**.
 
-```
-POSTGRES_DB=jobtracker  
-POSTGRES_USER=jobuser  
+### Backend profiles
+- `local` → Docker / local Postgres
+- `prod` → Railway-managed Postgres
+
+### Frontend configuration
+- API base URL is injected via `VITE_API_BASE_URL`
+- No hardcoded backend URLs
+
+---
+
+## 🧪 Running Locally (Development)
+
+### 1. Create `.env` file (local only)
+
+```env
+POSTGRES_DB=jobtracker
+POSTGRES_USER=jobuser
 POSTGRES_PASSWORD=supersecret
+SPRING_PROFILES_ACTIVE=local
 ```
-
 2. Start backend and database:
 
 ```
@@ -126,6 +150,12 @@ List all applications.
 
 Update an application.
 
+### PATCH /api/applications/{id}/status
+
+Update application status.
+
+### PATCH /api/applications/{id}/notes
+
 ### DELETE /api/applications/{id}
 
 Delete an application.
@@ -134,43 +164,43 @@ Delete an application.
 
 ## Roadmap
 
-Phase 1 (MVP)
+### Phase 1 — MVP ✅
 
 - CRUD operations
-- Basic dashboard
-- Status enum
-- JPA auditing
+- Dashboard
+- Pipeline view
+- Notes with autosave
+- Deployed backend & frontend
 
-Phase 2 (UI Enhancements)
+### Phase 2 — UX & Polish
 
-- Tailwind CSS styling
-- Sorting and filtering
-- Status badges
-- Dark mode
+- Optimistic UI updates
+- Loading & empty states
+- Improved animations
+- Visual refinements
 
-Phase 3 (Productivity Features)
+### Phase 3 — Productivity
 
 - Reminders
-- Analytics
+- Analytics (time in status)
 - Export to CSV
 
-Phase 4 (Advanced)
+### Phase 4 — Advanced
 
 - Authentication
-- Deployment
+- Multi-user support
+- Attachments
 - Browser extension
-- Autofill job details from URLs
-
 ---
 
 ## Purpose
 
 This project aims to:
 
-- Improve full-stack development skills
-- Practice TypeScript, React, Vite, and Docker
-- Build a useful tool for managing job applications
-- Serve as a strong portfolio piece
+- Practice full-stack development with modern tools
+- Learn real-world deployment and configuration
+- Design clean APIs and UI interactions
+- Serve as a strong, production-grade portfolio project
 
 ---
 
