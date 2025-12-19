@@ -29,7 +29,6 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}:
     }
 
     function closeModal() {
-        console.log("Closing modal")
         setIsModalOpen(false);
         setToolBarOpen(!toolBarOpen);
     }

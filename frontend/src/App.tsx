@@ -31,8 +31,6 @@ export default function App() {
 
     async function handleSubmit(request: ApplicationRequest) {
         const newApp = await createApplication(request);
-
-        console.log(newApp);
         setAllApps(prev => [...prev, newApp]);
     }
 
@@ -92,7 +90,6 @@ export default function App() {
     async function handlePublishNotes(notes: string, id?: number) {
         try {
             if (id == undefined) return;
-            console.log("updating notes: " + notes)
             await updateApplicationNotes(id, notes)
         } catch (error) {
             console.error("error updating notes")
