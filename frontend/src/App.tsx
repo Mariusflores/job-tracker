@@ -1,11 +1,18 @@
 import './App.css'
 import {BrowserRouter, Navigate, Route, Routes} from "react-router-dom";
 import {DashboardPage} from "./pages/DashboardPage.tsx";
-import {Layout} from "./components/ui/Layout.tsx";
+import {Layout} from "./components/layout/Layout.tsx";
 import {PipelinePage} from "./pages/PipelinePage.tsx";
 import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "./types/application.ts";
-import {createApplication, deleteApplication, getApplications, updateApplication} from "./api/applications.ts";
+import {
+    createApplication,
+    deleteApplication,
+    getApplications,
+    updateApplication,
+    updateApplicationNotes,
+    updateApplicationStatus
+} from "./api/applications.ts";
 
 export default function App() {
     const [allApps, setAllApps] = useState<Application[]>([])
@@ -24,8 +31,6 @@ export default function App() {
 
     async function handleSubmit(request: ApplicationRequest) {
         const newApp = await createApplication(request);
-
-        console.log(newApp);
         setAllApps(prev => [...prev, newApp]);
     }
 
@@ -38,6 +43,30 @@ export default function App() {
             await loadApps();
         }
     }
+
+    async function handleUpdateStatusOptimistic(
+        status: string,
+        id: number
+    ) {
+        // Snapshot for rollback
+        const previous = allApps;
+
+        // 1. Optimistic update (status only)
+        setAllApps(prev =>
+            prev.map(app =>
+                app.id === id ? {...app, status} : app
+            )
+        );
+
+        // 2. Backend call
+        try {
+            await updateApplicationStatus(id, status);
+        } catch (err) {
+            console.error("Failed to update status, reverting", err);
+            setAllApps(previous);
+        }
+    }
+
 
     async function handleEdit(request: ApplicationRequest, id?: number) {
         try {
@@ -58,6 +87,16 @@ export default function App() {
         }
     }
 
+    async function handlePublishNotes(notes: string, id?: number) {
+        try {
+            if (id == undefined) return;
+            await updateApplicationNotes(id, notes)
+        } catch (error) {
+            console.error("error updating notes")
+        }
+    }
+
+
     return (
         <BrowserRouter>
             <Layout>
@@ -69,12 +108,13 @@ export default function App() {
                                handleSubmit={handleSubmit}
                                handleEdit={handleEdit}
                                handleDelete={handleDelete}
+                               handlePublishNotes={handlePublishNotes}
                                isLoading={isLoading}
                            />
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage applications={allApps}
-                                                                   onStatusChange={handleEdit}/>}/>
+                                                                   onStatusChange={handleUpdateStatusOptimistic}/>}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

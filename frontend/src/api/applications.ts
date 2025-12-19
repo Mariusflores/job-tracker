@@ -20,3 +20,29 @@ export async function updateApplication(id: number, request: ApplicationRequest)
     const response = await api.put("/application/" + id, request)
     return response.data;
 }
+
+export async function updateApplicationStatus(id: number, status: string) {
+    const response = await api.patch<string>(
+        "/application/" + id + "/status",
+        {status},
+        {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+    )
+    return response.data;
+}
+
+export async function updateApplicationNotes(id: number, notes: string) {
+    const response = await api.patch<string>(
+        "/application/" + id + "/notes",
+        {notes},
+        {
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+    )
+    return response.data;
+}

@@ -3,14 +3,15 @@ import {StatusBadge} from "../badges/StatusBadge.tsx";
 import {useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
 import {EditApplicationModal} from "../modals/EditApplicationModal.tsx";
-import {IconButton} from "../../ui/IconButton.tsx";
+import {IconButton} from "../../shared/IconButton.tsx";
 import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 import {parseDate} from "../../../utils/date.ts";
 
-export function ApplicationCard({application, onDelete, onEdit}: {
+export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}: {
     application: Application,
     onDelete: (id: number) => void,
     onEdit: (request: ApplicationRequest, id?: number) => void,
+    onPublishNotes: (notes: string, id?: number) => void
 }) {
     const [toolBarOpen, setToolBarOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +29,6 @@ export function ApplicationCard({application, onDelete, onEdit}: {
     }
 
     function closeModal() {
-        console.log("Closing modal")
         setIsModalOpen(false);
         setToolBarOpen(!toolBarOpen);
     }
@@ -41,7 +41,7 @@ export function ApplicationCard({application, onDelete, onEdit}: {
 
         {expanded && (
             <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}
-                                     publishNotes={onEdit}/>
+                                     publishNotes={onPublishNotes}/>
         )}
 
         <div role={"button"}

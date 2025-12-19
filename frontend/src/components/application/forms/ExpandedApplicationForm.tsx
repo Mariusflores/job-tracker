@@ -1,7 +1,7 @@
-import type {Application, ApplicationRequest} from "../../../types/application";
+import type {Application} from "../../../types/application";
 import {StatusBadge} from "../badges/StatusBadge";
 import {useEffect, useState} from "react";
-import {IconButton} from "../../ui/IconButton.tsx";
+import {IconButton} from "../../shared/IconButton.tsx";
 import {PencilSquareIcon} from "@heroicons/react/20/solid";
 import {parseDate} from "../../../utils/date.ts";
 
@@ -12,7 +12,7 @@ export function ExpandedApplicationForm({
                                         }: {
     application: Application,
     onClose: () => void,
-    publishNotes: (request: ApplicationRequest, id?: number) => void
+    publishNotes: (notes: string, id?: number) => void
 }) {
 
     const [notes, setNotes] = useState(application.notes ?? "");
@@ -36,17 +36,9 @@ export function ExpandedApplicationForm({
         setIsSaving(true);
 
         (async () => {
-            const request: ApplicationRequest = {
-                appliedDate: application.appliedDate,
-                companyName: application.companyName,
-                descriptionUrl: application.descriptionUrl,
-                jobTitle: application.jobTitle,
-                notes: notes,
-                status: application.status
 
-            };
             // Await for [saving..] display
-            await publishNotes(request, application.id);
+            await publishNotes(notes, application.id);
             setIsSaving(false);
             setLastSaved(new Date());
 

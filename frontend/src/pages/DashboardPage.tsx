@@ -2,17 +2,25 @@ import {useEffect, useState} from "react";
 import type {Application, ApplicationRequest} from "../types/application.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
-import Loader from "../components/ui/Loader.tsx";
+import Loader from "../components/shared/Loader.tsx";
 import {SORTERS} from "../constants/sorting.ts";
 import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 
 import {StatusBar} from "../components/application/cards/StatusBar.tsx";
 
-export function DashboardPage({allApps, handleSubmit, handleEdit, handleDelete, isLoading}: {
+export function DashboardPage({
+                                  allApps,
+                                  handleSubmit,
+                                  handleEdit,
+                                  handleDelete,
+                                  handlePublishNotes,
+                                  isLoading
+                              }: {
     allApps: Application[],
     handleSubmit: (request: ApplicationRequest) => void,
     handleEdit: (request: ApplicationRequest, id?: number) => void,
     handleDelete: (id: number) => void,
+    handlePublishNotes: (notes: string, id?: number) => void,
     isLoading: boolean
 }) {
     const [apps, setApps] = useState<Application[]>([])
@@ -109,7 +117,8 @@ export function DashboardPage({allApps, handleSubmit, handleEdit, handleDelete, 
                     <Loader isLoading={isLoading}/>
                 ) : (
                     apps.map(app => (
-                        <ApplicationCard onDelete={handleDelete} onEdit={handleEdit} key={app.id} application={app}/>
+                        <ApplicationCard onDelete={handleDelete} onEdit={handleEdit} onPublishNotes={handlePublishNotes}
+                                         key={app.id} application={app}/>
                     ))
                 )
                 }
