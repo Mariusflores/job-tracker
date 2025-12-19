@@ -8,8 +8,8 @@ This project is built as a learning experience **and** a production-ready MVP, f
 
 ## 🚀 Live Demo
 
-- **Frontend:** https://<your-frontend-domain>.up.railway.app  
-- **Backend API:** https://<your-backend-domain>.up.railway.app/api
+- **Frontend:** [https://<your-frontend-domain>.up.railway.app  ](https://frontend-production-770b8.up.railway.app/dashboard)
+- **Backend API:** [https://<your-backend-domain>.up.railway.app/api](https://job-tracker-production-df68.up.railway.app/)
 
 > The backend is not intended to be accessed directly by users, but the API is publicly reachable for the frontend.
 
