@@ -25,6 +25,7 @@ export function DashboardPage({
 }) {
     const [apps, setApps] = useState<Application[]>([])
 
+    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
     const [isSortOpen, setIsSortOpen] = useState(false)
     const [sortType, setSortType] = useState("date")
@@ -117,8 +118,14 @@ export function DashboardPage({
                     <Loader isLoading={isLoading}/>
                 ) : (
                     apps.map(app => (
-                        <ApplicationCard onDelete={handleDelete} onEdit={handleEdit} onPublishNotes={handlePublishNotes}
-                                         key={app.id} application={app}/>
+                        <ApplicationCard key={app.id}
+                                         onDelete={handleDelete}
+                                         onEdit={handleEdit}
+                                         onPublishNotes={handlePublishNotes}
+                                         application={app}
+                                         isMenuOpen={openMenuId === app.id}
+                                         onToggleMenu={() =>
+                                             setOpenMenuId(prev => (prev === app.id ? null : app.id))}/>
                     ))
                 )
                 }

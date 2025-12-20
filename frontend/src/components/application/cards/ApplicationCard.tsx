@@ -7,19 +7,20 @@ import {IconButton} from "../../shared/IconButton.tsx";
 import {ExpandedApplicationCard} from "../modals/ExpandedApplicationCard.tsx";
 import {parseDate} from "../../../utils/date.ts";
 
-export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}: {
+export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, isMenuOpen, onToggleMenu}: {
     application: Application,
     onDelete: (id: number) => void,
+    isMenuOpen: boolean,
+    onToggleMenu: () => void,
     onEdit: (request: ApplicationRequest, id?: number) => void,
     onPublishNotes: (notes: string, id?: number) => void
 }) {
-    const [toolBarOpen, setToolBarOpen] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(false)
 
     function handleDelete() {
         onDelete(application.id);
-        setToolBarOpen(!toolBarOpen);
+        onToggleMenu();
     }
 
 
@@ -30,11 +31,11 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}:
 
     function closeModal() {
         setIsModalOpen(false);
-        setToolBarOpen(!toolBarOpen);
+        onToggleMenu();
     }
 
     function toggleToolBar() {
-        setToolBarOpen(!toolBarOpen);
+        onToggleMenu();
     }
 
     return <div className={""}>
@@ -69,7 +70,7 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes}:
 
 
             {/* Dropdown Menu */}
-            {toolBarOpen && (
+            {isMenuOpen && (
                 <div onClick={(e) => e.stopPropagation()}
                      className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
                     <button onClick={() => {
