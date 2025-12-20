@@ -88,11 +88,21 @@ export default function App() {
     }
 
     async function handlePublishNotes(notes: string, id?: number) {
+        if (!id) return;
+
         try {
-            if (id == undefined) return;
-            await updateApplicationNotes(id, notes)
+            await updateApplicationNotes(id, notes);
+
+            setAllApps(prev =>
+                prev.map(app =>
+                    app.id === id
+                        ? {...app, notes}
+                        : app
+                )
+            );
+
         } catch (error) {
-            console.error("error updating notes")
+            console.error("error updating notes", error);
         }
     }
 
