@@ -77,10 +77,18 @@ export default function App() {
             setAllApps(prev =>
                 prev.map(app =>
                     app.id === id
-                        ? {...app, ...request} // merge new values into old item
+                        ? {
+                            ...app,
+                            jobTitle: request.jobTitle ?? app.jobTitle,
+                            companyName: request.companyName ?? app.companyName,
+                            descriptionUrl: request.descriptionUrl ?? app.descriptionUrl,
+                            status: request.status ?? app.status,
+                            appliedDate: request.appliedDate ?? app.appliedDate,
+                        }
                         : app
                 )
             );
+
 
         } catch (error) {
             await loadApps(); // fallback if update failed
