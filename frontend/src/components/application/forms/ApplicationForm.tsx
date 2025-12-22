@@ -11,7 +11,11 @@ export function ApplicationForm({
     }
 
     function submitApplication() {
-        const request: ApplicationRequest = {...data}
+        const request: ApplicationRequest = {
+            ...data,
+            jobTitle: data.jobTitle.trim(),
+            companyName: data.companyName.trim(),
+        }
         onClose()
         onSubmit(request, id)
     }
