@@ -2,8 +2,9 @@ package org.example.jobapplicationtracker.application.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.jobapplicationtracker.application.dto.ApplicationRequest;
+import org.example.jobapplicationtracker.application.dto.ApplicationCreateRequest;
 import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
+import org.example.jobapplicationtracker.application.dto.ApplicationUpdateRequest;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
 import org.example.jobapplicationtracker.application.model.Application;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
@@ -23,14 +24,13 @@ public class ApplicationService {
 
 
     @Transactional
-    public ApplicationResponse createApplication(ApplicationRequest request) {
+    public ApplicationResponse createApplication(ApplicationCreateRequest request) {
         Application application = Application.builder()
                 .jobTitle(request.getJobTitle())
                 .companyName(request.getCompanyName())
                 .descriptionUrl(request.getDescriptionUrl())
                 .status(request.getStatus())
                 .appliedDate(request.getAppliedDate())
-                .notes(request.getNotes())
                 .build();
 
         Application savedApplication = applicationRepository.save(application);
@@ -62,7 +62,7 @@ public class ApplicationService {
     }
 
     @Transactional
-    public void updateApplication(Long id, ApplicationRequest applicationRequest) {
+    public void updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
@@ -81,9 +81,7 @@ public class ApplicationService {
         if (applicationRequest.getAppliedDate() != null && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
             application.setAppliedDate(applicationRequest.getAppliedDate());
         }
-        if (applicationRequest.getNotes() != null && !applicationRequest.getNotes().equals(application.getNotes())) {
-            application.setNotes(applicationRequest.getNotes());
-        }
+
         try {
             applicationRepository.save(application);
         } catch (Exception e) {
