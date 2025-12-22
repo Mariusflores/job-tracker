@@ -12,12 +12,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ApplicationRequest {
+public class ApplicationCreateRequest {
     private String jobTitle;
     private String companyName;
     private String descriptionUrl;
     private ApplicationStatus status;
     private LocalDate appliedDate;
-    private String notes;
 
 }

@@ -1,10 +1,7 @@
 package org.example.jobapplicationtracker.application.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.jobapplicationtracker.application.dto.ApplicationRequest;
-import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
-import org.example.jobapplicationtracker.application.dto.UpdateNotesRequest;
-import org.example.jobapplicationtracker.application.dto.UpdateStatusRequest;
+import org.example.jobapplicationtracker.application.dto.*;
 import org.example.jobapplicationtracker.application.service.ApplicationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +27,7 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponse createApplication(@RequestBody ApplicationRequest request) {
+    public ApplicationResponse createApplication(@RequestBody ApplicationCreateRequest request) {
 
         return service.createApplication(request);
     }
@@ -39,7 +36,7 @@ public class ApplicationController {
 
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateApplication(@PathVariable Long id, @RequestBody ApplicationRequest applicationRequest) {
+    public void updateApplication(@PathVariable Long id, @RequestBody ApplicationUpdateRequest applicationRequest) {
         service.updateApplication(id, applicationRequest);
     }
 
