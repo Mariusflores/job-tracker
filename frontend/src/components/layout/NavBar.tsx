@@ -29,8 +29,8 @@ export function Navbar() {
             >
                 Pipeline
             </NavLink>
-
-            <NavLink
+            {/*
+                         <NavLink
                 to="/settings"
                 className={({isActive}) =>
                     `pb-1 transition-colors ${
@@ -42,6 +42,8 @@ export function Navbar() {
             >
                 Settings
             </NavLink>
+             */}
+
         </nav>
     );
 }
