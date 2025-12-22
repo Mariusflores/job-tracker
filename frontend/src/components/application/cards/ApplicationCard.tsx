@@ -85,11 +85,11 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
                     </button>
                 </div>
             )}
-            {/* Edit Application Modal */}
-            {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
-                                                  application={application}/>}
 
         </div>
+        {/* Edit Application Modal */}
+        {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
+                                              application={application}/>}
 
 
     </div>;
