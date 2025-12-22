@@ -10,7 +10,7 @@ export function parseDate(date: string) {
 
 function singleDigitDay(day: string) {
     // Return single digit for days < 10
-    return day.length > 1 ? day.charAt(1) : day
+    return String(Number(day));
 }
 
 
