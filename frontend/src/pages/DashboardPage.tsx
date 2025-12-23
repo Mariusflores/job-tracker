@@ -72,11 +72,11 @@ export function DashboardPage({
     }
 
     function openModal() {
-        setIsModalOpen(true)
+        setIsModalOpen(true);
     }
 
     function closeModal() {
-        setIsModalOpen(false)
+        setIsModalOpen(false);
     }
 
 
@@ -125,7 +125,9 @@ export function DashboardPage({
                                          application={app}
                                          isMenuOpen={openMenuId === app.id}
                                          onToggleMenu={() =>
-                                             setOpenMenuId(prev => (prev === app.id ? null : app.id))}/>
+                                             setOpenMenuId(prev => (prev === app.id ? null : app.id))}
+                                         closeMenu={() => setOpenMenuId(null)}
+                        />
                     ))
                 )
                 }
