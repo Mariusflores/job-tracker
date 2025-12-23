@@ -2,6 +2,7 @@ import type {ToolBarProps} from "../../../types/toolbar.ts";
 import {SORT_LABELS, SORTERS} from "../../../constants/sorting.ts";
 import {IconButton} from "../../shared/IconButton.tsx";
 import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
+import {useEffect, useRef} from "react";
 
 export function ToolBar({
                             sortType,
@@ -19,6 +20,37 @@ export function ToolBar({
                             onToggleOpen
                         }: ToolBarProps) {
     const sortTypeLabel = SORT_LABELS[sortType] ?? "Unknown"
+    const sortRef = useRef<HTMLDivElement | null>(null);
+    const filterRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            const target = e.target as Node;
+
+            if (isSortOpen && !sortRef.current?.contains(target)) {
+                setIsSortOpen(false);
+            }
+            if (isFilterOpen && !filterRef.current?.contains(target)) {
+                setIsFilterOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isSortOpen, isFilterOpen]);
+
+    useEffect(() => {
+        function handleKey(e: KeyboardEvent) {
+            if (e.key === "Escape") {
+                setIsSortOpen(false);
+                setIsFilterOpen(false);
+            }
+        }
+
+        document.addEventListener("keydown", handleKey);
+        return () => document.removeEventListener("keydown", handleKey);
+    }, []);
+
 
     return <div className={"flex flex-row justify-between"}>
         <div className={"flex items-center gap-2"}>
@@ -45,7 +77,7 @@ export function ToolBar({
             />
 
 
-            <div className={"relative"}>
+            <div ref={filterRef} className={"relative"}>
                 <IconButton
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     icon={<FunnelIcon className={"w-5 h-5"}/>
@@ -74,7 +106,7 @@ export function ToolBar({
 
 
             </div>
-            <div className={"relative"}>
+            <div ref={sortRef} className={"relative"}>
                 <IconButton
                     onClick={onToggleOpen}
                     icon={
