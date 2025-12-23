@@ -1,4 +1,5 @@
 import {useEffect} from "react";
+import {useEscapeKey} from "../../hooks/useEscapeKey.ts";
 
 let openModalCount = 0;
 export default function Modal({isOpen, onClose, form, style}: {
@@ -8,6 +9,13 @@ export default function Modal({isOpen, onClose, form, style}: {
     style: string
 
 }) {
+
+
+    useEscapeKey(() => {
+        if (isOpen) {
+            onClose();
+        }
+    });
 
     // Prevent Body Scroll
     useEffect(() => {
