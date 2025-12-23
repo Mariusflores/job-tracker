@@ -2,6 +2,9 @@ import type {ToolBarProps} from "../../../types/toolbar.ts";
 import {SORT_LABELS, SORTERS} from "../../../constants/sorting.ts";
 import {IconButton} from "../../shared/IconButton.tsx";
 import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
+import {useRef} from "react";
+import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
+import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
 
 export function ToolBar({
                             sortType,
@@ -19,6 +22,16 @@ export function ToolBar({
                             onToggleOpen
                         }: ToolBarProps) {
     const sortTypeLabel = SORT_LABELS[sortType] ?? "Unknown"
+    const sortRef = useRef<HTMLDivElement | null>(null);
+    const filterRef = useRef<HTMLDivElement | null>(null);
+
+    // User Event Hooks
+    useOutsideClick(sortRef, isSortOpen, () => setIsSortOpen(false));
+    useOutsideClick(filterRef, isFilterOpen, () => setIsFilterOpen(false));
+    useEscapeKey(() => {
+        setIsSortOpen(false)
+        setIsFilterOpen(false)
+    });
 
     return <div className={"flex flex-row justify-between"}>
         <div className={"flex items-center gap-2"}>
@@ -45,7 +58,7 @@ export function ToolBar({
             />
 
 
-            <div className={"relative"}>
+            <div ref={filterRef} className={"relative"}>
                 <IconButton
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
                     icon={<FunnelIcon className={"w-5 h-5"}/>
@@ -74,7 +87,7 @@ export function ToolBar({
 
 
             </div>
-            <div className={"relative"}>
+            <div ref={sortRef} className={"relative"}>
                 <IconButton
                     onClick={onToggleOpen}
                     icon={
