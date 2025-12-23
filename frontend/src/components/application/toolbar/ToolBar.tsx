@@ -2,7 +2,9 @@ import type {ToolBarProps} from "../../../types/toolbar.ts";
 import {SORT_LABELS, SORTERS} from "../../../constants/sorting.ts";
 import {IconButton} from "../../shared/IconButton.tsx";
 import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/20/solid";
-import {useEffect, useRef} from "react";
+import {useRef} from "react";
+import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
+import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
 
 export function ToolBar({
                             sortType,
@@ -23,34 +25,13 @@ export function ToolBar({
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            const target = e.target as Node;
-
-            if (isSortOpen && !sortRef.current?.contains(target)) {
-                setIsSortOpen(false);
-            }
-            if (isFilterOpen && !filterRef.current?.contains(target)) {
-                setIsFilterOpen(false);
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [isSortOpen, isFilterOpen]);
-
-    useEffect(() => {
-        function handleKey(e: KeyboardEvent) {
-            if (e.key === "Escape") {
-                setIsSortOpen(false);
-                setIsFilterOpen(false);
-            }
-        }
-
-        document.addEventListener("keydown", handleKey);
-        return () => document.removeEventListener("keydown", handleKey);
-    }, []);
-
+    // User Event Hooks
+    useOutsideClick(sortRef, isSortOpen, () => setIsSortOpen(false));
+    useOutsideClick(filterRef, isFilterOpen, () => setIsFilterOpen(false));
+    useEscapeKey(() => {
+        setIsSortOpen(false)
+        setIsFilterOpen(false)
+    });
 
     return <div className={"flex flex-row justify-between"}>
         <div className={"flex items-center gap-2"}>
