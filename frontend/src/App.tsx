@@ -65,19 +65,22 @@ export default function App() {
         status: ApplicationStatus,
         id: number
     ) {
-        // Snapshot for rollback
-        const previous = allApps;
+        const previous = structuredClone(allApps);
 
-        // 1. Optimistic update (status only)
         setAllApps(prev =>
             prev.map(app =>
                 app.id === id ? {...app, status} : app
             )
         );
 
-        // 2. Backend call
         try {
-            await updateApplicationStatus(id, status);
+            const updated = await updateApplicationStatus(id, status);
+
+            setAllApps(prev =>
+                prev.map(app =>
+                    app.id === id ? updated : app
+                )
+            );
         } catch (err) {
             console.error("Failed to update status, reverting", err);
             setAllApps(previous);
@@ -89,19 +92,14 @@ export default function App() {
         request: UpdateApplicationRequest,
         id: number
     ) {
-        // Snapshot for rollback
         const previous = structuredClone(allApps);
 
         try {
-            // 1. Backend update
-            await updateApplication(id, request);
+            const updatedApp = await updateApplication(id, request);
 
-            // 2. Optimistic local update (safe partial merge)
             setAllApps(prev =>
                 prev.map(app =>
-                    app.id === id
-                        ? {...app, ...request}
-                        : app
+                    app.id === id ? updatedApp : app
                 )
             );
         } catch (error) {
@@ -115,16 +113,13 @@ export default function App() {
         if (!id) return;
 
         try {
-            await updateApplicationNotes(id, notes);
+            const updated = await updateApplicationNotes(id, notes);
 
             setAllApps(prev =>
                 prev.map(app =>
-                    app.id === id
-                        ? {...app, notes}
-                        : app
+                    app.id === id ? updated : app
                 )
             );
-
         } catch (error) {
             console.error("error updating notes", error);
         }
