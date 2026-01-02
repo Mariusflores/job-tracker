@@ -3,13 +3,13 @@ import {useState} from "react";
 import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
-import type {Application} from "../types/application.ts";
+import type {Application, ApplicationStatus} from "../types/application.ts";
 
-const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"];
+const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
 
 export function PipelinePage({applications, onStatusChange}: {
     applications: Application[],
-    onStatusChange: (status: string, id: number) => void
+    onStatusChange: (status: ApplicationStatus, id: number) => void
 }) {
     const [apps, setApps] = useState(applications);
 
@@ -20,6 +20,10 @@ export function PipelinePage({applications, onStatusChange}: {
         REJECTED: apps.filter(a => a.status === "REJECTED"),
     } as const;
     const [activeId, setActiveId] = useState<number | null>(null);
+
+    function isApplicationStatus(value: unknown): value is ApplicationStatus {
+        return STATUSES.includes(value as ApplicationStatus);
+    }
 
 
     function handleDragEnd(event: DragEndEvent) {
@@ -35,8 +39,8 @@ export function PipelinePage({applications, onStatusChange}: {
         const activeApp = apps.find(a => a.id === activeId);
         if (!activeApp) return;
 
-        const isColumnChange = typeof overId === "string";
-        if (isColumnChange) {
+
+        if (isApplicationStatus(overId)) {
             // Changing column (status)
             setApps(prev =>
                 prev.map(a =>
@@ -47,7 +51,7 @@ export function PipelinePage({applications, onStatusChange}: {
             );
 
             // trigger backend update
-            onStatusChange(overId as string, activeId);
+            onStatusChange(overId, activeId);
             return;
         }
 

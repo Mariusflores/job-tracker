@@ -1,10 +1,10 @@
 import {useState} from "react";
-import type {ApplicationData, ApplicationRequest} from "../../../types/application.ts";
+import type {ApplicationData, CreateApplicationRequest} from "../../../types/application.ts";
 import {ApplicationForm} from "./ApplicationForm.tsx";
 
 export function AddApplicationForm({onClose, onSubmit}: {
     onClose: () => void,
-    onSubmit: (request: ApplicationRequest) => void
+    onSubmit: (request: CreateApplicationRequest) => void
 }) {
     const today = new Date().toISOString().split("T")[0];
 
@@ -17,12 +17,21 @@ export function AddApplicationForm({onClose, onSubmit}: {
         notes: ""
     })
 
+    function handleCreate(data: ApplicationData) {
+        const request: CreateApplicationRequest = {
+            ...data,
+            jobTitle: data.jobTitle.trim(),
+            companyName: data.companyName.trim(),
+        };
+        onSubmit(request);
+    }
+
+
     return (
         <ApplicationForm
-            id={undefined}
             data={data}
             setData={setData}
             onClose={onClose}
-            onSubmit={onSubmit}/>
+            onSubmit={handleCreate}/>
     );
 }

@@ -1,4 +1,4 @@
-import type {ApplicationData, ApplicationRequest} from "./application.ts";
+import type {ApplicationData} from "./application.ts";
 
 export interface FormProps {
     id?: number,
@@ -6,5 +6,5 @@ export interface FormProps {
     setData: (d: ApplicationData) => void,
 
     onClose: () => void,
-    onSubmit: (request: ApplicationRequest, id?: number) => void
+    onSubmit: (data: ApplicationData) => void
 }

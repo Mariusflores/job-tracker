@@ -1,8 +1,8 @@
 import type {FormProps} from "../../../types/form.ts";
-import type {ApplicationData, ApplicationRequest} from "../../../types/application.ts";
+import type {ApplicationData, ApplicationStatus} from "../../../types/application.ts";
 
 export function ApplicationForm({
-                                    id, data, setData, onClose, onSubmit
+                                    data, setData, onClose, onSubmit
                                 }:
                                 FormProps) {
 
@@ -10,19 +10,11 @@ export function ApplicationForm({
         setData({...data, [key]: value})
     }
 
-    function submitApplication() {
-        const request: ApplicationRequest = {
-            ...data,
-            jobTitle: data.jobTitle.trim(),
-            companyName: data.companyName.trim(),
-        }
-        onClose()
-        onSubmit(request, id)
-    }
 
     return <form className="space-y-4 p-4" onSubmit={(e) => {
         e.preventDefault();
-        submitApplication();
+        onSubmit(data);
+        onClose();
     }}>
 
         <h2 className="text-xl font-semibold mb-2">Add Application</h2>
@@ -66,7 +58,7 @@ export function ApplicationForm({
         <div className="flex flex-col space-y-1">
             <label className="text-sm font-medium">Status</label>
             <select
-                onChange={e => update("status", e.target.value)}
+                onChange={e => update("status", e.target.value as ApplicationStatus)}
                 value={data.status}
                 className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required

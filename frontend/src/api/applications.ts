@@ -1,12 +1,12 @@
 import {api} from "./client.ts"
-import type {Application, ApplicationRequest} from "../types/application.ts";
+import type {Application, CreateApplicationRequest, UpdateApplicationRequest} from "../types/application.ts";
 
 export async function getApplications() {
     const response = await api.get<Application[]>("/application/all")
     return response.data;
 }
 
-export async function createApplication(request: ApplicationRequest) {
+export async function createApplication(request: CreateApplicationRequest) {
     const response = await api.post<Application>("/application", request);
     return response.data;
 }
@@ -16,7 +16,8 @@ export async function deleteApplication(id: number) {
     return response.data;
 }
 
-export async function updateApplication(id: number, request: ApplicationRequest) {
+// TODO Update to patch
+export async function updateApplication(id: number, request: UpdateApplicationRequest) {
     const response = await api.put("/application/" + id, request)
     return response.data;
 }

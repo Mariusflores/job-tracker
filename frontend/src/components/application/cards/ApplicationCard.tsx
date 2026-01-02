@@ -1,4 +1,4 @@
-import type {Application, ApplicationRequest} from "../../../types/application.ts";
+import type {Application, UpdateApplicationRequest} from "../../../types/application.ts";
 import {StatusBadge} from "../badges/StatusBadge.tsx";
 import {useRef, useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
@@ -15,7 +15,7 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
     isMenuOpen: boolean,
     onToggleMenu: () => void,
     closeMenu: () => void,
-    onEdit: (request: ApplicationRequest, id?: number) => void,
+    onEdit: (request: UpdateApplicationRequest, id: number) => void,
     onPublishNotes: (notes: string, id?: number) => void
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);

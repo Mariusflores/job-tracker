@@ -4,7 +4,12 @@ import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {Layout} from "./components/layout/Layout.tsx";
 import {PipelinePage} from "./pages/PipelinePage.tsx";
 import {useEffect, useState} from "react";
-import type {Application, ApplicationRequest} from "./types/application.ts";
+import type {
+    Application,
+    ApplicationStatus,
+    CreateApplicationRequest,
+    UpdateApplicationRequest
+} from "./types/application.ts";
 import {
     createApplication,
     deleteApplication,
@@ -22,6 +27,18 @@ export default function App() {
         loadApps();
     }, []);
 
+    useEffect(() => {
+        if (import.meta.env.DEV) {
+            allApps.forEach(app => {
+                if (!["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].includes(app.status)) {
+                    throw new Error(`Invalid status detected: ${app.status}`);
+                }
+            });
+        }
+
+    }, [allApps]);
+
+
     async function loadApps() {
         setIsLoading(true);
         const data = await getApplications();
@@ -29,7 +46,7 @@ export default function App() {
         setIsLoading(false);
     }
 
-    async function handleSubmit(request: ApplicationRequest) {
+    async function handleSubmit(request: CreateApplicationRequest) {
         const newApp = await createApplication(request);
         setAllApps(prev => [...prev, newApp]);
     }
@@ -45,7 +62,7 @@ export default function App() {
     }
 
     async function handleUpdateStatusOptimistic(
-        status: string,
+        status: ApplicationStatus,
         id: number
     ) {
         // Snapshot for rollback
@@ -68,32 +85,31 @@ export default function App() {
     }
 
 
-    async function handleEdit(request: ApplicationRequest, id?: number) {
-        try {
-            if (id !== undefined) {
-                await updateApplication(id, request);
-            }
+    async function handleEdit(
+        request: UpdateApplicationRequest,
+        id: number
+    ) {
+        // Snapshot for rollback
+        const previous = structuredClone(allApps);
 
+        try {
+            // 1. Backend update
+            await updateApplication(id, request);
+
+            // 2. Optimistic local update (safe partial merge)
             setAllApps(prev =>
                 prev.map(app =>
                     app.id === id
-                        ? {
-                            ...app,
-                            jobTitle: request.jobTitle ?? app.jobTitle,
-                            companyName: request.companyName ?? app.companyName,
-                            descriptionUrl: request.descriptionUrl ?? app.descriptionUrl,
-                            status: request.status ?? app.status,
-                            appliedDate: request.appliedDate ?? app.appliedDate,
-                        }
+                        ? {...app, ...request}
                         : app
                 )
             );
-
-
         } catch (error) {
-            await loadApps(); // fallback if update failed
+            console.error("Failed to update application, reverting", error);
+            setAllApps(previous);
         }
     }
+
 
     async function handlePublishNotes(notes: string, id?: number) {
         if (!id) return;

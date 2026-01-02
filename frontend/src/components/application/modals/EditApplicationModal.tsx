@@ -1,11 +1,11 @@
-import type {Application, ApplicationRequest} from "../../../types/application.ts";
+import type {Application, UpdateApplicationRequest} from "../../../types/application.ts";
 import Modal from "../../shared/Modal.tsx";
 import {EditApplicationForm} from "../forms/EditApplicationForm.tsx";
 
 export function EditApplicationModal({isOpen, onClose, onSubmit, application}: {
     isOpen: boolean,
     onClose: () => void,
-    onSubmit: (request: ApplicationRequest, id?: number) => void,
+    onSubmit: (request: UpdateApplicationRequest, id: number) => void,
     application: Application
 }) {
 

@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import type {Application, ApplicationRequest} from "../types/application.ts";
+import type {Application, CreateApplicationRequest, UpdateApplicationRequest} from "../types/application.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/shared/Loader.tsx";
@@ -17,8 +17,8 @@ export function DashboardPage({
                                   isLoading
                               }: {
     allApps: Application[],
-    handleSubmit: (request: ApplicationRequest) => void,
-    handleEdit: (request: ApplicationRequest, id?: number) => void,
+    handleSubmit: (request: CreateApplicationRequest) => void,
+    handleEdit: (request: UpdateApplicationRequest, id: number) => void,
     handleDelete: (id: number) => void,
     handlePublishNotes: (notes: string, id?: number) => void,
     isLoading: boolean
