@@ -4,7 +4,12 @@ import {DashboardPage} from "./pages/DashboardPage.tsx";
 import {Layout} from "./components/layout/Layout.tsx";
 import {PipelinePage} from "./pages/PipelinePage.tsx";
 import {useEffect, useState} from "react";
-import type {Application, ApplicationRequest} from "./types/application.ts";
+import type {
+    Application,
+    ApplicationStatus,
+    CreateApplicationRequest,
+    UpdateApplicationRequest
+} from "./types/application.ts";
 import {
     createApplication,
     deleteApplication,
@@ -22,6 +27,18 @@ export default function App() {
         loadApps();
     }, []);
 
+    useEffect(() => {
+        if (import.meta.env.DEV) {
+            allApps.forEach(app => {
+                if (!["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].includes(app.status)) {
+                    throw new Error(`Invalid status detected: ${app.status}`);
+                }
+            });
+        }
+
+    }, [allApps]);
+
+
     async function loadApps() {
         setIsLoading(true);
         const data = await getApplications();
@@ -29,7 +46,7 @@ export default function App() {
         setIsLoading(false);
     }
 
-    async function handleSubmit(request: ApplicationRequest) {
+    async function handleSubmit(request: CreateApplicationRequest) {
         const newApp = await createApplication(request);
         setAllApps(prev => [...prev, newApp]);
     }
@@ -45,22 +62,25 @@ export default function App() {
     }
 
     async function handleUpdateStatusOptimistic(
-        status: string,
+        status: ApplicationStatus,
         id: number
     ) {
-        // Snapshot for rollback
-        const previous = allApps;
+        const previous = structuredClone(allApps);
 
-        // 1. Optimistic update (status only)
         setAllApps(prev =>
             prev.map(app =>
                 app.id === id ? {...app, status} : app
             )
         );
 
-        // 2. Backend call
         try {
-            await updateApplicationStatus(id, status);
+            const updated = await updateApplicationStatus(id, status);
+
+            setAllApps(prev =>
+                prev.map(app =>
+                    app.id === id ? updated : app
+                )
+            );
         } catch (err) {
             console.error("Failed to update status, reverting", err);
             setAllApps(previous);
@@ -68,47 +88,37 @@ export default function App() {
     }
 
 
-    async function handleEdit(request: ApplicationRequest, id?: number) {
+    async function handleEdit(
+        request: UpdateApplicationRequest,
+        id: number
+    ) {
+        const previous = structuredClone(allApps);
+
         try {
-            if (id !== undefined) {
-                await updateApplication(id, request);
-            }
+            const updatedApp = await updateApplication(id, request);
 
             setAllApps(prev =>
                 prev.map(app =>
-                    app.id === id
-                        ? {
-                            ...app,
-                            jobTitle: request.jobTitle ?? app.jobTitle,
-                            companyName: request.companyName ?? app.companyName,
-                            descriptionUrl: request.descriptionUrl ?? app.descriptionUrl,
-                            status: request.status ?? app.status,
-                            appliedDate: request.appliedDate ?? app.appliedDate,
-                        }
-                        : app
+                    app.id === id ? updatedApp : app
                 )
             );
-
-
         } catch (error) {
-            await loadApps(); // fallback if update failed
+            console.error("Failed to update application, reverting", error);
+            setAllApps(previous);
         }
     }
 
-    async function handlePublishNotes(notes: string, id?: number) {
-        if (!id) return;
+
+    async function handlePublishNotes(notes: string, id: number) {
 
         try {
-            await updateApplicationNotes(id, notes);
+            const updated = await updateApplicationNotes(id, notes);
 
             setAllApps(prev =>
                 prev.map(app =>
-                    app.id === id
-                        ? {...app, notes}
-                        : app
+                    app.id === id ? updated : app
                 )
             );
-
         } catch (error) {
             console.error("error updating notes", error);
         }
@@ -132,7 +142,9 @@ export default function App() {
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage applications={allApps}
-                                                                   onStatusChange={handleUpdateStatusOptimistic}/>}/>
+                                                                   onStatusChange={handleUpdateStatusOptimistic}
+                                                                   onPublishNotes={handlePublishNotes}
+                    />}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

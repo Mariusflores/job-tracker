@@ -6,7 +6,7 @@ export function ExpandedApplicationCard({expanded, onClose, application, publish
     expanded: boolean,
     onClose: () => void,
     application: Application,
-    publishNotes: (notes: string, id?: number) => void
+    publishNotes: (notes: string, id: number) => void
 }) {
     return <Modal isOpen={expanded} onClose={onClose}
                   form={<ExpandedApplicationForm application={application} onClose={onClose}

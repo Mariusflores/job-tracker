@@ -1,10 +1,10 @@
-import type {Application, ApplicationData, ApplicationRequest} from "../../../types/application.ts";
+import type {Application, ApplicationData, UpdateApplicationRequest} from "../../../types/application.ts";
 import {useState} from "react";
 import {ApplicationForm} from "./ApplicationForm.tsx";
 
 export function EditApplicationForm({onClose, onSubmit, application}: {
     onClose: () => void,
-    onSubmit: (request: ApplicationRequest, id?: number,) => void,
+    onSubmit: (request: UpdateApplicationRequest, id: number,) => void,
     application: Application
 }) {
     const [data, setData] = useState<ApplicationData>({
@@ -13,16 +13,28 @@ export function EditApplicationForm({onClose, onSubmit, application}: {
         descriptionUrl: application.descriptionUrl,
         status: application.status,
         appliedDate: application.appliedDate,
-        notes: ""
+        notes: application.notes
     })
+
+    function handleUpdate(data: ApplicationData) {
+        const request: UpdateApplicationRequest = {
+            jobTitle: data.jobTitle.trim(),
+            companyName: data.companyName.trim(),
+            descriptionUrl: data.descriptionUrl,
+            status: data.status,
+            appliedDate: data.appliedDate,
+        };
+
+        onSubmit(request, application.id);
+    }
 
 
     return (
-        <ApplicationForm id={application.id}
-                         data={data}
-                         setData={setData}
-                         onClose={onClose}
-                         onSubmit={onSubmit}
+        <ApplicationForm
+            data={data}
+            setData={setData}
+            onClose={onClose}
+            onSubmit={handleUpdate}
         />
     );
 }

@@ -1,13 +1,29 @@
-import type {Application} from "../../types/application.ts";
 import {StatusBadge} from "../application/badges/StatusBadge.tsx";
+import type {PipelineProps} from "../../types/pipeline.ts";
+import {ArrowsPointingOutIcon} from "@heroicons/react/16/solid";
+import {IconButton} from "../shared/IconButton.tsx";
 
-export function PipelineCard({application}: { application: Application }) {
+export function PipelineCard({application, onOpenDetails, isOverlay = false}: PipelineProps) {
     return (
         <div className="
+            relative
             bg-white border rounded-lg shadow p-3
             cursor-grab active:cursor-grabbing
             transition hover:shadow-md
         ">
+            {onOpenDetails && !isOverlay && (
+                <div className="absolute top-2 right-2">
+                    <IconButton
+                        onPointerDown={(e) => {
+                            e.stopPropagation();
+                            onOpenDetails(application.id);
+                            console.log("Setting expanded id: " + application.id)
+                        }}
+                        icon={<ArrowsPointingOutIcon className="w-4 h-4"/>}
+                    />
+                </div>
+            )}
+
             <p className="font-semibold text-gray-900 text-sm">
                 {application.companyName}
             </p>
@@ -22,3 +38,4 @@ export function PipelineCard({application}: { application: Application }) {
         </div>
     );
 }
+

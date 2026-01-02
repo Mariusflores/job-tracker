@@ -22,5 +22,5 @@
 }
 
 .animate-slide-out {
-    animation: slide-in 0.2s ease-out;
+    animation: slide-out 0.2s ease-out;
 }

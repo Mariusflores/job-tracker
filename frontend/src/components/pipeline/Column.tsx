@@ -3,7 +3,11 @@ import type {Application} from "../../types/application.ts";
 import {SortableContext, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import {SortableCard} from "./SortableCard.tsx";
 
-export function Column({status, cards}: { status: string, cards: Application[] }) {
+export function Column({status, cards, onOpenDetails}: {
+    status: string,
+    cards: Application[],
+    onOpenDetails: (id: number) => void
+}) {
     const {setNodeRef} = useDroppable({id: status});
 
     return (
@@ -13,7 +17,7 @@ export function Column({status, cards}: { status: string, cards: Application[] }
             <div className="space-y-3">
                 <SortableContext items={cards.map(c => c.id)} strategy={verticalListSortingStrategy}>
                     {cards.map(card => (
-                        <SortableCard key={card.id} application={card}/>
+                        <SortableCard key={card.id} application={card} onOpenDetails={onOpenDetails}/>
                     ))}
                 </SortableContext>
             </div>

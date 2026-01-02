@@ -12,7 +12,7 @@ export function ExpandedApplicationForm({
                                         }: {
     application: Application,
     onClose: () => void,
-    publishNotes: (notes: string, id?: number) => void
+    publishNotes: (notes: string, id: number) => void
 }) {
 
     const [notes, setNotes] = useState(application.notes ?? "");
