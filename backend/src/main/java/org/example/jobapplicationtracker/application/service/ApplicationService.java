@@ -1,5 +1,6 @@
 package org.example.jobapplicationtracker.application.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.jobapplicationtracker.application.dto.ApplicationCreateRequest;
@@ -22,20 +23,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
 
-
-    @Transactional
-    public ApplicationResponse createApplication(ApplicationCreateRequest request) {
-        Application application = Application.builder()
-                .jobTitle(request.getJobTitle())
-                .companyName(request.getCompanyName())
-                .descriptionUrl(request.getDescriptionUrl())
-                .status(request.getStatus())
-                .appliedDate(request.getAppliedDate())
-                .build();
-
-        Application savedApplication = applicationRepository.save(application);
-        return mapToApplicationResponse(savedApplication);
-    }
+    // Fetch data Methods
 
     public List<ApplicationResponse> getAllApplications() {
 
@@ -61,8 +49,26 @@ public class ApplicationService {
 
     }
 
+    // Edit Data methods
+
     @Transactional
-    public void updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
+    public ApplicationResponse createApplication(
+            @Valid ApplicationCreateRequest request) {
+        Application application = Application.builder()
+                .jobTitle(request.getJobTitle())
+                .companyName(request.getCompanyName())
+                .descriptionUrl(request.getDescriptionUrl())
+                .status(request.getStatus())
+                .appliedDate(request.getAppliedDate())
+                .build();
+
+        Application savedApplication = applicationRepository.save(application);
+        return mapToApplicationResponse(savedApplication);
+    }
+
+
+    @Transactional
+    public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
@@ -82,46 +88,41 @@ public class ApplicationService {
             application.setAppliedDate(applicationRequest.getAppliedDate());
         }
 
-        try {
-            applicationRepository.save(application);
-        } catch (Exception e) {
-            log.error("Error while saving application", e);
-        }
+        Application savedApplication = applicationRepository.save(application);
+        return mapToApplicationResponse(savedApplication);
 
     }
 
+    @Transactional
     public void deleteApplication(Long id) {
-        try {
-            applicationRepository.deleteById(id);
-        } catch (ApplicationNotFoundException e) {
-            log.error("Could not find application with id: " + id);
-        }
+
+        applicationRepository.deleteById(id);
+
     }
 
-    public void updateApplicationStatus(Long id, ApplicationStatus status) {
+    @Transactional
+    public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status) {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
         application.setStatus(status);
 
-        try {
-            applicationRepository.save(application);
-        } catch (Exception e) {
-            log.error("Error while saving application", e);
-        }
+        Application savedApplication = applicationRepository.save(application);
+        return mapToApplicationResponse(savedApplication);
+
     }
 
-    public void updateApplicationNotes(long id, String notes) {
+    @Transactional
+    public ApplicationResponse updateApplicationNotes(long id, String notes) {
 
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
         application.setNotes(notes);
-        try {
-            applicationRepository.save(application);
-        } catch (Exception e) {
-            log.error("Error while saving application", e);
-        }
+
+        Application savedApplication = applicationRepository.save(application);
+        return mapToApplicationResponse(savedApplication);
+
 
     }
 }

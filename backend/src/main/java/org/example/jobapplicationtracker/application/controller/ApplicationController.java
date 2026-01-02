@@ -27,29 +27,29 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponse createApplication(@RequestBody ApplicationCreateRequest request) {
+    public ApplicationResponse createApplication(@RequestBody ApplicationCreateRequest createRequest) {
 
-        return service.createApplication(request);
+        return service.createApplication(createRequest);
     }
 
-    // PUT Requests
+    // PATCH Requests
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateApplication(@PathVariable Long id, @RequestBody ApplicationUpdateRequest applicationRequest) {
-        service.updateApplication(id, applicationRequest);
+    public ApplicationResponse updateApplication(@PathVariable Long id, @RequestBody ApplicationUpdateRequest updateRequest) {
+        return service.updateApplication(id, updateRequest);
     }
 
     @PatchMapping("{id}/status")
     @ResponseStatus(HttpStatus.OK)
-    public void updateApplicationStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest request) {
-        service.updateApplicationStatus(id, request.getApplicationStatus());
+    public ApplicationResponse updateApplicationStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest updateStatusRequest) {
+        return service.updateApplicationStatus(id, updateStatusRequest.getApplicationStatus());
     }
 
     @PatchMapping("/{id}/notes")
     @ResponseStatus(HttpStatus.OK)
-    public void updateApplicationNotes(@PathVariable long id, @RequestBody UpdateNotesRequest request) {
-        service.updateApplicationNotes(id, request.getNotes());
+    public ApplicationResponse updateApplicationNotes(@PathVariable long id, @RequestBody UpdateNotesRequest updateNotesRequest) {
+        return service.updateApplicationNotes(id, updateNotesRequest.getNotes());
     }
 
     // DELETE Requests

@@ -16,9 +16,9 @@ export async function deleteApplication(id: number) {
     return response.data;
 }
 
-// TODO Update to patch
+
 export async function updateApplication(id: number, request: UpdateApplicationRequest) {
-    const response = await api.put("/application/" + id, request)
+    const response = await api.patch("/application/" + id, request)
     return response.data;
 }
 
