@@ -39,21 +39,36 @@ export function PipelinePage({applications, onStatusChange}: {
         const activeApp = apps.find(a => a.id === activeId);
         if (!activeApp) return;
 
-
+        // Remove updated application from array, then reinsert to the bottom of the column after status update
         if (isApplicationStatus(overId)) {
-            // Changing column (status)
-            setApps(prev =>
-                prev.map(a =>
-                    a.id === activeId
-                        ? {...a, status: overId}
-                        : a
-                )
-            );
+            setApps(prev => {
+                const moving = prev.find(a => a.id === activeId);
+                if (!moving) return prev;
 
-            // trigger backend update
+                const withoutMoving = prev.filter(a => a.id !== activeId);
+
+                const updated = {...moving, status: overId};
+
+                const lastIndexOfStatus = withoutMoving
+                    .map((a, i) => ({a, i}))
+                    .filter(({a}) => a.status === overId)
+                    .pop()?.i;
+
+                if (lastIndexOfStatus === undefined) {
+                    // No items in that column → append at end
+                    return [...withoutMoving, updated];
+                }
+
+                // Insert AFTER the last item of that status
+                const result = [...withoutMoving];
+                result.splice(lastIndexOfStatus + 1, 0, updated);
+                return result;
+            });
+
             onStatusChange(overId, activeId);
             return;
         }
+
 
         // Reordering within the same column
         const columnApps = apps.filter(a => a.status === activeApp.status);
