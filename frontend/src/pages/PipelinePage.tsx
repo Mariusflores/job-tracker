@@ -13,8 +13,10 @@ export function PipelinePage({applications, onStatusChange, onPublishNotes}: {
     onStatusChange: (status: ApplicationStatus, id: number) => void
     onPublishNotes: (notes: string, id: number) => void
 }) {
+    // Local copy of applications to preserve column ordering
     const [apps, setApps] = useState<Application[]>(applications);
 
+    // Backend updates are merged via useEffect without resetting order
     useEffect(() => {
         setApps(prev =>
             prev.map(app => ({
