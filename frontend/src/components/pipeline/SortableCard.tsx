@@ -2,7 +2,10 @@ import type {Application} from "../../types/application.ts";
 import {PipelineCard} from "./PipelineCard.tsx";
 import {useSortable} from "@dnd-kit/sortable";
 
-export function SortableCard({application}: { application: Application }) {
+export function SortableCard({application, onOpenDetails}: {
+    application: Application,
+    onOpenDetails: (id: number) => void
+}) {
     const {attributes, listeners, setNodeRef, transform, isDragging} = useSortable({id: application.id});
 
     const style: React.CSSProperties | undefined =
@@ -15,7 +18,7 @@ export function SortableCard({application}: { application: Application }) {
 
     return (
         <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-            <PipelineCard application={application}/>
+            <PipelineCard application={application} onOpenDetails={onOpenDetails}/>
         </div>
     );
 }

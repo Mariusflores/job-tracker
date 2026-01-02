@@ -4,12 +4,14 @@ import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import type {Application, ApplicationStatus} from "../types/application.ts";
+import {ExpandedApplicationCard} from "../components/application/modals/ExpandedApplicationCard.tsx";
 
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
 
 export function PipelinePage({applications, onStatusChange}: {
     applications: Application[],
     onStatusChange: (status: ApplicationStatus, id: number) => void
+    onEditNotes: (notes: string, id: number) => void
 }) {
     const [apps, setApps] = useState(applications);
 
@@ -20,6 +22,10 @@ export function PipelinePage({applications, onStatusChange}: {
         REJECTED: apps.filter(a => a.status === "REJECTED"),
     } as const;
     const [activeId, setActiveId] = useState<number | null>(null);
+
+    const [expandedApplicationId, setExpandedApplicationId] =
+        useState<number | null>(null);
+
 
     function isApplicationStatus(value: unknown): value is ApplicationStatus {
         return STATUSES.includes(value as ApplicationStatus);
@@ -88,33 +94,53 @@ export function PipelinePage({applications, onStatusChange}: {
         setActiveId(event.active.id as number);
     }
 
+    function openExpandedView(id: number) {
+        setExpandedApplicationId(id);
+        console.log("Opening")
+    }
+
     const activeApp = apps.find(a => a.id === activeId);
 
+    const expandedApplication =
+        apps.find(a => a.id === expandedApplicationId);
+
+    console.log("expanded application: " + expandedApplication?.id)
+
     return (
-        <DndContext
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-        >
-            {/* COLUMNS */}
-            <div className="grid grid-cols-4 gap-4">
-                {STATUSES.map(status => (
-                    <Column
-                        key={status}
-                        status={status}
-                        cards={columns[status as keyof typeof columns]}
-                    />
+        <>
+            {expandedApplication && (
+                <ExpandedApplicationCard
+                    application={expandedApplication}
+                    onClose={() => setExpandedApplicationId(null)}
+                    expanded={expandedApplicationId !== null}
+                    publishNotes={() => console.log("notes")}/>
+            )}
+            <DndContext
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
+            >
+                {/* COLUMNS */}
+                <div className="grid grid-cols-4 gap-4">
+                    {STATUSES.map(status => (
+                        <Column
+                            key={status}
+                            status={status}
+                            cards={columns[status as keyof typeof columns]}
+                            onOpenDetails={openExpandedView}
+                        />
 
 
-                ))}
-            </div>
+                    ))}
+                </div>
 
-            {/* DRAG OVERLAY */}
-            <DragOverlay>
-                {activeApp && (
-                    <PipelineCard application={activeApp}/>
-                )}
-            </DragOverlay>
-        </DndContext>
+                {/* DRAG OVERLAY */}
+                <DragOverlay>
+                    {activeApp && (
+                        <PipelineCard application={activeApp} isOverlay/>
+                    )}
+                </DragOverlay>
+            </DndContext>
+        </>
     );
 
 }
