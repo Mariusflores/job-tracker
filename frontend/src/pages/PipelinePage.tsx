@@ -18,12 +18,25 @@ export function PipelinePage({applications, onStatusChange, onPublishNotes}: {
 
     // Backend updates are merged via useEffect without resetting order
     useEffect(() => {
-        setApps(prev =>
-            prev.map(app => ({
-                ...app,
-                ...applications.find(a => a.id === app.id),
-            }))
-        );
+        setApps(prev => {
+            const backendById = new Map(applications.map(a => [a.id, a]));
+
+            // 1. Update existing apps IN THE SAME ORDER
+            const updated = prev
+                .map(app => {
+                    const backend = backendById.get(app.id);
+                    return backend ? {...app, ...backend} : app;
+                })
+                // 2. Remove apps deleted in backend
+                .filter(app => backendById.has(app.id));
+
+            // 3. Append new apps that did not exist locally
+            const newApps = applications.filter(
+                app => !prev.some(p => p.id === app.id)
+            );
+
+            return [...updated, ...newApps];
+        });
     }, [applications]);
 
 
@@ -125,7 +138,6 @@ export function PipelinePage({applications, onStatusChange, onPublishNotes}: {
 
     function openExpandedView(id: number) {
         setExpandedApplicationId(id);
-        console.log("Opening")
     }
 
     const activeApp = apps.find(a => a.id === activeId);
@@ -133,7 +145,9 @@ export function PipelinePage({applications, onStatusChange, onPublishNotes}: {
     const expandedApplication =
         apps.find(a => a.id === expandedApplicationId);
 
-    console.log("expanded application: " + expandedApplication?.id)
+    if (!applications.length) {
+        return <div className="p-6 text-gray-500">Loading pipeline…</div>;
+    }
 
     return (
         <>

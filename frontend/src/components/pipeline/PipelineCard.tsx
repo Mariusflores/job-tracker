@@ -17,7 +17,6 @@ export function PipelineCard({application, onOpenDetails, isOverlay = false}: Pi
                         onPointerDown={(e) => {
                             e.stopPropagation();
                             onOpenDetails(application.id);
-                            console.log("Setting expanded id: " + application.id)
                         }}
                         icon={<ArrowsPointingOutIcon className="w-4 h-4"/>}
                     />
