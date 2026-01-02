@@ -109,8 +109,7 @@ export default function App() {
     }
 
 
-    async function handlePublishNotes(notes: string, id?: number) {
-        if (!id) return;
+    async function handlePublishNotes(notes: string, id: number) {
 
         try {
             const updated = await updateApplicationNotes(id, notes);
@@ -143,7 +142,9 @@ export default function App() {
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage applications={allApps}
-                                                                   onStatusChange={handleUpdateStatusOptimistic}/>}/>
+                                                                   onStatusChange={handleUpdateStatusOptimistic}
+                                                                   onPublishNotes={handlePublishNotes}
+                    />}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

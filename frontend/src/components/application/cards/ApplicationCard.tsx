@@ -16,7 +16,7 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
     onToggleMenu: () => void,
     closeMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => void,
-    onPublishNotes: (notes: string, id?: number) => void
+    onPublishNotes: (notes: string, id: number) => void
 }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [expanded, setExpanded] = useState(false);

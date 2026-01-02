@@ -20,7 +20,7 @@ export function DashboardPage({
     handleSubmit: (request: CreateApplicationRequest) => void,
     handleEdit: (request: UpdateApplicationRequest, id: number) => void,
     handleDelete: (id: number) => void,
-    handlePublishNotes: (notes: string, id?: number) => void,
+    handlePublishNotes: (notes: string, id: number) => void,
     isLoading: boolean
 }) {
     const [apps, setApps] = useState<Application[]>([])
