@@ -18,19 +18,19 @@ export function ToolBar({
                             setStatusFilter,
                             isSortMenuOpen,
                             setSortKey,
-                            onToggleSortMenu,
-                            onToggleFilterMenu, onCloseFilterMenu, onCloseSortMenu
+                            toggleSortMenu,
+                            toggleFilterMenu, closeFilterMenu, closeSortMenu
                         }: ToolBarProps) {
     const sortKeyLabel = SORT_LABELS[sortKey] ?? "Unknown"
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
 
     // User Event Hooks
-    useOutsideClick(sortRef, isSortMenuOpen, () => onCloseSortMenu());
-    useOutsideClick(filterRef, isFilterMenuOpen, () => onCloseFilterMenu());
+    useOutsideClick(sortRef, isSortMenuOpen, () => closeSortMenu());
+    useOutsideClick(filterRef, isFilterMenuOpen, () => closeFilterMenu());
     useEscapeKey(() => {
-        onCloseSortMenu();
-        onCloseFilterMenu();
+        closeSortMenu();
+        closeFilterMenu();
     });
 
     return <div className={"flex flex-row justify-between"}>
@@ -60,7 +60,7 @@ export function ToolBar({
 
             <div ref={filterRef} className={"relative"}>
                 <IconButton
-                    onClick={() => onToggleFilterMenu()}
+                    onClick={() => toggleFilterMenu()}
                     icon={<FunnelIcon className={"w-5 h-5"}/>
                     }
                 />
@@ -75,7 +75,7 @@ export function ToolBar({
                             value={statusFilter}
                             onChange={(e) => {
                                 setStatusFilter(e.target.value);
-                                onCloseFilterMenu();
+                                closeFilterMenu();
                             }}
                             className="border rounded-md px-2 py-1 text-gray-700 w-full"
                         >
@@ -93,7 +93,7 @@ export function ToolBar({
             </div>
             <div ref={sortRef} className={"relative"}>
                 <IconButton
-                    onClick={onToggleSortMenu}
+                    onClick={toggleSortMenu}
                     icon={
                         sortDirection == "asc"
                             ? <BarsArrowUpIcon className={"w-5 h-5"}/>
@@ -112,7 +112,7 @@ export function ToolBar({
                                         `}
                                 onClick={() => {
                                     setSortKey(key);
-                                    onCloseSortMenu();
+                                    closeSortMenu();
                                 }}
                             >
                                 {key.charAt(0).toUpperCase() + key.slice(1)}

@@ -87,10 +87,10 @@ export function DashboardPage({
                     setStatusFilter={setStatusFilter}
                     isSortMenuOpen={isSortMenuOpen}
                     setSortKey={setSortKey}
-                    onToggleSortMenu={() => setIsSortMenuOpen(!isSortMenuOpen)}
-                    onToggleFilterMenu={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-                    onCloseFilterMenu={() => setIsFilterMenuOpen(false)}
-                    onCloseSortMenu={() => setIsSortMenuOpen(false)}
+                    toggleSortMenu={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                    toggleFilterMenu={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+                    closeFilterMenu={() => setIsFilterMenuOpen(false)}
+                    closeSortMenu={() => setIsSortMenuOpen(false)}
 
                 />
 

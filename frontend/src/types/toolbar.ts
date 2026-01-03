@@ -17,8 +17,8 @@ export interface ToolBarProps {
 
     setSortKey: React.Dispatch<React.SetStateAction<string>>;
 
-    onToggleSortMenu: () => void;
-    onToggleFilterMenu: () => void;
-    onCloseSortMenu: () => void;
-    onCloseFilterMenu: () => void;
+    toggleSortMenu: () => void;
+    toggleFilterMenu: () => void;
+    closeSortMenu: () => void;
+    closeFilterMenu: () => void;
 }
