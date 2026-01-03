@@ -5,6 +5,7 @@ import {BarsArrowDownIcon, BarsArrowUpIcon, FunnelIcon} from "@heroicons/react/2
 import {useRef} from "react";
 import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
 import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
+import {STATUS_UI, STATUSES} from "../../../constants/status.ts";
 
 export function ToolBar({
                             sortKey,
@@ -79,10 +80,11 @@ export function ToolBar({
                             className="border rounded-md px-2 py-1 text-gray-700 w-full"
                         >
                             <option value="">All</option>
-                            <option value="APPLIED">Applied</option>
-                            <option value="INTERVIEW">Interview</option>
-                            <option value="OFFER">Job Offer</option>
-                            <option value="REJECTED">Rejected</option>
+                            {STATUSES.map(status => (
+                                <option key={status} value={status}>
+                                    {STATUS_UI[status].label}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 )}
