@@ -4,9 +4,10 @@ import {ApplicationForm} from "./ApplicationForm.tsx";
 
 export function AddApplicationForm({onClose, onSubmit}: {
     onClose: () => void,
-    onSubmit: (request: CreateApplicationRequest) => void
+    onSubmit: (request: CreateApplicationRequest) => Promise<void>,
 }) {
     const today = new Date().toISOString().split("T")[0];
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [data, setData] = useState<ApplicationData>({
         jobTitle: "",
@@ -17,13 +18,20 @@ export function AddApplicationForm({onClose, onSubmit}: {
         notes: ""
     })
 
-    function handleCreate(data: ApplicationData) {
-        const request: CreateApplicationRequest = {
-            ...data,
-            jobTitle: data.jobTitle.trim(),
-            companyName: data.companyName.trim(),
-        };
-        onSubmit(request);
+    async function handleCreate(data: ApplicationData) {
+        setIsSubmitting(true)
+        try {
+            const request: CreateApplicationRequest = {
+                ...data,
+                jobTitle: data.jobTitle.trim(),
+                companyName: data.companyName.trim(),
+            };
+            await onSubmit(request);
+            onClose()
+        } finally {
+            setIsSubmitting(false)
+        }
+
     }
 
 
@@ -32,6 +40,9 @@ export function AddApplicationForm({onClose, onSubmit}: {
             data={data}
             setData={setData}
             onClose={onClose}
-            onSubmit={handleCreate}/>
+            onSubmit={handleCreate}
+            isSubmitting={isSubmitting}
+        />
+
     );
 }
