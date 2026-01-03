@@ -25,6 +25,7 @@ export function DashboardPage({
     isLoading: boolean
 }) {
 
+
     type SortKey = keyof typeof SORTERS;
     const [sortKey, setSortKey] = useState<SortKey>("date");
     const [openContextMenuId, setOpenContextMenuId] = useState<number | null>(null);
@@ -55,6 +56,9 @@ export function DashboardPage({
         setIsCreateModalOpen(false);
     }
 
+    function toggleContextMenuFor(appId: number) {
+        setOpenContextMenuId(prev => (prev === appId ? null : appId));
+    }
 
     return (
         <div className="min-h-screen flex justify-center">
@@ -104,8 +108,7 @@ export function DashboardPage({
                                          onPublishNotes={handlePublishNotes}
                                          application={app}
                                          isContextMenuOpen={openContextMenuId === app.id}
-                                         onToggleContextMenu={() =>
-                                             setOpenContextMenuId(prev => (prev === app.id ? null : app.id))}
+                                         toggleContextMenu={() => toggleContextMenuFor(app.id)}
                                          closeContextMenu={() => setOpenContextMenuId(null)}
                         />
                     ))

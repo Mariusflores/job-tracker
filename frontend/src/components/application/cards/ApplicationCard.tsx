@@ -15,13 +15,13 @@ export function ApplicationCard({
                                     onEdit,
                                     onPublishNotes,
                                     isContextMenuOpen,
-                                    onToggleContextMenu,
+                                    toggleContextMenu,
                                     closeContextMenu
                                 }: {
     application: Application,
     onDelete: (id: number) => void,
     isContextMenuOpen: boolean,
-    onToggleContextMenu: () => void,
+    toggleContextMenu: () => void,
     closeContextMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => void,
     onPublishNotes: (notes: string, id: number) => void
@@ -36,7 +36,7 @@ export function ApplicationCard({
 
     function handleDelete() {
         onDelete(application.id);
-        onToggleContextMenu();
+        toggleContextMenu();
     }
 
 
@@ -51,7 +51,7 @@ export function ApplicationCard({
     }
 
     function toggleToolBar() {
-        onToggleContextMenu();
+        toggleContextMenu();
     }
 
     return <div className={""}>
