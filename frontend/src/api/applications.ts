@@ -11,23 +11,23 @@ export async function getApplications() {
     return response.data;
 }
 
-export async function createApplication(request: CreateApplicationRequest) {
+export async function createApplicationApi(request: CreateApplicationRequest) {
     const response = await api.post<Application>("/application", request);
     return response.data;
 }
 
-export async function deleteApplication(id: number) {
+export async function deleteApplicationApi(id: number) {
     const response = await api.delete("/application/" + id);
     return response.data;
 }
 
 
-export async function updateApplication(id: number, request: UpdateApplicationRequest) {
+export async function updateApplicationApi(id: number, request: UpdateApplicationRequest) {
     const response = await api.patch("/application/" + id, request)
     return response.data;
 }
 
-export async function updateApplicationStatus(
+export async function updateApplicationStatusApi(
     id: number,
     status: ApplicationStatus
 ): Promise<Application> {
@@ -38,7 +38,7 @@ export async function updateApplicationStatus(
     return response.data;
 }
 
-export async function updateApplicationNotes(
+export async function updateApplicationNotesApi(
     id: number,
     notes: string
 ): Promise<Application> {

@@ -4,8 +4,8 @@ export const SORTERS: Record<
     keyof typeof SORT_LABELS,
     (a: Application, b: Application) => number
 > = {
-    status: (a, b) => a.status.localeCompare(b.status),
     date: (a, b) => a.appliedDate.localeCompare(b.appliedDate),
+    status: (a, b) => a.status.localeCompare(b.status),
     company: (a, b) => a.companyName.localeCompare(b.companyName),
     title: (a, b) => a.jobTitle.localeCompare(b.jobTitle),
 };

@@ -1,23 +1,24 @@
 import React from "react";
 
 export interface ToolBarProps {
-    sortType: string;
+    sortKey: string;
     sortDirection: "asc" | "desc";
     setSortDirection: React.Dispatch<React.SetStateAction<"asc" | "desc">>;
 
     searchQuery: string;
     setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 
-    isFilterOpen: boolean;
-    setIsFilterOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isFilterMenuOpen: boolean;
 
-    filterStatus: string;
-    setFilterStatus: React.Dispatch<React.SetStateAction<string>>;
+    statusFilter: string;
+    setStatusFilter: React.Dispatch<React.SetStateAction<string>>;
 
-    isSortOpen: boolean;
-    setIsSortOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    isSortMenuOpen: boolean;
 
-    setSortType: React.Dispatch<React.SetStateAction<string>>;
+    setSortKey: React.Dispatch<React.SetStateAction<string>>;
 
-    onToggleOpen: () => void;
+    toggleSortMenu: () => void;
+    toggleFilterMenu: () => void;
+    closeSortMenu: () => void;
+    closeFilterMenu: () => void;
 }

@@ -9,53 +9,63 @@ import {parseDate} from "../../../utils/date.ts";
 import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
 import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
 
-export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, isMenuOpen, onToggleMenu, closeMenu}: {
+export function ApplicationCard({
+                                    application,
+                                    onDelete,
+                                    onEdit,
+                                    onPublishNotes,
+                                    isContextMenuOpen,
+                                    toggleContextMenu,
+                                    closeContextMenu
+                                }: {
     application: Application,
     onDelete: (id: number) => void,
-    isMenuOpen: boolean,
-    onToggleMenu: () => void,
-    closeMenu: () => void,
+    isContextMenuOpen: boolean,
+    toggleContextMenu: () => void,
+    closeContextMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => void,
     onPublishNotes: (notes: string, id: number) => void
 }) {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [expanded, setExpanded] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const menuRef = useRef<HTMLDivElement | null>(null);
 
-    useOutsideClick(menuRef, isMenuOpen, closeMenu);
-    useEscapeKey(() => closeMenu());
+    useOutsideClick(menuRef, isContextMenuOpen, closeContextMenu);
+    useEscapeKey(() => closeContextMenu());
 
     function handleDelete() {
         onDelete(application.id);
-        onToggleMenu();
+        closeContextMenu();
     }
 
 
-    function openModal() {
-        closeMenu();
-        setIsModalOpen(true);
+    function openEditModal() {
+        closeContextMenu();
+        setIsEditModalOpen(true);
 
     }
 
-    function closeModal() {
-        setIsModalOpen(false);
+    function closeEditModal() {
+        setIsEditModalOpen(false);
     }
 
-    function toggleToolBar() {
-        onToggleMenu();
+    function openExpandedView() {
+        setIsExpanded(true);
     }
 
     return <div className={""}>
 
-        {expanded && (
-            <ExpandedApplicationCard expanded={expanded} onClose={() => setExpanded(false)} application={application}
+        {isExpanded && (
+            <ExpandedApplicationCard expanded={isExpanded}
+                                     onClose={() => setIsExpanded(false)}
+                                     application={application}
                                      publishNotes={onPublishNotes}/>
         )}
 
         <div role={"button"}
              className={"relative  space-y-4 bg-white rounded-lg shadow p-4 border hover:shadow-lg transition "}
-             onClick={() => setExpanded(true)}
+             onClick={openExpandedView}
         >
             <div className={"flex flex-row justify-between"}>
                 <p className={"font-semibold text-2xl text-black"}>{application.companyName}</p>
@@ -67,17 +77,17 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
 
                     <div ref={menuRef}>
                         <IconButton onClick={(e) => {
-                            e.stopPropagation()
-                            toggleToolBar()
+                            e.stopPropagation();
+                            toggleContextMenu();
                         }}
                                     icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
 
                         {/* Dropdown Menu */}
-                        {isMenuOpen && (
+                        {isContextMenuOpen && (
                             <div onClick={(e) => e.stopPropagation()}
                                  className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
                                 <button onClick={() => {
-                                    openModal()
+                                    openEditModal()
                                 }}
                                         className="block text-black px-4 py-2 hover:bg-gray-100 w-full text-left">
                                     Edit
@@ -99,8 +109,8 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
 
         </div>
         {/* Edit Application Modal */}
-        {isModalOpen && <EditApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={onEdit}
-                                              application={application}/>}
+        {isEditModalOpen && <EditApplicationModal isOpen={isEditModalOpen} onClose={closeEditModal} onSubmit={onEdit}
+                                                  application={application}/>}
 
 
     </div>;
