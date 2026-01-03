@@ -19,6 +19,8 @@ import {
     updateApplicationStatusApi
 } from "./api/applications.ts";
 import {STATUSES} from "./constants/status.ts";
+import type {Enrichment} from "./types/enrichment.ts";
+import {fetchJobPostingEnrichmentApi} from "./api/enrichment.ts";
 
 export default function App() {
     const [backendApps, setBackendApps] = useState<Application[]>([])
@@ -125,6 +127,10 @@ export default function App() {
         }
     }
 
+    async function fetchJobPostEnrichment(url: string): Promise<Enrichment> {
+        return await fetchJobPostingEnrichmentApi(url);
+    }
+
 
     return (
         <BrowserRouter>
@@ -138,8 +144,7 @@ export default function App() {
                                handleEdit={updateApplication}
                                handleDelete={deleteApplication}
                                handlePublishNotes={updateApplicationNotes}
-                               isLoading={isLoading}
-                           />
+                               isLoading={isLoading} onAutofill={fetchJobPostEnrichment}/>
 
                            }/>
                     <Route path="/pipeline" element={<PipelinePage backendApps={backendApps}
