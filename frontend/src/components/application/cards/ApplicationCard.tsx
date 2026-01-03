@@ -23,7 +23,7 @@ export function ApplicationCard({
     isContextMenuOpen: boolean,
     toggleContextMenu: () => void,
     closeContextMenu: () => void,
-    onEdit: (request: UpdateApplicationRequest, id: number) => void,
+    onEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
     onPublishNotes: (notes: string, id: number) => void
 }) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);

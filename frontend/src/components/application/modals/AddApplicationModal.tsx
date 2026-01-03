@@ -5,7 +5,7 @@ import Modal from "../../shared/Modal.tsx";
 export function AddApplicationModal({isOpen, onClose, onSubmit}: {
     isOpen: boolean,
     onClose: () => void,
-    onSubmit: (request: CreateApplicationRequest) => void
+    onSubmit: (request: CreateApplicationRequest) => Promise<void>
 }) {
 
 

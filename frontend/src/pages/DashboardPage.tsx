@@ -18,8 +18,8 @@ export function DashboardPage({
                                   isLoading
                               }: {
     backendApps: Application[],
-    handleSubmit: (request: CreateApplicationRequest) => void,
-    handleEdit: (request: UpdateApplicationRequest, id: number) => void,
+    handleSubmit: (request: CreateApplicationRequest) => Promise<void>,
+    handleEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
     handleDelete: (id: number) => void,
     handlePublishNotes: (notes: string, id: number) => void,
     isLoading: boolean
