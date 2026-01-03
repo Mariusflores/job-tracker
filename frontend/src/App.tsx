@@ -141,7 +141,7 @@ export default function App() {
                            />
 
                            }/>
-                    <Route path="/pipeline" element={<PipelinePage applications={allApps}
+                    <Route path="/pipeline" element={<PipelinePage backendApps={allApps}
                                                                    onStatusChange={handleUpdateStatusOptimistic}
                                                                    onPublishNotes={handlePublishNotes}
                     />}/>
