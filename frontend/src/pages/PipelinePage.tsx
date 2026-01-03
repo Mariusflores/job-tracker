@@ -106,7 +106,7 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
                 <ExpandedApplicationCard
                     application={expandedApplication}
                     onClose={() => setExpandedAppId(null)}
-                    expandedAppId={expandedAppId !== null}
+                    expanded={expandedAppId !== null}
                     publishNotes={onPublishNotes}/>
             )}
             <DndContext

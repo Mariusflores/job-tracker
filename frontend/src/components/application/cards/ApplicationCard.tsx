@@ -57,7 +57,8 @@ export function ApplicationCard({
     return <div className={""}>
 
         {isExpanded && (
-            <ExpandedApplicationCard expandedAppId={isExpanded} onClose={() => setIsExpanded(false)}
+            <ExpandedApplicationCard expanded={isExpanded}
+                                     onClose={() => setIsExpanded(false)}
                                      application={application}
                                      publishNotes={onPublishNotes}/>
         )}
