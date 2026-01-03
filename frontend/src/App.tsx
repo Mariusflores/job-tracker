@@ -11,16 +11,17 @@ import type {
     UpdateApplicationRequest
 } from "./types/application.ts";
 import {
-    createApplication,
-    deleteApplication,
+    createApplicationApi,
+    deleteApplicationApi,
     getApplications,
-    updateApplication,
-    updateApplicationNotes,
-    updateApplicationStatus
+    updateApplicationApi,
+    updateApplicationNotesApi,
+    updateApplicationStatusApi
 } from "./api/applications.ts";
+import {STATUSES} from "./constants/status.ts";
 
 export default function App() {
-    const [allApps, setAllApps] = useState<Application[]>([])
+    const [backendApps, setBackendApps] = useState<Application[]>([])
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
@@ -29,92 +30,92 @@ export default function App() {
 
     useEffect(() => {
         if (import.meta.env.DEV) {
-            allApps.forEach(app => {
-                if (!["APPLIED", "INTERVIEW", "OFFER", "REJECTED"].includes(app.status)) {
+            backendApps.forEach(app => {
+                if (!STATUSES.includes(app.status)) {
                     throw new Error(`Invalid status detected: ${app.status}`);
                 }
             });
         }
 
-    }, [allApps]);
+    }, [backendApps]);
 
 
     async function loadApps() {
         setIsLoading(true);
         const data = await getApplications();
-        setAllApps(data)
+        setBackendApps(data)
         setIsLoading(false);
     }
 
-    async function handleSubmit(request: CreateApplicationRequest) {
-        const newApp = await createApplication(request);
-        setAllApps(prev => [...prev, newApp]);
+    async function createApplication(request: CreateApplicationRequest) {
+        const newApp = await createApplicationApi(request);
+        setBackendApps(prev => [...prev, newApp]);
     }
 
-    async function handleDelete(id: number) {
-        setAllApps(prev => prev.filter(app => app.id !== id));
+    async function deleteApplication(id: number) {
+        setBackendApps(prev => prev.filter(app => app.id !== id));
 
         try {
-            await deleteApplication(id);
+            await deleteApplicationApi(id);
         } catch (error) {
             await loadApps();
         }
     }
 
-    async function handleUpdateStatusOptimistic(
+    async function updateApplicationStatus(
         status: ApplicationStatus,
         id: number
     ) {
-        const previous = structuredClone(allApps);
+        const previous = structuredClone(backendApps);
 
-        setAllApps(prev =>
+        setBackendApps(prev =>
             prev.map(app =>
                 app.id === id ? {...app, status} : app
             )
         );
 
         try {
-            const updated = await updateApplicationStatus(id, status);
+            const updated = await updateApplicationStatusApi(id, status);
 
-            setAllApps(prev =>
+            setBackendApps(prev =>
                 prev.map(app =>
                     app.id === id ? updated : app
                 )
             );
         } catch (err) {
             console.error("Failed to update status, reverting", err);
-            setAllApps(previous);
+            setBackendApps(previous);
         }
     }
 
 
-    async function handleEdit(
+    async function updateApplication(
         request: UpdateApplicationRequest,
         id: number
     ) {
-        const previous = structuredClone(allApps);
+        const previous = structuredClone(backendApps);
 
         try {
-            const updatedApp = await updateApplication(id, request);
+            const updatedApp = await updateApplicationApi(id, request);
 
-            setAllApps(prev =>
+            setBackendApps(prev =>
                 prev.map(app =>
                     app.id === id ? updatedApp : app
                 )
             );
         } catch (error) {
             console.error("Failed to update application, reverting", error);
-            setAllApps(previous);
+            setBackendApps(previous);
         }
     }
 
 
-    async function handlePublishNotes(notes: string, id: number) {
+    async function updateApplicationNotes(notes: string, id: number) {
 
         try {
-            const updated = await updateApplicationNotes(id, notes);
+            const updated = await updateApplicationNotesApi(id, notes);
 
-            setAllApps(prev =>
+            setBackendApps(prev =>
                 prev.map(app =>
                     app.id === id ? updated : app
                 )
@@ -132,18 +133,18 @@ export default function App() {
                     <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
                     <Route path="/dashboard"
                            element={<DashboardPage
-                               backendApps={allApps}
-                               handleSubmit={handleSubmit}
-                               handleEdit={handleEdit}
-                               handleDelete={handleDelete}
-                               handlePublishNotes={handlePublishNotes}
+                               backendApps={backendApps}
+                               handleSubmit={createApplication}
+                               handleEdit={updateApplication}
+                               handleDelete={deleteApplication}
+                               handlePublishNotes={updateApplicationNotes}
                                isLoading={isLoading}
                            />
 
                            }/>
-                    <Route path="/pipeline" element={<PipelinePage backendApps={allApps}
-                                                                   onStatusChange={handleUpdateStatusOptimistic}
-                                                                   onPublishNotes={handlePublishNotes}
+                    <Route path="/pipeline" element={<PipelinePage backendApps={backendApps}
+                                                                   onStatusChange={updateApplicationStatus}
+                                                                   onPublishNotes={updateApplicationNotes}
                     />}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
