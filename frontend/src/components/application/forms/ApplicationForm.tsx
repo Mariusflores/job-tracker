@@ -2,7 +2,7 @@ import type {FormProps} from "../../../types/form.ts";
 import type {ApplicationData, ApplicationStatus} from "../../../types/application.ts";
 
 export function ApplicationForm({
-                                    data, setData, onClose, onSubmit
+                                    data, setData, onClose, onSubmit, isSubmitting
                                 }:
                                 FormProps) {
 
@@ -13,8 +13,8 @@ export function ApplicationForm({
 
     return <form className="space-y-4 p-4" onSubmit={(e) => {
         e.preventDefault();
+        if (isSubmitting) return
         onSubmit(data);
-        onClose();
     }}>
 
         <h2 className="text-xl font-semibold mb-2">Add Application</h2>
@@ -94,9 +94,10 @@ export function ApplicationForm({
 
             <button
                 type="submit"
+                disabled={isSubmitting}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
-                Save
+                {isSubmitting ? "Saving..." : "Save"}
             </button>
         </div>
     </form>

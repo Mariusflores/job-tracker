@@ -4,9 +4,11 @@ import {ApplicationForm} from "./ApplicationForm.tsx";
 
 export function EditApplicationForm({onClose, onSubmit, application}: {
     onClose: () => void,
-    onSubmit: (request: UpdateApplicationRequest, id: number,) => void,
+    onSubmit: (request: UpdateApplicationRequest, id: number,) => Promise<void>,
     application: Application
 }) {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [data, setData] = useState<ApplicationData>({
         jobTitle: application.jobTitle,
         companyName: application.companyName,
@@ -16,16 +18,24 @@ export function EditApplicationForm({onClose, onSubmit, application}: {
         notes: application.notes
     })
 
-    function handleUpdate(data: ApplicationData) {
-        const request: UpdateApplicationRequest = {
-            jobTitle: data.jobTitle.trim(),
-            companyName: data.companyName.trim(),
-            descriptionUrl: data.descriptionUrl,
-            status: data.status,
-            appliedDate: data.appliedDate,
-        };
+    async function handleUpdate(data: ApplicationData) {
+        setIsSubmitting(true);
+        try {
+            const request: UpdateApplicationRequest = {
+                jobTitle: data.jobTitle.trim(),
+                companyName: data.companyName.trim(),
+                descriptionUrl: data.descriptionUrl,
+                status: data.status,
+                appliedDate: data.appliedDate,
+            };
 
-        onSubmit(request, application.id);
+            await onSubmit(request, application.id);
+
+            onClose();
+        } finally {
+            setIsSubmitting(false)
+        }
+
     }
 
 
@@ -35,6 +45,7 @@ export function EditApplicationForm({onClose, onSubmit, application}: {
             setData={setData}
             onClose={onClose}
             onSubmit={handleUpdate}
+            isSubmitting={isSubmitting}
         />
     );
 }
