@@ -9,23 +9,35 @@ import {ExpandedApplicationCard} from "../components/application/modals/Expanded
 const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
 
 function mergeBackendApps(
-    local: Application[],
-    backend: Application[]
+    localOrdered: Application[],
+    backendSnapshot: Application[]
 ): Application[] {
-    const backendById = new Map(backend.map(a => [a.id, a]));
+    const backendById = new Map(backendSnapshot.map(a => [a.id, a]));
 
-    const updated = local
+    const updated = localOrdered
         .map(app => {
             const backendApp = backendById.get(app.id);
             return backendApp ? {...app, ...backendApp} : app;
         })
         .filter(app => backendById.has(app.id));
 
-    const newApps = backend.filter(
-        app => !local.some(l => l.id === app.id)
+    const newApps = backendSnapshot.filter(
+        app => !localOrdered.some(l => l.id === app.id)
     );
 
     return [...updated, ...newApps];
+}
+
+function resolveTargetStatus(
+    overId: unknown,
+    pipelineApps: Application[]
+): ApplicationStatus | null {
+    if (STATUSES.includes(overId as ApplicationStatus)) {
+        return overId as ApplicationStatus;
+    }
+
+    const overApp = pipelineApps.find(a => a.id === overId);
+    return overApp?.status ?? null;
 }
 
 
@@ -56,11 +68,6 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         useState<number | null>(null);
 
 
-    function isApplicationStatus(value: unknown): value is ApplicationStatus {
-        return STATUSES.includes(value as ApplicationStatus);
-    }
-
-
     function handleDragEnd(event: DragEndEvent) {
         const {active, over} = event;
         setActiveId(null);
@@ -74,16 +81,7 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         const draggedApp = pipelineApps.find(a => a.id === activeId);
         if (!draggedApp) return;
 
-        let targetStatus: ApplicationStatus | null = null;
-
-        if (isApplicationStatus(overId)) {
-            targetStatus = overId;
-        } else {
-            const overApp = pipelineApps.find(a => a.id === overId);
-            if (overApp) {
-                targetStatus = overApp.status;
-            }
-        }
+        const targetStatus = resolveTargetStatus(overId, pipelineApps);
 
         const isSameColumn = targetStatus === draggedApp.status;
 
