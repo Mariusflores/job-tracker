@@ -1,44 +1,16 @@
 import {DndContext, type DragEndEvent, DragOverlay, type DragStartEvent} from "@dnd-kit/core";
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import type {Application, ApplicationStatus} from "../types/application.ts";
 import {ExpandedApplicationCard} from "../components/application/modals/ExpandedApplicationCard.tsx";
-
-const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
-
-function mergeBackendApps(
-    localOrdered: Application[],
-    backendSnapshot: Application[]
-): Application[] {
-    const backendById = new Map(backendSnapshot.map(a => [a.id, a]));
-
-    const updated = localOrdered
-        .map(app => {
-            const backendApp = backendById.get(app.id);
-            return backendApp ? {...app, ...backendApp} : app;
-        })
-        .filter(app => backendById.has(app.id));
-
-    const newApps = backendSnapshot.filter(
-        app => !localOrdered.some(l => l.id === app.id)
-    );
-
-    return [...updated, ...newApps];
-}
-
-function resolveTargetStatus(
-    overId: unknown,
-    pipelineApps: Application[]
-): ApplicationStatus | null {
-    if (STATUSES.includes(overId as ApplicationStatus)) {
-        return overId as ApplicationStatus;
-    }
-
-    const overApp = pipelineApps.find(a => a.id === overId);
-    return overApp?.status ?? null;
-}
+import {
+    mergeBackendApps,
+    moveAppToBottomOfStatus,
+    resolveTargetStatus,
+    STATUSES
+} from "../utils/pipeline/pipelineOrder.ts";
 
 
 export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
@@ -56,12 +28,13 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
     }, [backendApps]);
 
 
-    const columns = {
+    const columns = useMemo(() => ({
         APPLIED: pipelineApps.filter(a => a.status === "APPLIED"),
         INTERVIEW: pipelineApps.filter(a => a.status === "INTERVIEW"),
         OFFER: pipelineApps.filter(a => a.status === "OFFER"),
         REJECTED: pipelineApps.filter(a => a.status === "REJECTED"),
-    } as const;
+    }), [pipelineApps]);
+
     const [activeId, setActiveId] = useState<number | null>(null);
 
     const [expandedAppId, setExpandedAppId] =
@@ -89,37 +62,18 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         // Remove updated application from array, then reinsert to the bottom of the column after status update
         if (targetStatus && targetStatus !== draggedApp.status) {
 
-            setPipelineApps(prev => {
-                const remaining = prev.filter(a => a.id !== activeId);
-
-                const insertIndex =
-                    remaining.reduce<number | null>((lastIdx, app, idx) => {
-                        return app.status === targetStatus ? idx : lastIdx;
-                    }, null);
-
-                const updated = {...draggedApp, status: targetStatus};
-
-                if (insertIndex === null) {
-                    return [...remaining, updated];
-                }
-
-                return [
-                    ...remaining.slice(0, insertIndex + 1),
-                    updated,
-                    ...remaining.slice(insertIndex + 1),
-                ];
-            });
-
+            setPipelineApps(prev =>
+                moveAppToBottomOfStatus(prev, draggedApp.id, targetStatus)
+            );
             onStatusChange(targetStatus, activeId);
             return;
         }
 
-
-// Reordering ONLY if same column
+        // Reordering ONLY if same column
         if (isSameColumn) {
-            const columnApps = pipelineApps.filter(a => a.status === draggedApp.status);
-            const oldIndex = columnApps.findIndex(a => a.id === activeId);
-            const newIndex = columnApps.findIndex(a => a.id === overId);
+            const columnApps = pipelineApps.filter(app => app.status === draggedApp.status);
+            const oldIndex = columnApps.findIndex(app => app.id === activeId);
+            const newIndex = columnApps.findIndex(app => app.id === overId);
 
             if (oldIndex !== -1 && newIndex !== -1) {
                 const reordered = arrayMove(columnApps, oldIndex, newIndex);
@@ -138,7 +92,7 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         setActiveId(event.active.id as number);
     }
 
-    function openExpandedView(id: number) {
+    function openDetails(id: number) {
         setExpandedAppId(id);
     }
 
@@ -171,7 +125,7 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
                             key={status}
                             status={status}
                             cards={columns[status as keyof typeof columns]}
-                            onOpenDetails={openExpandedView}
+                            onOpenDetails={openDetails}
                         />
 
 
