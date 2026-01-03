@@ -83,12 +83,15 @@ export function DashboardPage({
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
                     isFilterMenuOpen={isFilterMenuOpen}
-                    setIsFilterButtonOpen={setIsFilterMenuOpen}
                     statusFilter={statusFilter}
                     setStatusFilter={setStatusFilter}
-                    isSortMenuOpen={isSortMenuOpen} setIsSortButtonOpen={setIsSortMenuOpen}
+                    isSortMenuOpen={isSortMenuOpen}
                     setSortKey={setSortKey}
-                    onToggleOpen={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                    onToggleSortMenu={() => setIsSortMenuOpen(!isSortMenuOpen)}
+                    onToggleFilterMenu={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
+                    onCloseFilterMenu={() => setIsFilterMenuOpen(false)}
+                    onCloseSortMenu={() => setIsSortMenuOpen(false)}
+
                 />
 
                 {isLoading ? (
@@ -101,9 +104,9 @@ export function DashboardPage({
                                          onPublishNotes={handlePublishNotes}
                                          application={app}
                                          isContextMenuOpen={openContextMenuId === app.id}
-                                         onToggleMenu={() =>
+                                         onToggleContextMenu={() =>
                                              setOpenContextMenuId(prev => (prev === app.id ? null : app.id))}
-                                         closeMenu={() => setOpenContextMenuId(null)}
+                                         closeContextMenu={() => setOpenContextMenuId(null)}
                         />
                     ))
                 )

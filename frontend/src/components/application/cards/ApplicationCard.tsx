@@ -15,14 +15,14 @@ export function ApplicationCard({
                                     onEdit,
                                     onPublishNotes,
                                     isContextMenuOpen,
-                                    onToggleMenu,
-                                    closeMenu
+                                    onToggleContextMenu,
+                                    closeContextMenu
                                 }: {
     application: Application,
     onDelete: (id: number) => void,
     isContextMenuOpen: boolean,
-    onToggleMenu: () => void,
-    closeMenu: () => void,
+    onToggleContextMenu: () => void,
+    closeContextMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => void,
     onPublishNotes: (notes: string, id: number) => void
 }) {
@@ -31,17 +31,17 @@ export function ApplicationCard({
 
     const menuRef = useRef<HTMLDivElement | null>(null);
 
-    useOutsideClick(menuRef, isContextMenuOpen, closeMenu);
-    useEscapeKey(() => closeMenu());
+    useOutsideClick(menuRef, isContextMenuOpen, closeContextMenu);
+    useEscapeKey(() => closeContextMenu());
 
     function handleDelete() {
         onDelete(application.id);
-        onToggleMenu();
+        onToggleContextMenu();
     }
 
 
     function openModal() {
-        closeMenu();
+        closeContextMenu();
         setIsModalOpen(true);
 
     }
@@ -51,7 +51,7 @@ export function ApplicationCard({
     }
 
     function toggleToolBar() {
-        onToggleMenu();
+        onToggleContextMenu();
     }
 
     return <div className={""}>

@@ -13,24 +13,23 @@ export function ToolBar({
                             searchQuery,
                             setSearchQuery,
                             isFilterMenuOpen,
-                            setIsFilterButtonOpen,
                             statusFilter,
                             setStatusFilter,
                             isSortMenuOpen,
-                            setIsSortButtonOpen,
                             setSortKey,
-                            onToggleOpen
+                            onToggleSortMenu,
+                            onToggleFilterMenu, onCloseFilterMenu, onCloseSortMenu
                         }: ToolBarProps) {
     const sortKeyLabel = SORT_LABELS[sortKey] ?? "Unknown"
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
 
     // User Event Hooks
-    useOutsideClick(sortRef, isSortMenuOpen, () => setIsSortButtonOpen(false));
-    useOutsideClick(filterRef, isFilterMenuOpen, () => setIsFilterButtonOpen(false));
+    useOutsideClick(sortRef, isSortMenuOpen, () => onCloseSortMenu());
+    useOutsideClick(filterRef, isFilterMenuOpen, () => onCloseFilterMenu());
     useEscapeKey(() => {
-        setIsSortButtonOpen(false)
-        setIsFilterButtonOpen(false)
+        onCloseSortMenu();
+        onCloseFilterMenu();
     });
 
     return <div className={"flex flex-row justify-between"}>
@@ -60,7 +59,7 @@ export function ToolBar({
 
             <div ref={filterRef} className={"relative"}>
                 <IconButton
-                    onClick={() => setIsFilterButtonOpen(!isFilterMenuOpen)}
+                    onClick={() => onToggleFilterMenu()}
                     icon={<FunnelIcon className={"w-5 h-5"}/>
                     }
                 />
@@ -73,7 +72,10 @@ export function ToolBar({
 
                         <select
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => {
+                                setStatusFilter(e.target.value);
+                                onCloseFilterMenu();
+                            }}
                             className="border rounded-md px-2 py-1 text-gray-700 w-full"
                         >
                             <option value="">All</option>
@@ -89,7 +91,7 @@ export function ToolBar({
             </div>
             <div ref={sortRef} className={"relative"}>
                 <IconButton
-                    onClick={onToggleOpen}
+                    onClick={onToggleSortMenu}
                     icon={
                         sortDirection == "asc"
                             ? <BarsArrowUpIcon className={"w-5 h-5"}/>
@@ -108,7 +110,7 @@ export function ToolBar({
                                         `}
                                 onClick={() => {
                                     setSortKey(key);
-                                    setIsSortButtonOpen(false);
+                                    onCloseSortMenu();
                                 }}
                             >
                                 {key.charAt(0).toUpperCase() + key.slice(1)}
