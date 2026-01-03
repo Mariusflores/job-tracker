@@ -7,37 +7,37 @@ import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
 import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
 
 export function ToolBar({
-                            sortType,
+                            sortKey,
                             sortDirection,
                             setSortDirection,
                             searchQuery,
                             setSearchQuery,
-                            isFilterOpen,
-                            setIsFilterOpen,
-                            filterStatus,
-                            setFilterStatus,
-                            isSortOpen,
-                            setIsSortOpen,
-                            setSortType,
+                            isFilterMenuOpen,
+                            setIsFilterButtonOpen,
+                            statusFilter,
+                            setStatusFilter,
+                            isSortMenuOpen,
+                            setIsSortButtonOpen,
+                            setSortKey,
                             onToggleOpen
                         }: ToolBarProps) {
-    const sortTypeLabel = SORT_LABELS[sortType] ?? "Unknown"
+    const sortKeyLabel = SORT_LABELS[sortKey] ?? "Unknown"
     const sortRef = useRef<HTMLDivElement | null>(null);
     const filterRef = useRef<HTMLDivElement | null>(null);
 
     // User Event Hooks
-    useOutsideClick(sortRef, isSortOpen, () => setIsSortOpen(false));
-    useOutsideClick(filterRef, isFilterOpen, () => setIsFilterOpen(false));
+    useOutsideClick(sortRef, isSortMenuOpen, () => setIsSortButtonOpen(false));
+    useOutsideClick(filterRef, isFilterMenuOpen, () => setIsFilterButtonOpen(false));
     useEscapeKey(() => {
-        setIsSortOpen(false)
-        setIsFilterOpen(false)
+        setIsSortButtonOpen(false)
+        setIsFilterButtonOpen(false)
     });
 
     return <div className={"flex flex-row justify-between"}>
         <div className={"flex items-center gap-2"}>
             <p className="text-gray-500">
                 Sort by: <span
-                className="font-medium">{sortTypeLabel}</span>
+                className="font-medium">{sortKeyLabel}</span>
             </p>
             <select
                 value={sortDirection}
@@ -60,20 +60,20 @@ export function ToolBar({
 
             <div ref={filterRef} className={"relative"}>
                 <IconButton
-                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    onClick={() => setIsFilterButtonOpen(!isFilterMenuOpen)}
                     icon={<FunnelIcon className={"w-5 h-5"}/>
                     }
                 />
 
-                {isFilterOpen && (
+                {isFilterMenuOpen && (
                     <div
                         className="absolute right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-48 p-3"
                     >
                         <p className="text-gray-700 mb-1 font-medium">Filter by Status</p>
 
                         <select
-                            value={filterStatus}
-                            onChange={(e) => setFilterStatus(e.target.value)}
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
                             className="border rounded-md px-2 py-1 text-gray-700 w-full"
                         >
                             <option value="">All</option>
@@ -96,7 +96,7 @@ export function ToolBar({
                             : <BarsArrowDownIcon className={"w-5 h-5"}/>
                     }/>
 
-                {isSortOpen && (
+                {isSortMenuOpen && (
                     <div
                         className="absolute right-0 mt-2 bg-white border shadow-lg rounded-md text-sm z-50 w-40">
                         {Object.keys(SORTERS).map(key => (
@@ -104,11 +104,11 @@ export function ToolBar({
                                 key={key}
                                 className={`block w-full text-black text-left px-4 py-2 
                                         hover:bg-gray-100
-                                        ${sortType === key ? "bg-gray-100 font-semibold" : ""}
+                                        ${sortKey === key ? "bg-gray-100 font-semibold" : ""}
                                         `}
                                 onClick={() => {
-                                    setSortType(key);
-                                    setIsSortOpen(false);
+                                    setSortKey(key);
+                                    setIsSortButtonOpen(false);
                                 }}
                             >
                                 {key.charAt(0).toUpperCase() + key.slice(1)}

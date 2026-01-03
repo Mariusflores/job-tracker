@@ -1,3 +1,5 @@
+import type {ApplicationStatus} from "../types/application.ts";
+
 export const STATUS_UI = {
     APPLIED: {
         label: "Applied",
@@ -20,3 +22,7 @@ export const STATUS_UI = {
         classes: "bg-gray-700 text-gray-200",
     },
 } as const;
+
+export const STATUSES: readonly ApplicationStatus[] = [
+    "APPLIED", "INTERVIEW", "OFFER", "REJECTED"
+] as const;

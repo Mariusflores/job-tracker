@@ -1,82 +1,58 @@
-import {useEffect, useState} from "react";
+import {useMemo, useState} from "react";
 import type {Application, CreateApplicationRequest, UpdateApplicationRequest} from "../types/application.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/shared/Loader.tsx";
-import {SORTERS} from "../constants/sorting.ts";
 import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 
 import {StatusBar} from "../components/application/cards/StatusBar.tsx";
+import {countByStatus, filterApps, sortAppsBy} from "../utils/dashboard/dashboardUtils.ts";
+import type {SORTERS} from "../constants/sorting.ts";
 
 export function DashboardPage({
-                                  allApps,
+                                  backendApps,
                                   handleSubmit,
                                   handleEdit,
                                   handleDelete,
                                   handlePublishNotes,
                                   isLoading
                               }: {
-    allApps: Application[],
+    backendApps: Application[],
     handleSubmit: (request: CreateApplicationRequest) => void,
     handleEdit: (request: UpdateApplicationRequest, id: number) => void,
     handleDelete: (id: number) => void,
     handlePublishNotes: (notes: string, id: number) => void,
     isLoading: boolean
 }) {
-    const [apps, setApps] = useState<Application[]>([])
 
-    const [openMenuId, setOpenMenuId] = useState<number | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
-    const [isSortOpen, setIsSortOpen] = useState(false)
-    const [sortType, setSortType] = useState("date")
+    type SortKey = keyof typeof SORTERS;
+    const [sortKey, setSortKey] = useState<SortKey>("date");
+    const [openContextMenuId, setOpenContextMenuId] = useState<number | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
+    const [isSortMenuOpen, setIsSortMenuOpen] = useState(false)
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
-    const [isFilterOpen, setIsFilterOpen] = useState(false)
-    const [filterStatus, setFilterStatus] = useState<string>("")
+    const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
+    const [statusFilter, setStatusFilter] = useState<string>("")
     const [searchQuery, setSearchQuery] = useState("");
 
-    const totalCount = allApps.length;
-    const appliedCount = allApps.filter(a => a.status == "APPLIED").length;
-    const interviewCount = allApps.filter(a => a.status == "INTERVIEW").length;
-    const offerCount = allApps.filter(a => a.status == "OFFER").length;
+
+    const totalCount = backendApps.length;
+    const appliedCount = countByStatus(backendApps, "APPLIED");
+    const interviewCount = countByStatus(backendApps, "INTERVIEW")
+    const offerCount = countByStatus(backendApps, "OFFER")
+
+    // Applications visible after filtering + sorting (derived from backend)
+    const visibleApps = useMemo(() => {
+        return sortAppsBy(filterApps(backendApps, statusFilter, searchQuery), sortKey, sortDirection);
+    }, [backendApps, statusFilter, searchQuery, sortKey, sortDirection]);
 
 
-    useEffect(() => {
-        // Apply filters before sorting
-        setApps(sortApps(applyFilters(allApps), sortType, sortDirection))
-    }, [sortType, sortDirection, filterStatus, searchQuery, allApps])
-
-
-    function sortApps(apps: Application[], sortType: string, direction: "asc" | "desc") {
-        const sorter = SORTERS[sortType as keyof typeof SORTERS];
-        if (!sorter) return apps;
-        const sorted = [...apps].sort(sorter);
-        return direction === "asc" ? sorted : sorted.reverse();
+    function openCreateModal() {
+        setIsCreateModalOpen(true);
     }
 
-    function applyFilters(apps: Application[]) {
-        let result = apps;
-
-        if (filterStatus) {
-            result = result.filter(a => a.status === filterStatus);
-        }
-
-        if (searchQuery.trim()) {
-            const q = searchQuery.toLowerCase();
-            result = result.filter(a =>
-                a.companyName.toLowerCase().includes(q) ||
-                a.jobTitle.toLowerCase().includes(q)
-            );
-        }
-
-        return result;
-    }
-
-    function openModal() {
-        setIsModalOpen(true);
-    }
-
-    function closeModal() {
-        setIsModalOpen(false);
+    function closeCreateModal() {
+        setIsCreateModalOpen(false);
     }
 
 
@@ -85,7 +61,7 @@ export function DashboardPage({
             <div className="bg-white shadow mt-5 space-y-4 p-6 md:p-10 w-full max-w-4xl mx-auto rounded-lg">
                 <div className={"flex flex-row justify-between"}>
                     <h2 className="text-3xl text-black font-semibold mb-4">Dashboard</h2>
-                    <button onClick={openModal}
+                    <button onClick={openCreateModal}
                             className={"px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-200"}
                     >
                         + Add Application
@@ -97,42 +73,44 @@ export function DashboardPage({
                            appliedCount={appliedCount}
                            interviewCount={interviewCount}
                            offerCount={offerCount}
-                           setFilterStatus={setFilterStatus}
-                           filterStatus={filterStatus}
+                           setStatusFilter={setStatusFilter}
+                           statusFilter={statusFilter}
                 />
                 <ToolBar
-                    sortType={sortType}
+                    sortKey={sortKey}
                     sortDirection={sortDirection}
                     setSortDirection={setSortDirection}
                     searchQuery={searchQuery}
                     setSearchQuery={setSearchQuery}
-                    isFilterOpen={isFilterOpen}
-                    setIsFilterOpen={setIsFilterOpen}
-                    filterStatus={filterStatus}
-                    setFilterStatus={setFilterStatus}
-                    isSortOpen={isSortOpen} setIsSortOpen={setIsSortOpen} setSortType={setSortType}
-                    onToggleOpen={() => setIsSortOpen(!isSortOpen)}
+                    isFilterMenuOpen={isFilterMenuOpen}
+                    setIsFilterButtonOpen={setIsFilterMenuOpen}
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    isSortMenuOpen={isSortMenuOpen} setIsSortButtonOpen={setIsSortMenuOpen}
+                    setSortKey={setSortKey}
+                    onToggleOpen={() => setIsSortMenuOpen(!isSortMenuOpen)}
                 />
 
                 {isLoading ? (
                     <Loader isLoading={isLoading}/>
                 ) : (
-                    apps.map(app => (
+                    visibleApps.map(app => (
                         <ApplicationCard key={app.id}
                                          onDelete={handleDelete}
                                          onEdit={handleEdit}
                                          onPublishNotes={handlePublishNotes}
                                          application={app}
-                                         isMenuOpen={openMenuId === app.id}
+                                         isContextMenuOpen={openContextMenuId === app.id}
                                          onToggleMenu={() =>
-                                             setOpenMenuId(prev => (prev === app.id ? null : app.id))}
-                                         closeMenu={() => setOpenMenuId(null)}
+                                             setOpenContextMenuId(prev => (prev === app.id ? null : app.id))}
+                                         closeMenu={() => setOpenContextMenuId(null)}
                         />
                     ))
                 )
                 }
-                {isModalOpen &&
-                    <AddApplicationModal isOpen={isModalOpen} onClose={closeModal} onSubmit={handleSubmit}/>}
+                {isCreateModalOpen &&
+                    <AddApplicationModal isOpen={isCreateModalOpen} onClose={closeCreateModal}
+                                         onSubmit={handleSubmit}/>}
             </div>
         </div>
     );

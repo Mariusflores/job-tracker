@@ -5,12 +5,8 @@ import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
 import type {Application, ApplicationStatus} from "../types/application.ts";
 import {ExpandedApplicationCard} from "../components/application/modals/ExpandedApplicationCard.tsx";
-import {
-    mergeBackendApps,
-    moveAppToBottomOfStatus,
-    resolveTargetStatus,
-    STATUSES
-} from "../utils/pipeline/pipelineOrder.ts";
+import {mergeBackendApps, moveAppToBottomOfStatus, resolveTargetStatus} from "../utils/pipeline/pipelineOrder.ts";
+import {STATUSES} from "../constants/status.ts";
 
 
 export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {

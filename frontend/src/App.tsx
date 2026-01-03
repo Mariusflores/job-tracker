@@ -132,7 +132,7 @@ export default function App() {
                     <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
                     <Route path="/dashboard"
                            element={<DashboardPage
-                               allApps={allApps}
+                               backendApps={allApps}
                                handleSubmit={handleSubmit}
                                handleEdit={handleEdit}
                                handleDelete={handleDelete}

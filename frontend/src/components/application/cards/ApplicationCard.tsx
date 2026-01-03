@@ -9,10 +9,18 @@ import {parseDate} from "../../../utils/date.ts";
 import {useOutsideClick} from "../../../hooks/useOutsideClick.ts";
 import {useEscapeKey} from "../../../hooks/useEscapeKey.ts";
 
-export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, isMenuOpen, onToggleMenu, closeMenu}: {
+export function ApplicationCard({
+                                    application,
+                                    onDelete,
+                                    onEdit,
+                                    onPublishNotes,
+                                    isContextMenuOpen,
+                                    onToggleMenu,
+                                    closeMenu
+                                }: {
     application: Application,
     onDelete: (id: number) => void,
-    isMenuOpen: boolean,
+    isContextMenuOpen: boolean,
     onToggleMenu: () => void,
     closeMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => void,
@@ -23,7 +31,7 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
 
     const menuRef = useRef<HTMLDivElement | null>(null);
 
-    useOutsideClick(menuRef, isMenuOpen, closeMenu);
+    useOutsideClick(menuRef, isContextMenuOpen, closeMenu);
     useEscapeKey(() => closeMenu());
 
     function handleDelete() {
@@ -73,7 +81,7 @@ export function ApplicationCard({application, onDelete, onEdit, onPublishNotes, 
                                     icon={<EllipsisVerticalIcon className="w-7 h-7 rotate-90"/>}/>
 
                         {/* Dropdown Menu */}
-                        {isMenuOpen && (
+                        {isContextMenuOpen && (
                             <div onClick={(e) => e.stopPropagation()}
                                  className="absolute right-3 top-10 bg-white border shadow-lg rounded-md text-sm overflow-hidden">
                                 <button onClick={() => {

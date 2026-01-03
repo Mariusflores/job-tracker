@@ -1,6 +1,5 @@
 import type {Application, ApplicationStatus} from "../../types/application.ts";
-
-export const STATUSES = ["APPLIED", "INTERVIEW", "OFFER", "REJECTED"] as const;
+import {STATUSES} from "../../constants/status.ts";
 
 // Syncs backend application updates into a locally ordered list without changing item order
 export function mergeBackendApps(
