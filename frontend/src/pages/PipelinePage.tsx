@@ -59,8 +59,8 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         const isSameColumn = targetStatus === draggedApp.status;
 
 
-        // Remove updated application from array, then reinsert to the bottom of the column after status update
-        if (targetStatus && targetStatus !== draggedApp.status) {
+        // Move card to bottom when changing columns
+        if (targetStatus && !isSameColumn) {
 
             setPipelineApps(prev =>
                 moveAppToBottomOfStatus(prev, draggedApp.id, targetStatus)
@@ -86,7 +86,6 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
         }
 
     }
-
 
     function handleDragStart(event: DragStartEvent) {
         setActiveId(event.active.id as number);
