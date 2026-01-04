@@ -59,32 +59,29 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
 
     return (
         <>
-            <div className="flex flex-col space-y-1">
-                <label className="text-sm font-medium">
-                    Auto-fill from Job URL
-                </label>
-
-                <div className="flex gap-2">
-                    <input
-                        type="url"
-                        placeholder="https://…"
-                        value={data.descriptionUrl}
-                        onChange={e =>
-                            setData(prev => ({...prev, descriptionUrl: e.target.value}))
-                        }
-                        className="flex-1 border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+            <div className="px-4 pt-2">
+                <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600 whitespace-nowrap">
+                        Auto-fill from URL
+                    </span>
 
                     <button
                         type="button"
                         disabled={!data.descriptionUrl || isAutoFilling}
                         onClick={() => handleAutofill(data.descriptionUrl)}
-                        className="px-3 py-2 bg-gray-100 border rounded-md hover:bg-gray-200 disabled:opacity-50"
+                        className="px-3 py-1.5
+                        text-sm
+                        bg-gray-100 border rounded-md
+                        hover:bg-gray-200
+                        disabled:opacity-50
+            "
                     >
                         {isAutoFilling ? "Fetching…" : "Auto-fill"}
                     </button>
                 </div>
             </div>
+
+
             <ApplicationForm
                 data={data}
                 setData={setData}
