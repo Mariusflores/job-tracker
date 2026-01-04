@@ -31,8 +31,15 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
 
             setData(prev => ({
                 ...prev,
-                jobTitle: result.jobTitle ?? prev.jobTitle,
-                companyName: result.companyName ?? prev.companyName,
+                jobTitle:
+                    !prev.jobTitle && result.jobTitle
+                        ? result.jobTitle
+                        : prev.jobTitle,
+
+                companyName:
+                    !prev.companyName && result.companyName
+                        ? result.companyName
+                        : prev.companyName,
             }));
 
         } finally {

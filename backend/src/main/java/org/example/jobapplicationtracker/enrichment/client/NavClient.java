@@ -7,10 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @Slf4j
-public class FinnClient {
+public class NavClient {
     public EnrichedJobData enrich(String url) {
 
         try {
@@ -23,11 +22,18 @@ public class FinnClient {
                     .timeout(5000)
                     .get();
 
-            Element titleElement = document.selectFirst("h2.t2.md\\:t1.mb-6");
+            Element titleElement = document.selectFirst(
+                    "dd.navds-body-long.navds-body-long--medium"
+            );
+
             String title = titleElement != null ? titleElement.text() : null;
 
 
-            Element companyElement = document.selectFirst("p.mb-24");
+            Element companyElement =
+                    document.selectFirst(
+                            "p.navds-body-long.navds-body-long--medium.navds-typo--semibold"
+                    );
+
             String company = companyElement != null ? companyElement.text() : null;
 
 
