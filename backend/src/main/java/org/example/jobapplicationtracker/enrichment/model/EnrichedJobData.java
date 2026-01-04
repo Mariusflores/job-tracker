@@ -2,6 +2,7 @@ package org.example.jobapplicationtracker.enrichment.model;
 
 public record EnrichedJobData(
         String jobTitle,
-        String companyName
+        String companyName,
+        EnrichmentSource source
 ) {
 }

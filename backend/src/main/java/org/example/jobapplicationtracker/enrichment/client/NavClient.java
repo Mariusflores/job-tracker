@@ -8,11 +8,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Component;
 
-
 @Component
 @Slf4j
-public class FinnClient {
-    private final static EnrichmentSource SOURCE = EnrichmentSource.FINN;
+public class NavClient {
+
+    private final static EnrichmentSource SOURCE = EnrichmentSource.NAV;
 
     public EnrichedJobData enrich(String url) {
 
@@ -26,20 +26,30 @@ public class FinnClient {
                     .timeout(5000)
                     .get();
 
-            Element titleElement = document.selectFirst("h2.t2.md\\:t1.mb-6");
-            if (titleElement == null) {
-                log.debug("Finn: primary title selector failed, using fallback");
+            Element titleElement = document.selectFirst(
+                    "dd.navds-body-long.navds-body-long--medium"
+            );
 
-                titleElement = document.selectFirst("main h2");
+            if (titleElement == null) {
+                log.debug("Nav: primary title selector failed, using fallback");
+                titleElement = document.selectFirst("main dd");
             }
+
             String title = titleElement != null ? titleElement.text() : null;
 
 
-            Element companyElement = document.selectFirst("p.mb-24");
+            Element companyElement =
+                    document.selectFirst(
+                            "p.navds-body-long.navds-body-long--medium.navds-typo--semibold"
+                    );
+
             if (companyElement == null) {
-                log.debug("Finn: primary company selector failed, using fallback");
+                // fallback: first bold-ish paragraph near header
+                log.debug("Nav: primary company selector failed, using fallback");
+
                 companyElement = document.selectFirst("main p");
             }
+
             String company = companyElement != null ? companyElement.text() : null;
 
 

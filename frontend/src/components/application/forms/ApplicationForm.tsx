@@ -1,5 +1,6 @@
 import type {FormProps} from "../../../types/form.ts";
 import type {ApplicationData, ApplicationStatus} from "../../../types/application.ts";
+import {STATUS_UI, STATUSES} from "../../../constants/status.ts";
 
 export function ApplicationForm({
                                     data, setData, onClose, onSubmit, isSubmitting
@@ -63,10 +64,11 @@ export function ApplicationForm({
                 className="border rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
             >
-                <option value="APPLIED">Applied</option>
-                <option value="INTERVIEW">Interview</option>
-                <option value="OFFER">Offer</option>
-                <option value="REJECTED">Rejected</option>
+                {STATUSES.map(status => (
+                    <option key={status} value={status}>
+                        {STATUS_UI[status].label}
+                    </option>
+                ))}
             </select>
         </div>
 
