@@ -93,7 +93,7 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
                 </div>
             </div>
             {enrichment && (
-                <div className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 ml-4 text-xs text-gray-500">
                     Auto-filled from{" "}
                     <span className="font-medium">
                         {SOURCE_UI[enrichment.source]}
