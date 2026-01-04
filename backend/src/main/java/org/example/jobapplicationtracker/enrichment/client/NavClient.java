@@ -2,6 +2,7 @@ package org.example.jobapplicationtracker.enrichment.client;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.jobapplicationtracker.enrichment.model.EnrichedJobData;
+import org.example.jobapplicationtracker.enrichment.model.EnrichmentSource;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -10,6 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class NavClient {
+
+    private final static EnrichmentSource SOURCE = EnrichmentSource.NAV;
+
     public EnrichedJobData enrich(String url) {
 
         try {
@@ -26,6 +30,11 @@ public class NavClient {
                     "dd.navds-body-long.navds-body-long--medium"
             );
 
+            if (titleElement == null) {
+                log.debug("Nav: primary title selector failed, using fallback");
+                titleElement = document.selectFirst("main dd");
+            }
+
             String title = titleElement != null ? titleElement.text() : null;
 
 
@@ -34,16 +43,23 @@ public class NavClient {
                             "p.navds-body-long.navds-body-long--medium.navds-typo--semibold"
                     );
 
+            if (companyElement == null) {
+                // fallback: first bold-ish paragraph near header
+                log.debug("Nav: primary company selector failed, using fallback");
+
+                companyElement = document.selectFirst("main p");
+            }
+
             String company = companyElement != null ? companyElement.text() : null;
 
 
             log.info("Fetched data: Company: " + company + " Title: " + title);
 
 
-            return new EnrichedJobData(title, company);
+            return new EnrichedJobData(title, company, SOURCE);
         } catch (Exception e) {
             log.error(e.getMessage());
-            return new EnrichedJobData(null, null);
+            return new EnrichedJobData(null, null, SOURCE);
         }
     }
 }
