@@ -8,6 +8,7 @@ import {ToolBar} from "../components/application/toolbar/ToolBar.tsx";
 import {StatusBar} from "../components/application/cards/StatusBar.tsx";
 import {countByStatus, filterApps, sortAppsBy} from "../utils/dashboard/dashboardUtils.ts";
 import type {SORTERS} from "../constants/sorting.ts";
+import type {Enrichment} from "../types/enrichment.ts";
 
 export function DashboardPage({
                                   backendApps,
@@ -15,13 +16,15 @@ export function DashboardPage({
                                   handleEdit,
                                   handleDelete,
                                   handlePublishNotes,
-                                  isLoading
+                                  isLoading,
+                                  onAutofill
                               }: {
     backendApps: Application[],
     handleSubmit: (request: CreateApplicationRequest) => Promise<void>,
     handleEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
     handleDelete: (id: number) => void,
     handlePublishNotes: (notes: string, id: number) => void,
+    onAutofill: (url: string) => Promise<Enrichment>,
     isLoading: boolean
 }) {
 
@@ -115,8 +118,11 @@ export function DashboardPage({
                 )
                 }
                 {isCreateModalOpen &&
-                    <AddApplicationModal isOpen={isCreateModalOpen} onClose={closeCreateModal}
-                                         onSubmit={handleSubmit}/>}
+                    <AddApplicationModal isOpen={isCreateModalOpen}
+                                         onClose={closeCreateModal}
+                                         onSubmit={handleSubmit}
+                                         onAutofill={onAutofill}
+                    />}
             </div>
         </div>
     );
