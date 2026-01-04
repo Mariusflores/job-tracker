@@ -2,6 +2,7 @@ import {useState} from "react";
 import type {ApplicationData, CreateApplicationRequest} from "../../../types/application.ts";
 import {ApplicationForm} from "./ApplicationForm.tsx";
 import type {Enrichment} from "../../../types/enrichment.ts";
+import {SOURCE_UI} from "../../../constants/enrichmentSource.ts";
 
 export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
     onClose: () => void,
@@ -11,6 +12,8 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
     const today = new Date().toISOString().split("T")[0];
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isAutoFilling, setIsAutoFilling] = useState(false);
+    const [enrichment, setEnrichment] = useState<Enrichment | null>(null);
+
 
     const [data, setData] = useState<ApplicationData>({
         jobTitle: "",
@@ -28,7 +31,9 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
 
         try {
             const result = await onAutofill(url);
-
+            console.log("Result: " + result.source)
+            setEnrichment(result);
+            console.log(enrichment?.source)
             setData(prev => ({
                 ...prev,
                 jobTitle:
@@ -87,6 +92,14 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
                     </button>
                 </div>
             </div>
+            {enrichment && (
+                <div className="mt-1 text-xs text-gray-500">
+                    Auto-filled from{" "}
+                    <span className="font-medium">
+                        {SOURCE_UI[enrichment.source]}
+                    </span>
+                </div>
+            )}
 
 
             <ApplicationForm
