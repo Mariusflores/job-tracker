@@ -149,7 +149,7 @@ export default function App() {
                            }/>
                     <Route path="/pipeline" element={<PipelinePage backendApps={backendApps}
                                                                    onStatusChange={updateApplicationStatus}
-                                                                   onPublishNotes={updateApplicationNotes}
+                                                                   onUpdateNotes={updateApplicationNotes}
                     />}/>
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>

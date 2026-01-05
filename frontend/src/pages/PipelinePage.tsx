@@ -9,10 +9,10 @@ import {mergeBackendApps, moveAppToBottomOfStatus, resolveTargetStatus} from "..
 import {STATUSES} from "../constants/status.ts";
 
 
-export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
+export function PipelinePage({backendApps, onStatusChange, onUpdateNotes}: {
     backendApps: Application[],
     onStatusChange: (status: ApplicationStatus, id: number) => void
-    onPublishNotes: (notes: string, id: number) => void
+    onUpdateNotes: (notes: string, id: number) => Promise<void>
 }) {
     // pipelineApps is the source of truth for column order.
     // Backend updates are merged WITHOUT changing order.
@@ -107,7 +107,7 @@ export function PipelinePage({backendApps, onStatusChange, onPublishNotes}: {
                     application={expandedApplication}
                     onClose={() => setExpandedAppId(null)}
                     expanded={expandedAppId !== null}
-                    updateNotes={onPublishNotes}/>
+                    updateNotes={onUpdateNotes}/>
             )}
             <DndContext
                 onDragStart={handleDragStart}
