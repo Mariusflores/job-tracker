@@ -13,7 +13,7 @@ export function ApplicationCard({
                                     application,
                                     onDelete,
                                     onEdit,
-                                    onPublishNotes,
+                                    updateNotes,
                                     isContextMenuOpen,
                                     toggleContextMenu,
                                     closeContextMenu
@@ -24,7 +24,7 @@ export function ApplicationCard({
     toggleContextMenu: () => void,
     closeContextMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
-    onPublishNotes: (notes: string, id: number) => void
+    updateNotes: (notes: string, id: number) => Promise<void>
 }) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -60,7 +60,7 @@ export function ApplicationCard({
             <ExpandedApplicationCard expanded={isExpanded}
                                      onClose={() => setIsExpanded(false)}
                                      application={application}
-                                     publishNotes={onPublishNotes}/>
+                                     updateNotes={updateNotes}/>
         )}
 
         <div role={"button"}

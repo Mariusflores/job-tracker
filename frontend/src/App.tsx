@@ -143,7 +143,7 @@ export default function App() {
                                handleSubmit={createApplication}
                                handleEdit={updateApplication}
                                handleDelete={deleteApplication}
-                               handlePublishNotes={updateApplicationNotes}
+                               handleUpdateNotes={updateApplicationNotes}
                                isLoading={isLoading} onAutofill={fetchJobPostEnrichment}/>
 
                            }/>
