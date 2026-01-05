@@ -2,7 +2,7 @@ import {useState} from "react";
 import type {ApplicationData, CreateApplicationRequest} from "../../../types/application.ts";
 import {ApplicationForm} from "./ApplicationForm.tsx";
 import type {Enrichment} from "../../../types/enrichment.ts";
-import {SOURCE_UI} from "../../../constants/enrichmentSource.ts";
+import {AutofillFromUrl} from "../actions/AutofillFromUrl.tsx";
 
 export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
     onClose: () => void,
@@ -71,35 +71,12 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
 
     return (
         <>
-            <div className="px-4 pt-2">
-                <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 whitespace-nowrap">
-                        Auto-fill from URL
-                    </span>
-
-                    <button
-                        type="button"
-                        disabled={!data.descriptionUrl || isAutoFilling}
-                        onClick={() => handleAutofill(data.descriptionUrl)}
-                        className="px-3 py-1.5
-                        text-sm
-                        bg-gray-100 border rounded-md
-                        hover:bg-gray-200
-                        disabled:opacity-50
-            "
-                    >
-                        {isAutoFilling ? "Fetching…" : "Auto-fill"}
-                    </button>
-                </div>
-            </div>
-            {enrichment && (
-                <div className="mt-1 ml-4 text-xs text-gray-500">
-                    Auto-filled from{" "}
-                    <span className="font-medium">
-                        {SOURCE_UI[enrichment.source]}
-                    </span>
-                </div>
-            )}
+            <AutofillFromUrl
+                disabled={!data.descriptionUrl}
+                isLoading={isAutoFilling}
+                enrichment={enrichment}
+                onClick={() => handleAutofill(data.descriptionUrl)}
+            />
 
 
             <ApplicationForm
