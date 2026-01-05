@@ -3,16 +3,17 @@ import {useEffect, useMemo, useState} from "react";
 import {PipelineCard} from "../components/pipeline/PipelineCard.tsx";
 import {Column} from "../components/pipeline/Column.tsx";
 import {arrayMove} from "@dnd-kit/sortable";
-import type {Application, ApplicationStatus} from "../types/application.ts";
+import type {Application, ApplicationStatus, StatusChange} from "../types/application.ts";
 import {ExpandedApplicationCard} from "../components/application/modals/ExpandedApplicationCard.tsx";
 import {mergeBackendApps, moveAppToBottomOfStatus, resolveTargetStatus} from "../utils/pipeline/pipelineOrder.ts";
 import {STATUSES} from "../constants/status.ts";
 
 
-export function PipelinePage({backendApps, onStatusChange, onUpdateNotes}: {
+export function PipelinePage({backendApps, onStatusChange, onUpdateNotes, getStatusHistory}: {
     backendApps: Application[],
     onStatusChange: (status: ApplicationStatus, id: number) => void
-    onUpdateNotes: (notes: string, id: number) => Promise<void>
+    onUpdateNotes: (notes: string, id: number) => Promise<void>,
+    getStatusHistory: (applicationId: number) => Promise<StatusChange[]>
 }) {
     // pipelineApps is the source of truth for column order.
     // Backend updates are merged WITHOUT changing order.
@@ -107,7 +108,8 @@ export function PipelinePage({backendApps, onStatusChange, onUpdateNotes}: {
                     application={expandedApplication}
                     onClose={() => setExpandedAppId(null)}
                     expanded={expandedAppId !== null}
-                    updateNotes={onUpdateNotes}/>
+                    updateNotes={onUpdateNotes}
+                    getStatusHistory={getStatusHistory}/>
             )}
             <DndContext
                 onDragStart={handleDragStart}

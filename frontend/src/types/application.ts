@@ -8,6 +8,14 @@ export interface Application {
     notes: string
 }
 
+export interface StatusChange {
+    id: number;
+    applicationId: number;
+    fromStatus: ApplicationStatus;
+    toStatus: ApplicationStatus;
+    changedAt: string;
+}
+
 export type ApplicationData = Omit<Application, "id">;
 
 export type CreateApplicationRequest = ApplicationData;

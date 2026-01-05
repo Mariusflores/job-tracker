@@ -3,47 +3,59 @@ import type {
     Application,
     ApplicationStatus,
     CreateApplicationRequest,
+    StatusChange,
     UpdateApplicationRequest
 } from "../types/application.ts";
 
+// GET
 export async function getApplications() {
     const response = await api.get<Application[]>("/application/all")
     return response.data;
 }
 
+export async function getStatusHistoryApi(applicationId: number) {
+    const response = await api.get<StatusChange[]>("/application/" + applicationId + "/status-history")
+    return response.data;
+}
+
+// POST
 export async function createApplicationApi(request: CreateApplicationRequest) {
     const response = await api.post<Application>("/application", request);
     return response.data;
 }
 
-export async function deleteApplicationApi(id: number) {
-    const response = await api.delete("/application/" + id);
+// DELETE
+
+export async function deleteApplicationApi(applicationId: number) {
+    const response = await api.delete("/application/" + applicationId);
     return response.data;
 }
 
 
-export async function updateApplicationApi(id: number, request: UpdateApplicationRequest) {
-    const response = await api.patch("/application/" + id, request)
+// PATCH
+
+export async function updateApplicationApi(applicationId: number, request: UpdateApplicationRequest) {
+    const response = await api.patch("/application/" + applicationId, request)
     return response.data;
 }
 
 export async function updateApplicationStatusApi(
-    id: number,
+    applicationId: number,
     status: ApplicationStatus
 ): Promise<Application> {
     const response = await api.patch<Application>(
-        `/application/${id}/status`,
+        `/application/${applicationId}/status`,
         {applicationStatus: status}
     );
     return response.data;
 }
 
 export async function updateApplicationNotesApi(
-    id: number,
+    applicationId: number,
     notes: string
 ): Promise<Application> {
     const response = await api.patch<Application>(
-        `/application/${id}/notes`,
+        `/application/${applicationId}/notes`,
         {notes}
     );
     return response.data;

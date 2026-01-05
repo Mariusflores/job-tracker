@@ -1,4 +1,4 @@
-import type {Application, UpdateApplicationRequest} from "../../../types/application.ts";
+import type {Application, StatusChange, UpdateApplicationRequest} from "../../../types/application.ts";
 import {StatusBadge} from "../badges/StatusBadge.tsx";
 import {useRef, useState} from "react";
 import {EllipsisVerticalIcon} from "@heroicons/react/20/solid";
@@ -16,7 +16,8 @@ export function ApplicationCard({
                                     updateNotes,
                                     isContextMenuOpen,
                                     toggleContextMenu,
-                                    closeContextMenu
+                                    closeContextMenu,
+                                    getStatusHistory
                                 }: {
     application: Application,
     onDelete: (id: number) => void,
@@ -24,7 +25,8 @@ export function ApplicationCard({
     toggleContextMenu: () => void,
     closeContextMenu: () => void,
     onEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
-    updateNotes: (notes: string, id: number) => Promise<void>
+    updateNotes: (notes: string, id: number) => Promise<void>,
+    getStatusHistory: (applicationId: number) => Promise<StatusChange[]>
 }) {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -60,7 +62,8 @@ export function ApplicationCard({
             <ExpandedApplicationCard expanded={isExpanded}
                                      onClose={() => setIsExpanded(false)}
                                      application={application}
-                                     updateNotes={updateNotes}/>
+                                     updateNotes={updateNotes}
+                                     getStatusHistory={getStatusHistory}/>
         )}
 
         <div role={"button"}
