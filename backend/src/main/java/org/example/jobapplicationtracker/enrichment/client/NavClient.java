@@ -17,7 +17,7 @@ public class NavClient {
     public EnrichedJobData enrich(String url) {
 
         try {
-            log.info("Fetching data from " + url);
+            log.debug("Fetching Nav job page from url={}", url);
             Document document = Jsoup.connect(url)
                     .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) " +
                             "AppleWebKit/537.36 (KHTML, like Gecko) " +
@@ -53,12 +53,16 @@ public class NavClient {
             String company = companyElement != null ? companyElement.text() : null;
 
 
-            log.info("Fetched data: Company: " + company + " Title: " + title);
+            log.debug(
+                    "Nav enrichment result: company='{}', title='{}'",
+                    company,
+                    title
+            );
 
 
             return new EnrichedJobData(title, company, SOURCE);
         } catch (Exception e) {
-            log.error(e.getMessage());
+            log.error("Finn enrichment failed for url={}", url, e);
             return new EnrichedJobData(null, null, SOURCE);
         }
     }

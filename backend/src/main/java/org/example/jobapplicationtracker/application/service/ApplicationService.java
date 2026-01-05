@@ -33,7 +33,9 @@ public class ApplicationService {
 
         List<Application> applications = applicationRepository.findAll();
 
-        log.info("Applications found: {}", applications);
+        log.debug("Applications fetched: ids={}",
+                applications.stream().map(Application::getId).toList()
+        );
 
 
         return applications.stream().map(this::mapToApplicationResponse).toList();
@@ -47,7 +49,11 @@ public class ApplicationService {
                     "Could not find application with id: " + applicationId
             );
         }
+
+
         List<ApplicationStatusChange> statusChanges = statusChangeRepository.findByApplicationIdOrderByChangedAtDesc(applicationId);
+
+        log.debug("Fetched {} applications", statusChanges.size());
 
         return statusChanges
                 .stream()
@@ -83,6 +89,11 @@ public class ApplicationService {
 
     @Transactional
     public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request) {
+        log.info(
+                "Creating application: company='{}', jobTitle='{}'",
+                request.getCompanyName(),
+                request.getJobTitle()
+        );
         Application application = Application.builder()
                 .jobTitle(request.getJobTitle().trim())
                 .companyName(request.getCompanyName().trim())
@@ -96,47 +107,13 @@ public class ApplicationService {
                 .build();
 
         Application savedApplication = applicationRepository.save(application);
+        log.info("Application created with id={}", savedApplication.getId());
         return mapToApplicationResponse(savedApplication);
-    }
-
-
-    @Transactional
-    public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
-        Application application = applicationRepository.findById(id)
-                .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
-
-        if (applicationRequest.getJobTitle() != null
-                && !applicationRequest.getJobTitle().isBlank()
-                && !applicationRequest.getJobTitle().equals(application.getJobTitle())) {
-            application.setJobTitle(applicationRequest.getJobTitle().trim());
-        }
-        if (applicationRequest.getCompanyName() != null
-                && !applicationRequest.getCompanyName().isBlank()
-                && !applicationRequest.getCompanyName().equals(application.getCompanyName())) {
-            application.setCompanyName(applicationRequest.getCompanyName().trim());
-        }
-        if (applicationRequest.getDescriptionUrl() != null
-                && !applicationRequest.getDescriptionUrl().equals(application.getDescriptionUrl())) {
-            application.setDescriptionUrl(applicationRequest.getDescriptionUrl().trim());
-        }
-
-        if (applicationRequest.getStatus() != null
-                && !applicationRequest.getStatus().equals(application.getStatus())) {
-            changeStatus(application, applicationRequest.getStatus());
-        }
-        if (applicationRequest.getAppliedDate() != null
-                && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
-            application.setAppliedDate(applicationRequest.getAppliedDate());
-        }
-
-
-        return mapToApplicationResponse(application);
-
     }
 
     @Transactional
     public void deleteApplication(Long id) {
-
+        log.info("Deleting application id={}", id);
 
         if (!applicationRepository.existsById(id)) {
             throw new ApplicationNotFoundException("Could not find application with id: " + id);
@@ -151,8 +128,53 @@ public class ApplicationService {
 
     }
 
+
+    @Transactional
+    public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
+
+        log.info("Updating application id={}", id);
+
+        Application application = applicationRepository.findById(id)
+                .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
+
+        if (applicationRequest.getJobTitle() != null
+                && !applicationRequest.getJobTitle().isBlank()
+                && !applicationRequest.getJobTitle().equals(application.getJobTitle())) {
+            log.debug("Updating jobTitle for application id={}", id);
+            application.setJobTitle(applicationRequest.getJobTitle().trim());
+        }
+        if (applicationRequest.getCompanyName() != null
+                && !applicationRequest.getCompanyName().isBlank()
+                && !applicationRequest.getCompanyName().equals(application.getCompanyName())) {
+            log.debug("Updating companyName for application id={}", id);
+            application.setCompanyName(applicationRequest.getCompanyName().trim());
+        }
+        if (applicationRequest.getDescriptionUrl() != null
+                && !applicationRequest.getDescriptionUrl().equals(application.getDescriptionUrl())) {
+            log.debug("Updating descriptionUrl for application id={}", id);
+            application.setDescriptionUrl(applicationRequest.getDescriptionUrl().trim());
+        }
+
+        if (applicationRequest.getStatus() != null
+                && !applicationRequest.getStatus().equals(application.getStatus())) {
+            changeStatus(application, applicationRequest.getStatus());
+        }
+        if (applicationRequest.getAppliedDate() != null
+                && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
+            log.debug("Updating appliedDate for application id={}", id);
+            application.setAppliedDate(applicationRequest.getAppliedDate());
+        }
+
+
+        return mapToApplicationResponse(application);
+
+    }
+
     @Transactional
     public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status) {
+
+        log.info("Updating status for application id={} to {}", id, status);
+
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
@@ -167,13 +189,17 @@ public class ApplicationService {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
-        if (notes != null && !notes.isBlank()) {
-            application.setNotes(notes.trim());
+        if (notes == null || notes.isBlank()) {
+            log.warn("Ignored empty notes update for application id={}", id);
+            return mapToApplicationResponse(application);
+
         }
 
+        log.info("Updating notes for application with id: {}", id);
+
+        application.setNotes(notes.trim());
 
         return mapToApplicationResponse(application);
-
 
     }
 
@@ -194,7 +220,7 @@ public class ApplicationService {
         );
 
 
-        ApplicationStatusChange savedStatus = statusChangeRepository.save(
+        statusChangeRepository.save(
                 ApplicationStatusChange.builder()
                         .applicationId(application.getId())
                         .fromStatus(oldStatus)
@@ -202,6 +228,5 @@ public class ApplicationService {
                         .build()
         );
 
-        log.info("Saved application status changes: {}", savedStatus);
     }
 }
