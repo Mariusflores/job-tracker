@@ -15,7 +15,7 @@ export function DashboardPage({
                                   handleSubmit,
                                   handleEdit,
                                   handleDelete,
-                                  handlePublishNotes,
+                                  handleUpdateNotes,
                                   isLoading,
                                   onAutofill
                               }: {
@@ -23,7 +23,7 @@ export function DashboardPage({
     handleSubmit: (request: CreateApplicationRequest) => Promise<void>,
     handleEdit: (request: UpdateApplicationRequest, id: number) => Promise<void>,
     handleDelete: (id: number) => void,
-    handlePublishNotes: (notes: string, id: number) => void,
+    handleUpdateNotes: (notes: string, id: number) => Promise<void>,
     onAutofill: (url: string) => Promise<Enrichment>,
     isLoading: boolean
 }) {
@@ -108,7 +108,7 @@ export function DashboardPage({
                         <ApplicationCard key={app.id}
                                          onDelete={handleDelete}
                                          onEdit={handleEdit}
-                                         onPublishNotes={handlePublishNotes}
+                                         updateNotes={handleUpdateNotes}
                                          application={app}
                                          isContextMenuOpen={openContextMenuId === app.id}
                                          toggleContextMenu={() => toggleContextMenuFor(app.id)}
