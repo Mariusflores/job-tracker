@@ -3,7 +3,7 @@ import type {ApplicationData, ApplicationStatus} from "../../../types/applicatio
 import {STATUS_UI, STATUSES} from "../../../constants/status.ts";
 
 export function ApplicationForm({
-                                    data, setData, onClose, onSubmit, isSubmitting
+                                    data, setData, onClose, onSubmit, isSubmitting, title
                                 }:
                                 FormProps) {
 
@@ -18,7 +18,7 @@ export function ApplicationForm({
         onSubmit(data);
     }}>
 
-        <h2 className="text-xl font-semibold mb-2">Add Application</h2>
+        <h2 className="text-xl font-semibold mb-2">{title}</h2>
 
         {/* Job Title */}
         <div className="flex flex-col space-y-1">
@@ -97,7 +97,7 @@ export function ApplicationForm({
             <button
                 type="submit"
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:bg-gray-500"
             >
                 {isSubmitting ? "Saving..." : "Save"}
             </button>

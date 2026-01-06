@@ -45,7 +45,7 @@ export function EditApplicationForm({onClose, onSubmit, application}: {
             setData={setData}
             onClose={onClose}
             onSubmit={handleUpdate}
-            isSubmitting={isSubmitting}
+            isSubmitting={isSubmitting} title={"Edit Application"}
         />
     );
 }

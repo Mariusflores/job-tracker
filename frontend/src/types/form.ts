@@ -8,4 +8,5 @@ export interface FormProps {
     onClose: () => void,
     onSubmit: (data: ApplicationData) => void
     isSubmitting: boolean
+    title: string,
 }
