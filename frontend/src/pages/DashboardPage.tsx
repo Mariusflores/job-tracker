@@ -41,7 +41,7 @@ export function DashboardPage({
     const [openContextMenuId, setOpenContextMenuId] = useState<number | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false)
     const [isSortMenuOpen, setIsSortMenuOpen] = useState(false)
-    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc")
+    const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
     const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false)
     const [statusFilter, setStatusFilter] = useState<string>("")
     const [searchQuery, setSearchQuery] = useState("");
