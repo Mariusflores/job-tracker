@@ -23,7 +23,8 @@ export function DashboardPage({
                                   handleUpdateNotes,
                                   isLoading,
                                   onAutofill,
-                                  getStatusHistory
+                                  getStatusHistory,
+                                  onLoadMore, hasMore
                               }: {
     backendApps: Application[],
     handleSubmit: (request: CreateApplicationRequest) => Promise<void>,
@@ -33,6 +34,8 @@ export function DashboardPage({
     onAutofill: (url: string) => Promise<Enrichment>,
     isLoading: boolean,
     getStatusHistory: (applicationId: number) => Promise<StatusChange[]>
+    onLoadMore: () => void,
+    hasMore: boolean
 }) {
 
 
@@ -125,6 +128,30 @@ export function DashboardPage({
                     ))
                 )
                 }
+                {hasMore && !isLoading && (
+                    <div className="flex flex-col items-center pt-6 gap-2">
+                        <span className="text-sm text-gray-500">
+                            Showing {backendApps.length} applications
+                        </span>
+
+                        <button
+                            onClick={onLoadMore}
+                            className="
+                            px-6 py-2
+                            rounded-md
+                            border
+                            bg-blue-50
+                            text-blue-700
+                            hover:bg-blue-100
+                            font-medium
+                            "
+                        >
+                            Load more
+                        </button>
+                    </div>
+                )}
+
+
                 {isCreateModalOpen &&
                     <AddApplicationModal isOpen={isCreateModalOpen}
                                          onClose={closeCreateModal}

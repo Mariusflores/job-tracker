@@ -26,11 +26,21 @@ import {fetchJobPostingEnrichmentApi} from "./api/enrichment.ts";
 
 export default function App() {
     const [backendApps, setBackendApps] = useState<Application[]>([]);
+
     const [isLoading, setIsLoading] = useState(false);
+    const [page, setPage] = useState(0);
+    const [size] = useState(10); // fixed for now
+    const [totalPages, setTotalPages] = useState(0);
 
     useEffect(() => {
-        loadApps();
+        loadApps(true);
     }, []);
+
+    useEffect(() => {
+        if (page === 0) return;
+        loadApps();
+    }, [page]);
+
 
     useEffect(() => {
         if (import.meta.env.DEV) {
@@ -44,20 +54,29 @@ export default function App() {
     }, [backendApps]);
 
 
-    async function loadApps() {
+    async function loadApps(reset = false) {
         setIsLoading(true);
-        const data = await getApplications();
-        setBackendApps(data)
+
+        const data = await getApplications(page, size);
+        setTotalPages(data.totalPages);
+
+        setBackendApps(prev =>
+            reset ? data.content : [...prev, ...data.content]
+        );
+
         setIsLoading(false);
     }
+
 
     async function getStatusHistory(applicationId: number): Promise<StatusChange[]> {
         return await getStatusHistoryApi(applicationId);
     }
 
     async function createApplication(request: CreateApplicationRequest) {
-        const newApp = await createApplicationApi(request);
-        setBackendApps(prev => [...prev, newApp]);
+        await createApplicationApi(request);
+        setPage(0);
+        await loadApps(true);
+
     }
 
     async function deleteApplication(id: number) {
@@ -137,6 +156,11 @@ export default function App() {
         return await fetchJobPostingEnrichmentApi(url);
     }
 
+    function loadMore() {
+        if (page + 1 >= totalPages) return;
+        setPage(prev => prev + 1);
+    }
+
 
     return (
         <BrowserRouter>
@@ -151,7 +175,10 @@ export default function App() {
                                handleDelete={deleteApplication}
                                handleUpdateNotes={updateApplicationNotes}
                                isLoading={isLoading} onAutofill={fetchJobPostEnrichment}
-                               getStatusHistory={getStatusHistory}/>
+                               getStatusHistory={getStatusHistory}
+                               onLoadMore={loadMore}
+                               hasMore={page + 1 < totalPages}
+                           />
 
                            }/>
                     <Route path="/pipeline" element={
