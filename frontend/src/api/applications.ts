@@ -6,10 +6,11 @@ import type {
     StatusChange,
     UpdateApplicationRequest
 } from "../types/application.ts";
+import type {PagedResponse} from "../types/pagination.ts";
 
 // GET
-export async function getApplications() {
-    const response = await api.get<Application[]>("/application/all")
+export async function getApplications(page: number, size: number): Promise<PagedResponse<Application>> {
+    const response = await api.get<PagedResponse<Application>>("/application?page=" + page + "&size=" + size)
     return response.data;
 }
 

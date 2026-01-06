@@ -3,6 +3,8 @@ package org.example.jobapplicationtracker.application.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.jobapplicationtracker.application.dto.*;
 import org.example.jobapplicationtracker.application.service.ApplicationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +19,10 @@ public class ApplicationController {
 
     // GET Requests
 
-    @GetMapping("/all")
-    public List<ApplicationResponse> getAllApplications() {
+    @GetMapping
+    public Page<ApplicationResponse> getApplications(Pageable pageable) {
 
-        return service.getAllApplications();
+        return service.getApplications(pageable);
     }
 
     @GetMapping("/{id}/status-history")

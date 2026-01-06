@@ -13,6 +13,8 @@ import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,16 +31,18 @@ public class ApplicationService {
 
     // Fetch data Methods
 
-    public List<ApplicationResponse> getAllApplications() {
+    public Page<ApplicationResponse> getApplications(Pageable pageable) {
 
-        List<Application> applications = applicationRepository.findAll();
+        Page<Application> page = applicationRepository.findAll(pageable);
 
-        log.debug("Applications fetched: ids={}",
-                applications.stream().map(Application::getId).toList()
+        log.debug(
+                "Fetched page {} with {} applications",
+                page.getNumber(),
+                page.getNumberOfElements()
         );
 
 
-        return applications.stream().map(this::mapToApplicationResponse).toList();
+        return page.map(this::mapToApplicationResponse);
 
 
     }
@@ -130,7 +134,7 @@ public class ApplicationService {
 
 
     @Transactional
-    public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
+    public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest) {
 
         log.info("Updating application id={}", id);
 
