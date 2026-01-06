@@ -8,12 +8,14 @@ import type {
     Application,
     ApplicationStatus,
     CreateApplicationRequest,
+    StatusChange,
     UpdateApplicationRequest
 } from "./types/application.ts";
 import {
     createApplicationApi,
     deleteApplicationApi,
     getApplications,
+    getStatusHistoryApi,
     updateApplicationApi,
     updateApplicationNotesApi,
     updateApplicationStatusApi
@@ -23,8 +25,8 @@ import type {Enrichment} from "./types/enrichment.ts";
 import {fetchJobPostingEnrichmentApi} from "./api/enrichment.ts";
 
 export default function App() {
-    const [backendApps, setBackendApps] = useState<Application[]>([])
-    const [isLoading, setIsLoading] = useState(false)
+    const [backendApps, setBackendApps] = useState<Application[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         loadApps();
@@ -47,6 +49,10 @@ export default function App() {
         const data = await getApplications();
         setBackendApps(data)
         setIsLoading(false);
+    }
+
+    async function getStatusHistory(applicationId: number): Promise<StatusChange[]> {
+        return await getStatusHistoryApi(applicationId);
     }
 
     async function createApplication(request: CreateApplicationRequest) {
@@ -144,13 +150,17 @@ export default function App() {
                                handleEdit={updateApplication}
                                handleDelete={deleteApplication}
                                handleUpdateNotes={updateApplicationNotes}
-                               isLoading={isLoading} onAutofill={fetchJobPostEnrichment}/>
+                               isLoading={isLoading} onAutofill={fetchJobPostEnrichment}
+                               getStatusHistory={getStatusHistory}/>
 
                            }/>
-                    <Route path="/pipeline" element={<PipelinePage backendApps={backendApps}
-                                                                   onStatusChange={updateApplicationStatus}
-                                                                   onUpdateNotes={updateApplicationNotes}
-                    />}/>
+                    <Route path="/pipeline" element={
+                        <PipelinePage backendApps={backendApps}
+                                      onStatusChange={updateApplicationStatus}
+                                      onUpdateNotes={updateApplicationNotes}
+                                      getStatusHistory={getStatusHistory}
+                        />}
+                    />
                     {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
                 </Routes>
             </Layout>

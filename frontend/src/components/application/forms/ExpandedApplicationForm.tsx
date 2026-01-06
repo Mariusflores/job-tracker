@@ -1,22 +1,37 @@
-import type {Application} from "../../../types/application";
+import type {Application, StatusChange} from "../../../types/application";
 import {StatusBadge} from "../badges/StatusBadge";
 import {parseDate} from "../../../utils/date.ts";
 import {EditableNotes} from "./EditableNotes.tsx";
+import {useEffect, useState} from "react";
 
 
 export function ExpandedApplicationForm({
                                             application,
                                             onClose,
-                                            updateNotes
+                                            updateNotes,
+                                            getStatusHistory
                                         }: {
     application: Application,
     onClose: () => void,
     updateNotes: (notes: string, id: number) => Promise<void>
+    getStatusHistory: (applicationId: number) => Promise<StatusChange[]>
 }) {
+
+    const [statusHistory, setStatusHistory] = useState<StatusChange[]>([])
+
+    useEffect(() => {
+        loadStatusHistory()
+    }, []);
+
+    async function loadStatusHistory() {
+        setStatusHistory(await getStatusHistory(application.id))
+    }
 
     async function saveNotes(notes: string) {
         await updateNotes(notes, application.id);
     }
+
+    console.log(statusHistory)
 
 
     return (
@@ -70,6 +85,48 @@ export function ExpandedApplicationForm({
 
                 {/* Optional: Notes */}
                 <EditableNotes initialNotes={application.notes} onSave={saveNotes}/>
+
+                {statusHistory.length > 0 && (
+                    <div className="p-4 bg-gray-50 rounded-lg border">
+                        <h3 className="text-sm font-medium text-gray-700 mb-3">
+                            Status history
+                        </h3>
+
+                        <ul className="space-y-4">
+                            {statusHistory.map((change, index) => (
+                                <li key={change.id} className="flex gap-3">
+                                    {/* Timeline column */}
+                                    <div className="flex flex-col items-center">
+                                        <div className="w-2 h-2 rounded-full bg-blue-500 mt-1"/>
+                                        {index !== statusHistory.length - 1 && (
+                                            <div className="w-px flex-1 bg-gray-300 mt-1"/>
+                                        )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="space-y-0.5">
+                                        <p className="text-sm font-medium text-gray-800">
+                                            {change.toStatus}
+                                        </p>
+                                        <p className="text-xs text-gray-500">
+                                            from {change.fromStatus}
+                                        </p>
+                                        <p className="text-xs text-gray-400">
+                                            {new Date(change.changedAt).toLocaleString([], {
+                                                year: "numeric",
+                                                month: "short",
+                                                day: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })}
+                                        </p>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
 
             </div>
 

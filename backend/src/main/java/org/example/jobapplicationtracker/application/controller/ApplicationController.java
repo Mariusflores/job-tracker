@@ -23,6 +23,11 @@ public class ApplicationController {
         return service.getAllApplications();
     }
 
+    @GetMapping("/{id}/status-history")
+    public List<StatusChangeResponse> getStatusHistory(@PathVariable Long id) {
+        return service.getStatusHistory(id);
+    }
+
     // POST Requests
 
     @PostMapping

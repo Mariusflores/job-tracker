@@ -89,7 +89,7 @@ export function EditableNotes({
                     />
                     <div className="mt-1 flex justify-between text-xs text-gray-500">
                         <span>
-                            {notes.length} characters
+                            {notes?.length ?? 0} characters
                         </span>
                         {isSaving && <span>Saving…</span>}
                         {!isSaving && lastSaved && (

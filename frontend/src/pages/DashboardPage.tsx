@@ -1,5 +1,10 @@
 import {useMemo, useState} from "react";
-import type {Application, CreateApplicationRequest, UpdateApplicationRequest} from "../types/application.ts";
+import type {
+    Application,
+    CreateApplicationRequest,
+    StatusChange,
+    UpdateApplicationRequest
+} from "../types/application.ts";
 import {ApplicationCard} from "../components/application/cards/ApplicationCard.tsx";
 import {AddApplicationModal} from "../components/application/modals/AddApplicationModal.tsx";
 import Loader from "../components/shared/Loader.tsx";
@@ -17,7 +22,8 @@ export function DashboardPage({
                                   handleDelete,
                                   handleUpdateNotes,
                                   isLoading,
-                                  onAutofill
+                                  onAutofill,
+                                  getStatusHistory
                               }: {
     backendApps: Application[],
     handleSubmit: (request: CreateApplicationRequest) => Promise<void>,
@@ -25,7 +31,8 @@ export function DashboardPage({
     handleDelete: (id: number) => void,
     handleUpdateNotes: (notes: string, id: number) => Promise<void>,
     onAutofill: (url: string) => Promise<Enrichment>,
-    isLoading: boolean
+    isLoading: boolean,
+    getStatusHistory: (applicationId: number) => Promise<StatusChange[]>
 }) {
 
 
@@ -113,6 +120,7 @@ export function DashboardPage({
                                          isContextMenuOpen={openContextMenuId === app.id}
                                          toggleContextMenu={() => toggleContextMenuFor(app.id)}
                                          closeContextMenu={() => setOpenContextMenuId(null)}
+                                         getStatusHistory={getStatusHistory}
                         />
                     ))
                 )

@@ -6,10 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.jobapplicationtracker.application.dto.ApplicationCreateRequest;
 import org.example.jobapplicationtracker.application.dto.ApplicationResponse;
 import org.example.jobapplicationtracker.application.dto.ApplicationUpdateRequest;
+import org.example.jobapplicationtracker.application.dto.StatusChangeResponse;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
 import org.example.jobapplicationtracker.application.model.Application;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
+import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
+import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ import java.util.List;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final StatusChangeRepository statusChangeRepository;
 
     // Fetch data Methods
 
@@ -29,10 +33,42 @@ public class ApplicationService {
 
         List<Application> applications = applicationRepository.findAll();
 
+        log.debug("Applications fetched: ids={}",
+                applications.stream().map(Application::getId).toList()
+        );
+
 
         return applications.stream().map(this::mapToApplicationResponse).toList();
 
 
+    }
+
+    public List<StatusChangeResponse> getStatusHistory(Long applicationId) {
+        if (!applicationRepository.existsById(applicationId)) {
+            throw new ApplicationNotFoundException(
+                    "Could not find application with id: " + applicationId
+            );
+        }
+
+
+        List<ApplicationStatusChange> statusChanges = statusChangeRepository.findByApplicationIdOrderByChangedAtDesc(applicationId);
+
+        log.debug("Fetched {} applications", statusChanges.size());
+
+        return statusChanges
+                .stream()
+                .map(this::mapToStatusChangeResponse)
+                .toList();
+    }
+
+    private StatusChangeResponse mapToStatusChangeResponse(ApplicationStatusChange applicationStatusChange) {
+        return StatusChangeResponse.builder()
+                .id(applicationStatusChange.getId())
+                .applicationId(applicationStatusChange.getApplicationId())
+                .fromStatus(applicationStatusChange.getFromStatus())
+                .toStatus(applicationStatusChange.getToStatus())
+                .changedAt(applicationStatusChange.getChangedAt())
+                .build();
     }
 
     private ApplicationResponse mapToApplicationResponse(Application application) {
@@ -52,63 +88,98 @@ public class ApplicationService {
     // Edit Data methods
 
     @Transactional
-    public ApplicationResponse createApplication(
-            @Valid ApplicationCreateRequest request) {
+    public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request) {
+        log.info(
+                "Creating application: company='{}', jobTitle='{}'",
+                request.getCompanyName(),
+                request.getJobTitle()
+        );
         Application application = Application.builder()
-                .jobTitle(request.getJobTitle())
-                .companyName(request.getCompanyName())
-                .descriptionUrl(request.getDescriptionUrl())
+                .jobTitle(request.getJobTitle().trim())
+                .companyName(request.getCompanyName().trim())
+                .descriptionUrl(
+                        request.getDescriptionUrl() != null
+                                ? request.getDescriptionUrl().trim()
+                                : null
+                )
                 .status(request.getStatus())
                 .appliedDate(request.getAppliedDate())
                 .build();
 
         Application savedApplication = applicationRepository.save(application);
+        log.info("Application created with id={}", savedApplication.getId());
         return mapToApplicationResponse(savedApplication);
+    }
+
+    @Transactional
+    public void deleteApplication(Long id) {
+        log.info("Deleting application id={}", id);
+
+        if (!applicationRepository.existsById(id)) {
+            throw new ApplicationNotFoundException("Could not find application with id: " + id);
+        }
+
+        // Manual Deletion of StatusChange items connected to Application
+        // Might migrate to Flyway + DB level cascading at a later time
+        statusChangeRepository.deleteAllByApplicationId(id);
+
+        applicationRepository.deleteById(id);
+
+
     }
 
 
     @Transactional
     public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
+
+        log.info("Updating application id={}", id);
+
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
-        if (applicationRequest.getJobTitle() != null && !applicationRequest.getJobTitle().equals(application.getJobTitle())) {
-            application.setJobTitle(applicationRequest.getJobTitle());
+        if (applicationRequest.getJobTitle() != null
+                && !applicationRequest.getJobTitle().isBlank()
+                && !applicationRequest.getJobTitle().equals(application.getJobTitle())) {
+            log.debug("Updating jobTitle for application id={}", id);
+            application.setJobTitle(applicationRequest.getJobTitle().trim());
         }
-        if (applicationRequest.getCompanyName() != null && !applicationRequest.getCompanyName().equals(application.getCompanyName())) {
-            application.setCompanyName(applicationRequest.getCompanyName());
+        if (applicationRequest.getCompanyName() != null
+                && !applicationRequest.getCompanyName().isBlank()
+                && !applicationRequest.getCompanyName().equals(application.getCompanyName())) {
+            log.debug("Updating companyName for application id={}", id);
+            application.setCompanyName(applicationRequest.getCompanyName().trim());
         }
-        if (applicationRequest.getDescriptionUrl() != null && !applicationRequest.getDescriptionUrl().equals(application.getDescriptionUrl())) {
-            application.setDescriptionUrl(applicationRequest.getDescriptionUrl());
+        if (applicationRequest.getDescriptionUrl() != null
+                && !applicationRequest.getDescriptionUrl().equals(application.getDescriptionUrl())) {
+            log.debug("Updating descriptionUrl for application id={}", id);
+            application.setDescriptionUrl(applicationRequest.getDescriptionUrl().trim());
         }
-        if (applicationRequest.getStatus() != null && !applicationRequest.getStatus().equals(application.getStatus())) {
-            application.setStatus(applicationRequest.getStatus());
+
+        if (applicationRequest.getStatus() != null
+                && !applicationRequest.getStatus().equals(application.getStatus())) {
+            changeStatus(application, applicationRequest.getStatus());
         }
-        if (applicationRequest.getAppliedDate() != null && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
+        if (applicationRequest.getAppliedDate() != null
+                && !applicationRequest.getAppliedDate().equals(application.getAppliedDate())) {
+            log.debug("Updating appliedDate for application id={}", id);
             application.setAppliedDate(applicationRequest.getAppliedDate());
         }
 
-        Application savedApplication = applicationRepository.save(application);
-        return mapToApplicationResponse(savedApplication);
 
-    }
-
-    @Transactional
-    public void deleteApplication(Long id) {
-
-        applicationRepository.deleteById(id);
+        return mapToApplicationResponse(application);
 
     }
 
     @Transactional
     public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status) {
+
+        log.info("Updating status for application id={} to {}", id, status);
+
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
-        application.setStatus(status);
-
-        Application savedApplication = applicationRepository.save(application);
-        return mapToApplicationResponse(savedApplication);
+        changeStatus(application, status);
+        return mapToApplicationResponse(application);
 
     }
 
@@ -118,11 +189,44 @@ public class ApplicationService {
         Application application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
-        application.setNotes(notes);
+        if (notes == null || notes.isBlank()) {
+            log.warn("Ignored empty notes update for application id={}", id);
+            return mapToApplicationResponse(application);
 
-        Application savedApplication = applicationRepository.save(application);
-        return mapToApplicationResponse(savedApplication);
+        }
 
+        log.info("Updating notes for application with id: {}", id);
+
+        application.setNotes(notes.trim());
+
+        return mapToApplicationResponse(application);
+
+    }
+
+    private void changeStatus(Application application, ApplicationStatus newStatus) {
+        ApplicationStatus oldStatus = application.getStatus();
+
+        if (oldStatus == newStatus) {
+            return;
+        }
+
+        application.setStatus(newStatus);
+
+        log.debug(
+                "Application {} status changed: {} -> {}",
+                application.getId(),
+                oldStatus,
+                newStatus
+        );
+
+
+        statusChangeRepository.save(
+                ApplicationStatusChange.builder()
+                        .applicationId(application.getId())
+                        .fromStatus(oldStatus)
+                        .toStatus(newStatus)
+                        .build()
+        );
 
     }
 }

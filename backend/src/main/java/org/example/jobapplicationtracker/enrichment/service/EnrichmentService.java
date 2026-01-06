@@ -21,7 +21,7 @@ public class EnrichmentService {
 
     public EnrichedJobData enrich(String url) {
         meterRegistry.counter("enrichment.requests").increment();
-
+        log.info("Enrichment request received for url={}", url);
         if (url.contains("finn.no")) {
             EnrichedJobData result = finnClient.enrich(url);
             recordResult(result);
@@ -31,6 +31,8 @@ public class EnrichmentService {
             recordResult(result);
             return result;
         }
+        
+        log.warn("Unsupported enrichment source for url={}", url);
         meterRegistry.counter("enrichment.failure", "source", "UNKNOWN").increment();
         return new EnrichedJobData(null, null, EnrichmentSource.UNKNOWN);
     }

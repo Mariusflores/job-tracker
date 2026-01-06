@@ -84,7 +84,7 @@ export function AddApplicationForm({onClose, onSubmit, onAutofill}: {
                 setData={setData}
                 onClose={onClose}
                 onSubmit={handleCreate}
-                isSubmitting={isSubmitting}
+                isSubmitting={isSubmitting} title={"Add Application"}
             />
         </>
     );
