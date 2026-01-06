@@ -130,7 +130,7 @@ public class ApplicationService {
 
 
     @Transactional
-    public ApplicationResponse updateApplication(Long id, ApplicationUpdateRequest applicationRequest) {
+    public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest) {
 
         log.info("Updating application id={}", id);
 

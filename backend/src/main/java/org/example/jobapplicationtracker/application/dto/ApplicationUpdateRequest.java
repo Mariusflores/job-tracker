@@ -1,5 +1,6 @@
 package org.example.jobapplicationtracker.application.dto;
 
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class ApplicationUpdateRequest {
     private String companyName;
     private String descriptionUrl;
     private ApplicationStatus status;
+    @PastOrPresent(message = "Applied date cannot be in the future")
     private LocalDate appliedDate;
 
 }
