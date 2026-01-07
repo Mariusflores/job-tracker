@@ -14,11 +14,15 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     @Query("SELECT a FROM Application a  " +
             "WHERE " +
             "(a.appliedDate < :appliedDate) " +
-            "OR (a.appliedDate = :appliedDate AND a.applicationId < :applicationId) " +
-            "ORDER BY a.appliedDate desc, a.applicationId desc")
-    public List<Application> findNextApplicationsByCursor(
+            "OR (a.appliedDate = :appliedDate AND a.id < :applicationId) " +
+            "ORDER BY a.appliedDate desc, a.id desc")
+    List<Application> findNextApplicationsByCursor(
             @Param("appliedDate") LocalDate appliedDate,
             @Param("applicationId") Long applicationId,
             Pageable pageable
     );
+
+    @Query("SELECT a FROM Application a  " +
+            "ORDER BY a.appliedDate desc, a.id desc")
+    List<Application> findApplicationsInCanonicalOrder(Pageable pageable);
 }

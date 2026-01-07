@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class ApplicationService {
     private final StatusChangeRepository statusChangeRepository;
 
     // Fetch data Methods
+
 
     public Page<ApplicationResponse> getApplications(Pageable pageable) {
 
@@ -48,55 +50,58 @@ public class ApplicationService {
         return page.map(this::mapToApplicationResponse);
     }
 
-    public ApplicationPageResponse getNextApplicationsByCursor(int limit, String currentCursor) throws IllegalArgumentException {
+    public ApplicationPageResponse getNextApplicationsByCursor(int limit, Optional<String> currentCursor) throws IllegalArgumentException {
 
-        Pageable pageable = PageRequest.of(0, limit);
+        ///  Phase 1 - Interpret Input
+        // Limit + 1 (+1 is evidence for further pages existing)
+        Pageable pageable = PageRequest.of(0, limit + 1);
 
-        if (currentCursor == null) {
-            /*
-             * TODO Is this first page, error
-             *  Should i somehow separate first page and error?
-             *  how to find first element in sort order
-             *
-             **/
+        List<Application> applications;
+
+        if (currentCursor.isPresent()) {
+
+            // Decode request
+            ApplicationCursor cursor = ApplicationCursor.Decode(currentCursor.get());
+
+            applications = applicationRepository.findNextApplicationsByCursor(cursor.getAppliedDate(), cursor.getApplicationId(), pageable);
+        } else {
+            applications = applicationRepository.findApplicationsInCanonicalOrder(pageable);
+
         }
 
-        // Decode request
-        ApplicationCursor cursor = ApplicationCursor.Decode(currentCursor);
 
-        // Validate id exist
+        /// Phase 2
+        // Return empty content if no more applications
+        if (applications.isEmpty()) {
+            return ApplicationPageResponse.builder()
+                    .content(List.of())
+                    .nextCursor(null)
+                    .hasMore(false)
+                    .build();
+        }
+        boolean hasMore = applications.size() > limit;
 
-        // Validations
+        // Remove evidence from content
+        applications.removeLast();
 
-        // get applications
-        List<Application> applications = applicationRepository.findNextApplicationsByCursor(cursor.getAppliedDate(), cursor.getApplicationId(), pageable);
-        /* TODO (What if applications is empty?)
-         *  What does applications.getLast() mean then?
-         *  Should nextCursor exist?
-         *  Should hasMore be true?
-         * */
-        /* TODO (Where do i guarantee the ordering that cursor assumes?)
-         * */
+        // Encode nextCursor
+        String nextCursor = null;
+        if (hasMore) {
+            Application cursorApplication = applications.getLast();
+            nextCursor = ApplicationCursor.Encode(
+                    ApplicationCursor.builder()
+                            .appliedDate(cursorApplication.getAppliedDate())
+                            .applicationId(cursorApplication.getId())
+                            .build()
+            );
+        }
 
-        // encode nextCursor
-        Application cursorApplication = applications.getLast();
-        String nextCursor = ApplicationCursor.Encode(
-                ApplicationCursor.builder()
-                        .appliedDate(cursorApplication.getAppliedDate())
-                        .applicationId(cursorApplication.getId())
-                        .build()
-        );
 
         // Build response
-        /*
-         * TODO (When is hasMore true? When there are more Applications beyond what is extracted at this point)
-         *  What evidence do i require before i say hasMore = true?
-         *  I Require that there exists additional applications beyond the last now given item. but how?
-         * */
         return ApplicationPageResponse.builder()
                 .content(applications.stream().map(this::mapToApplicationResponse).toList())
                 .nextCursor(nextCursor)
-                .hasMore(true)
+                .hasMore(hasMore)
                 .build();
 
     }
