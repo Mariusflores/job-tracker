@@ -7,6 +7,7 @@ import org.example.jobapplicationtracker.application.dto.pagination.ApplicationP
 import org.example.jobapplicationtracker.application.dto.response.StatusChangeResponse;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
 import org.example.jobapplicationtracker.application.mapper.ApplicationMapper;
+import org.example.jobapplicationtracker.application.mapper.StatusChangeMapper;
 import org.example.jobapplicationtracker.application.model.Application;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
@@ -133,18 +134,8 @@ public class ApplicationQueryService {
 
         return statusChanges
                 .stream()
-                .map(this::mapToStatusChangeResponse)
+                .map(StatusChangeMapper::toStatusChangeResponse)
                 .toList();
-    }
-
-    private StatusChangeResponse mapToStatusChangeResponse(ApplicationStatusChange applicationStatusChange) {
-        return StatusChangeResponse.builder()
-                .id(applicationStatusChange.getId())
-                .applicationId(applicationStatusChange.getApplicationId())
-                .fromStatus(applicationStatusChange.getFromStatus())
-                .toStatus(applicationStatusChange.getToStatus())
-                .changedAt(applicationStatusChange.getChangedAt())
-                .build();
     }
 
 
