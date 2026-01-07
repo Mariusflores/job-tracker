@@ -1,4 +1,4 @@
-package org.example.jobapplicationtracker.application.dto;
+package org.example.jobapplicationtracker.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

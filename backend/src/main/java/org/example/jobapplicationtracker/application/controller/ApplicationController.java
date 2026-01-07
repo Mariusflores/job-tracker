@@ -1,7 +1,12 @@
 package org.example.jobapplicationtracker.application.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.jobapplicationtracker.application.dto.*;
+import org.example.jobapplicationtracker.application.dto.request.ApplicationCreateRequest;
+import org.example.jobapplicationtracker.application.dto.request.ApplicationUpdateRequest;
+import org.example.jobapplicationtracker.application.dto.request.UpdateNotesRequest;
+import org.example.jobapplicationtracker.application.dto.request.UpdateStatusRequest;
+import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
+import org.example.jobapplicationtracker.application.dto.response.StatusChangeResponse;
 import org.example.jobapplicationtracker.application.service.ApplicationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
