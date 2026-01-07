@@ -29,7 +29,6 @@ public class ApplicationController {
             @RequestParam(defaultValue = "10") int limit,
             @RequestParam(required = false) String cursor
     ) {
-
         return service.getNextApplicationsByCursor(limit, Optional.ofNullable(cursor));
     }
 

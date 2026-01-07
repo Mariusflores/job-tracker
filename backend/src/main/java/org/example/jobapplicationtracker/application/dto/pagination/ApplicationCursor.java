@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.example.jobapplicationtracker.application.error.InvalidCursorException;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -19,7 +20,7 @@ public class ApplicationCursor {
 
     public static String Encode(ApplicationCursor cursor) {
         if (cursor == null) {
-            throw new IllegalArgumentException("Cursor is null");
+            throw new InvalidCursorException("Cursor is null");
         }
 
         String raw =
@@ -33,7 +34,7 @@ public class ApplicationCursor {
 
     public static ApplicationCursor Decode(String encoded) {
         if (encoded == null) {
-            throw new IllegalArgumentException("Encoded Cursor is null");
+            throw new InvalidCursorException("Encoded Cursor is null");
         }
 
         byte[] decoded =
@@ -44,7 +45,7 @@ public class ApplicationCursor {
         String[] parts = raw.split("\\|");
 
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid cursor format");
+            throw new InvalidCursorException("Invalid cursor format");
         }
 
         return new ApplicationCursor(
