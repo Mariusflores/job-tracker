@@ -53,6 +53,18 @@ public class ApplicationService {
     public ApplicationPageResponse getNextApplicationsByCursor(int limit, Optional<String> currentCursor) throws IllegalArgumentException {
 
         ///  Phase 1 - Interpret Input
+
+        log.debug(
+                "Fetching applications page: limit={}, cursorPresent={}",
+                limit,
+                currentCursor.isPresent()
+        );
+
+        currentCursor.ifPresent(c ->
+                log.debug("Using cursor token: {}", c)
+        );
+
+
         // Limit + 1 (+1 is evidence for further pages existing)
         Pageable pageable = PageRequest.of(0, limit + 1);
 
@@ -71,14 +83,24 @@ public class ApplicationService {
 
 
         /// Phase 2
+
+        log.debug(
+                "Fetched {} applications (limit={}, evidenceExpected={})",
+                applications.size(),
+                limit,
+                applications.size() > limit
+        );
         // Return empty content if no more applications
         if (applications.isEmpty()) {
+            log.debug("No applications found beyond cursor — returning terminal page");
             return ApplicationPageResponse.builder()
                     .content(List.of())
                     .nextCursor(null)
                     .hasMore(false)
                     .build();
         }
+
+
         boolean hasMore = applications.size() > limit;
 
         // Remove evidence from content
@@ -87,7 +109,14 @@ public class ApplicationService {
         // Encode nextCursor
         String nextCursor = null;
         if (hasMore) {
+
             Application cursorApplication = applications.getLast();
+            log.debug(
+                    "Derived next cursor from application id={}, appliedDate={}",
+                    cursorApplication.getId(),
+                    cursorApplication.getAppliedDate()
+            );
+
             nextCursor = ApplicationCursor.Encode(
                     ApplicationCursor.builder()
                             .appliedDate(cursorApplication.getAppliedDate())
@@ -96,6 +125,11 @@ public class ApplicationService {
             );
         }
 
+        log.debug(
+                "Returning application page: returned={}, hasMore={}",
+                applications.size(),
+                hasMore
+        );
 
         // Build response
         return ApplicationPageResponse.builder()
