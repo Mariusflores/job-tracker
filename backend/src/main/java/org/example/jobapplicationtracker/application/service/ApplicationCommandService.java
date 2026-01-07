@@ -6,88 +6,25 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.jobapplicationtracker.application.dto.request.ApplicationCreateRequest;
 import org.example.jobapplicationtracker.application.dto.request.ApplicationUpdateRequest;
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
-import org.example.jobapplicationtracker.application.dto.response.StatusChangeResponse;
 import org.example.jobapplicationtracker.application.error.ApplicationNotFoundException;
+import org.example.jobapplicationtracker.application.mapper.ApplicationMapper;
 import org.example.jobapplicationtracker.application.model.Application;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 
-public class ApplicationService {
+public class ApplicationCommandService {
 
     private final ApplicationRepository applicationRepository;
     private final StatusChangeRepository statusChangeRepository;
 
-    // Fetch data Methods
-
-    public Page<ApplicationResponse> getApplications(Pageable pageable) {
-
-        Page<Application> page = applicationRepository.findAll(pageable);
-
-        log.debug(
-                "Fetched page {} with {} applications",
-                page.getNumber(),
-                page.getNumberOfElements()
-        );
-
-
-        return page.map(this::mapToApplicationResponse);
-
-
-    }
-
-    public List<StatusChangeResponse> getStatusHistory(Long applicationId) {
-        if (!applicationRepository.existsById(applicationId)) {
-            throw new ApplicationNotFoundException(
-                    "Could not find application with id: " + applicationId
-            );
-        }
-
-
-        List<ApplicationStatusChange> statusChanges = statusChangeRepository.findByApplicationIdOrderByChangedAtDesc(applicationId);
-
-        log.debug("Fetched {} applications", statusChanges.size());
-
-        return statusChanges
-                .stream()
-                .map(this::mapToStatusChangeResponse)
-                .toList();
-    }
-
-    private StatusChangeResponse mapToStatusChangeResponse(ApplicationStatusChange applicationStatusChange) {
-        return StatusChangeResponse.builder()
-                .id(applicationStatusChange.getId())
-                .applicationId(applicationStatusChange.getApplicationId())
-                .fromStatus(applicationStatusChange.getFromStatus())
-                .toStatus(applicationStatusChange.getToStatus())
-                .changedAt(applicationStatusChange.getChangedAt())
-                .build();
-    }
-
-    private ApplicationResponse mapToApplicationResponse(Application application) {
-
-        return ApplicationResponse.builder()
-                .id(application.getId())
-                .jobTitle(application.getJobTitle())
-                .companyName(application.getCompanyName())
-                .descriptionUrl(application.getDescriptionUrl())
-                .appliedDate(application.getAppliedDate())
-                .status(application.getStatus())
-                .notes(application.getNotes())
-                .build();
-
-    }
 
     // Edit Data methods
 
@@ -112,7 +49,7 @@ public class ApplicationService {
 
         Application savedApplication = applicationRepository.save(application);
         log.info("Application created with id={}", savedApplication.getId());
-        return mapToApplicationResponse(savedApplication);
+        return ApplicationMapper.toApplicationResponse(savedApplication);
     }
 
     @Transactional
@@ -170,7 +107,7 @@ public class ApplicationService {
         }
 
 
-        return mapToApplicationResponse(application);
+        return ApplicationMapper.toApplicationResponse(application);
 
     }
 
@@ -183,7 +120,7 @@ public class ApplicationService {
                 .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
         changeStatus(application, status);
-        return mapToApplicationResponse(application);
+        return ApplicationMapper.toApplicationResponse(application);
 
     }
 
@@ -195,7 +132,7 @@ public class ApplicationService {
 
         if (notes == null || notes.isBlank()) {
             log.warn("Ignored empty notes update for application id={}", id);
-            return mapToApplicationResponse(application);
+            return ApplicationMapper.toApplicationResponse(application);
 
         }
 
@@ -203,7 +140,7 @@ public class ApplicationService {
 
         application.setNotes(notes.trim());
 
-        return mapToApplicationResponse(application);
+        return ApplicationMapper.toApplicationResponse(application);
 
     }
 
