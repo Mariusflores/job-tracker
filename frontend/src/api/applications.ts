@@ -9,8 +9,21 @@ import type {
 import type {PagedResponse} from "../types/pagination.ts";
 
 // GET
-export async function getApplications(page: number, size: number): Promise<PagedResponse<Application>> {
-    const response = await api.get<PagedResponse<Application>>("/application?page=" + page + "&size=" + size)
+export async function getApplications(
+    limit: number,
+    cursor: string | null): Promise<PagedResponse<Application>> {
+
+    const params: Record<string, string | number> = {limit};
+
+    if (cursor) {
+        params.cursor = cursor;
+    }
+
+    const response = await api.get<PagedResponse<Application>>(
+        "/application",
+        {params}
+    );
+
     return response.data;
 }
 

@@ -28,18 +28,13 @@ export default function App() {
     const [backendApps, setBackendApps] = useState<Application[]>([]);
 
     const [isLoading, setIsLoading] = useState(false);
-    const [page, setPage] = useState(0);
-    const [size] = useState(10); // fixed for now
-    const [totalPages, setTotalPages] = useState(0);
+    const [cursor, setCursor] = useState("");
+    const [limit] = useState(10); // fixed for now
+    const [hasMore, setHasMore] = useState(false);
 
     useEffect(() => {
         loadApps(true);
     }, []);
-
-    useEffect(() => {
-        if (page === 0) return;
-        loadApps();
-    }, [page]);
 
 
     useEffect(() => {
@@ -57,8 +52,10 @@ export default function App() {
     async function loadApps(reset = false) {
         setIsLoading(true);
 
-        const data = await getApplications(page, size);
-        setTotalPages(data.totalPages);
+        const data = await getApplications(limit, cursor);
+
+        setCursor(data.nextCursor)
+        setHasMore(data.hasMore)
 
         setBackendApps(prev =>
             reset ? data.content : [...prev, ...data.content]
@@ -74,7 +71,7 @@ export default function App() {
 
     async function createApplication(request: CreateApplicationRequest) {
         await createApplicationApi(request);
-        setPage(0);
+        setCursor("");
         await loadApps(true);
 
     }
@@ -156,9 +153,9 @@ export default function App() {
         return await fetchJobPostingEnrichmentApi(url);
     }
 
-    function loadMore() {
-        if (page + 1 >= totalPages) return;
-        setPage(prev => prev + 1);
+    async function loadMore() {
+        if (!hasMore || isLoading) return;
+        await loadApps()
     }
 
 
@@ -177,7 +174,7 @@ export default function App() {
                                isLoading={isLoading} onAutofill={fetchJobPostEnrichment}
                                getStatusHistory={getStatusHistory}
                                onLoadMore={loadMore}
-                               hasMore={page + 1 < totalPages}
+                               hasMore={hasMore}
                            />
 
                            }/>
