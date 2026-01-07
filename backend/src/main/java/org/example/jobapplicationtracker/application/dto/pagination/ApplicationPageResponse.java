@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.jobapplicationtracker.application.model.Application;
+import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 public class ApplicationPageResponse {
 
-    private List<Application> content;
+    private List<ApplicationResponse> content;
     private String nextCursor;
     private boolean hasMore;
 }
