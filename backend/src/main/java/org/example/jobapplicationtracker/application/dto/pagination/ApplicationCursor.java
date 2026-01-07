@@ -37,20 +37,26 @@ public class ApplicationCursor {
             throw new InvalidCursorException("Encoded Cursor is null");
         }
 
-        byte[] decoded =
-                Base64.getDecoder().decode(encoded);
-        String raw =
-                new String(decoded, StandardCharsets.UTF_8);
+        try {
+            byte[] decoded =
+                    Base64.getDecoder().decode(encoded);
+            String raw =
+                    new String(decoded, StandardCharsets.UTF_8);
 
-        String[] parts = raw.split("\\|");
+            String[] parts = raw.split("\\|");
 
-        if (parts.length != 2) {
+            if (parts.length != 2) {
+                throw new InvalidCursorException("Invalid cursor format");
+            }
+
+            return new ApplicationCursor(
+                    LocalDate.parse(parts[0]),
+                    Long.valueOf(parts[1])
+            );
+        } catch (RuntimeException e) {
             throw new InvalidCursorException("Invalid cursor format");
         }
 
-        return new ApplicationCursor(
-                LocalDate.parse(parts[0]),
-                Long.valueOf(parts[1])
-        );
+
     }
 }
