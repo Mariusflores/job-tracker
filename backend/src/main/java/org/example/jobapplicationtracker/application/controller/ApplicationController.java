@@ -1,6 +1,7 @@
 package org.example.jobapplicationtracker.application.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobapplicationtracker.application.dto.pagination.ApplicationPageResponse;
 import org.example.jobapplicationtracker.application.dto.request.ApplicationCreateRequest;
 import org.example.jobapplicationtracker.application.dto.request.ApplicationUpdateRequest;
 import org.example.jobapplicationtracker.application.dto.request.UpdateNotesRequest;
@@ -8,12 +9,11 @@ import org.example.jobapplicationtracker.application.dto.request.UpdateStatusReq
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 import org.example.jobapplicationtracker.application.dto.response.StatusChangeResponse;
 import org.example.jobapplicationtracker.application.service.ApplicationService;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,9 +25,12 @@ public class ApplicationController {
     // GET Requests
 
     @GetMapping
-    public Page<ApplicationResponse> getApplications(Pageable pageable) {
+    public ApplicationPageResponse getApplicationsByCursor(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(required = false) String cursor
+    ) {
 
-        return service.getApplications(pageable);
+        return service.getNextApplicationsByCursor(limit, Optional.ofNullable(cursor));
     }
 
     @GetMapping("/{id}/status-history")

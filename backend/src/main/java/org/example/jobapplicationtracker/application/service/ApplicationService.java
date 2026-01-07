@@ -15,7 +15,6 @@ import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,21 +33,6 @@ public class ApplicationService {
     private final StatusChangeRepository statusChangeRepository;
 
     // Fetch data Methods
-
-
-    public Page<ApplicationResponse> getApplications(Pageable pageable) {
-
-        Page<Application> page = applicationRepository.findAll(pageable);
-
-        log.debug(
-                "Fetched page {} with {} applications",
-                page.getNumber(),
-                page.getNumberOfElements()
-        );
-
-
-        return page.map(this::mapToApplicationResponse);
-    }
 
     public ApplicationPageResponse getNextApplicationsByCursor(int limit, Optional<String> currentCursor) throws IllegalArgumentException {
 
