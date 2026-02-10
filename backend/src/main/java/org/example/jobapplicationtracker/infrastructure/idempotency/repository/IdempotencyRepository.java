@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 
 public interface IdempotencyRepository extends JpaRepository<IdempotencyRecord, Long> {
 
-    boolean existsByKey(String key);
-
     @Modifying
     @Query("""
                 DELETE FROM IdempotencyRecord r
