@@ -325,7 +325,6 @@ public class ApplicationCommandService {
     // Edit Data methods
 
     private String generateResponseSnapshot(Application application) {
-        ApplicationResponse response = ApplicationMapper.toApplicationResponse(application);
         Map<String, Object> snapshot = new TreeMap<>();
         snapshot.put("id", application.getId());
         snapshot.put("jobTitle", application.getJobTitle());
