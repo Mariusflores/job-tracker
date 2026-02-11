@@ -32,7 +32,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
             "ORDER BY a.appliedDate desc, a.id desc")
     List<Application> findApplicationsInCanonicalOrder(@Param("userId") Long userId, Pageable pageable);
 
-    boolean existsByIdAndUserId(@NotNull Long id, @NotNull Long userId);
-
     Optional<Application> findByIdAndUserId(@NotNull Long id, @NotNull Long userId);
 }

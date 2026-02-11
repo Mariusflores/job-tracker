@@ -2,6 +2,7 @@ package org.example.jobapplicationtracker.application.service;
 
 import org.example.jobapplicationtracker.application.dto.pagination.ApplicationPageResponse;
 import org.example.jobapplicationtracker.application.dto.request.ApplicationCreateRequest;
+import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.infrastructure.auth.model.User;
@@ -232,7 +233,7 @@ public class ApplicationQueryServiceIT {
         // Extract dates
         List<LocalDate> dates = page.getContent()
                 .stream()
-                .map(app -> app.getAppliedDate())
+                .map(ApplicationResponse::getAppliedDate)
                 .toList();
 
         // Should be sorted descending
@@ -241,7 +242,7 @@ public class ApplicationQueryServiceIT {
         // Verify ID tie-breaker on same date
         List<Long> ids = page.getContent()
                 .stream()
-                .map(app -> app.getId())
+                .map(ApplicationResponse::getId)
                 .toList();
 
         // If two items share same date (2024-01-01),
