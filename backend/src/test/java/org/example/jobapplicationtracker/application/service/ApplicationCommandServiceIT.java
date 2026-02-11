@@ -5,11 +5,14 @@ import org.example.jobapplicationtracker.application.dto.request.ApplicationUpda
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
+import org.example.jobapplicationtracker.infrastructure.auth.model.User;
+import org.example.jobapplicationtracker.infrastructure.auth.repository.UserRepository;
 import org.example.jobapplicationtracker.infrastructure.idempotency.repository.IdempotencyRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
@@ -19,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@WithMockUser(username = "test@example.com")
 class ApplicationCommandServiceIT {
 
     @Autowired
@@ -30,11 +34,26 @@ class ApplicationCommandServiceIT {
     @Autowired
     private IdempotencyRepository idempotencyRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
     @BeforeEach
     void setUp() {
         idempotencyRepository.deleteAll();
         applicationRepository.deleteAll();
+        userRepository.deleteAll();
+
+        userRepository.save(
+                User.builder()
+                        .email("test@example.com")
+                        .password("dummy") // password irrelevant for @WithMockUser
+                        .firstName("Test")
+                        .lastName("User")
+                        .build()
+        );
     }
+
 
     // 🧪 Test 1: CREATE is idempotent
     @Test

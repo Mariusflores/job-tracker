@@ -1,5 +1,10 @@
 FRONTEND_URL: http://localhost:3000
 
+jwt:
+  secret: testsecretkeytestsecretkeytestsecretkey
+  expiration: 3600000
+
+
 spring:
   datasource:
     url: jdbc:h2:mem:testdb

@@ -12,6 +12,7 @@ import org.example.jobapplicationtracker.infrastructure.idempotency.model.Action
 @Builder
 public class IdempotencyIntent {
     private String key;
+    private Long userId;
     private ActionType action;
     private Long targetId;
     private String payloadHash;

@@ -12,6 +12,8 @@ import org.example.jobapplicationtracker.application.model.Application;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
+import org.example.jobapplicationtracker.infrastructure.auth.context.SecurityContextCurrentUserProvider;
+import org.example.jobapplicationtracker.infrastructure.auth.model.User;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,11 +28,14 @@ public class ApplicationQueryService {
 
     private final ApplicationRepository applicationRepository;
     private final StatusChangeRepository statusChangeRepository;
+    private final SecurityContextCurrentUserProvider userProvider;
 
 
     // Fetch data Methods
 
     public ApplicationPageResponse getNextApplicationsByCursor(int limit, Optional<String> currentCursor) throws IllegalArgumentException {
+        User user = userProvider.getCurrentUser();
+
 
         ///  Phase 1 - Interpret Input
 
