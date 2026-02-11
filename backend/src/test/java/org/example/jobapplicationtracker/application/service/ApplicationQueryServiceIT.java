@@ -20,6 +20,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -237,7 +238,7 @@ public class ApplicationQueryServiceIT {
                 .toList();
 
         // Should be sorted descending
-        assertThat(dates).isSortedAccordingTo((d1, d2) -> d2.compareTo(d1));
+        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder());
 
         // Verify ID tie-breaker on same date
         List<Long> ids = page.getContent()
@@ -247,7 +248,7 @@ public class ApplicationQueryServiceIT {
 
         // If two items share same date (2024-01-01),
         // the one created later (higher id) should come first
-        assertThat(ids).isSortedAccordingTo((i1, i2) -> i2.compareTo(i1));
+        assertThat(ids).isSortedAccordingTo(Comparator.reverseOrder());
     }
 
 
