@@ -15,13 +15,13 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public String registerUser(@RequestBody RegisterRequest request) throws Exception {
+    public String registerUser(@RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public String login(@RequestBody LoginRequest request) throws Exception {
+    public String login(@RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }
