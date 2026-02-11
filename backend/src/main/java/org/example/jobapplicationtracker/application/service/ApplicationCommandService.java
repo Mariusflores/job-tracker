@@ -41,9 +41,9 @@ public class ApplicationCommandService {
 
 
     @Transactional
-    public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request) {
-        String key = UUID.randomUUID().toString();// Dummy string, will be replaced with parameter
-        ActionType action = ActionType.CREATE_APPLICATION; // Dummy
+    public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request, String idempotencyKey) {
+        String key = idempotencyKey;
+        ActionType action = ActionType.CREATE_APPLICATION;
         log.info(
                 "Creating application: company='{}', jobTitle='{}'",
                 request.getCompanyName(),
@@ -96,9 +96,9 @@ public class ApplicationCommandService {
     }
 
     @Transactional
-    public void deleteApplication(Long id) {
-        String key = UUID.randomUUID().toString();// Dummy string, will be replaced with parameter
-        ActionType action = ActionType.DELETE_APPLICATION; // Dummy
+    public void deleteApplication(Long id, String idempotencyKey) {
+        String key = idempotencyKey;
+        ActionType action = ActionType.DELETE_APPLICATION;
         log.info("Deleting application id={}", id);
 
         String canonicalPayload = generateCanonicalPayload(id, action);
@@ -114,8 +114,12 @@ public class ApplicationCommandService {
         try {
             idempotencyService.tryReserve(intent);
 
+            // Idempotent: if already deleted, skip deletion
             if (!applicationRepository.existsById(id)) {
-                throw new ApplicationNotFoundException("Could not find application with id: " + id);
+                log.info("Application id={} already deleted", id);
+                String responseSnapshot = generateDeleteSnapshot(id);
+                idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+                return;
             }
 
 
@@ -145,10 +149,10 @@ public class ApplicationCommandService {
 
 
     @Transactional
-    public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest) {
+    public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest, String idempotencyKey) {
 
-        String key = UUID.randomUUID().toString();// Dummy string, will be replaced with parameter
-        ActionType action = ActionType.UPDATE_APPLICATION; // Dummy
+        String key = idempotencyKey;
+        ActionType action = ActionType.UPDATE_APPLICATION;
 
         log.info("Updating application id={}", id);
         String canonicalPayload = generateCanonicalPayload(applicationRequest, action, id);
@@ -210,9 +214,9 @@ public class ApplicationCommandService {
     }
 
     @Transactional
-    public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status) {
-        String key = UUID.randomUUID().toString();// Dummy string, will be replaced with parameter
-        ActionType action = ActionType.CHANGE_APPLICATION_STATUS; // Dummy
+    public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status, String idempotencyKey) {
+        String key = idempotencyKey;
+        ActionType action = ActionType.CHANGE_APPLICATION_STATUS;
 
         log.info("Updating status for application id={} to {}", id, status);
 
@@ -244,9 +248,9 @@ public class ApplicationCommandService {
     }
 
     @Transactional
-    public ApplicationResponse updateApplicationNotes(long id, String notes) {
-        String key = UUID.randomUUID().toString();// Dummy string, will be replaced with parameter
-        ActionType action = ActionType.CHANGE_APPLICATION_NOTES; // Dummy
+    public ApplicationResponse updateApplicationNotes(long id, String notes, String idempotencyKey) {
+        String key = idempotencyKey;
+        ActionType action = ActionType.CHANGE_APPLICATION_NOTES;
 
         String canonicalPayload = generateCanonicalPayload(id, notes, action);
         String payloadHash = HashingUtil.sha256(canonicalPayload);

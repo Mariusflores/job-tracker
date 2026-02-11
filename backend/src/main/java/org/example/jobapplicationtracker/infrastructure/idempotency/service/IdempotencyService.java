@@ -7,6 +7,8 @@ import org.example.jobapplicationtracker.infrastructure.idempotency.dto.Idempote
 import org.example.jobapplicationtracker.infrastructure.idempotency.model.IdempotencyRecord;
 import org.example.jobapplicationtracker.infrastructure.idempotency.repository.IdempotencyRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -17,9 +19,16 @@ public class IdempotencyService {
     private final IdempotencyRepository repository;
     private final static Long EXPIRATION_TIME_MINUTES = 45L;
 
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public IdempotencyRecordResponse loadExisting(String key) {
         IdempotencyRecord record = repository.findByKey(key);
+
+        if (record == null) {
+            throw new IllegalStateException(
+                    "Idempotency conflict detected but no committed record exists for key=" + key
+            );
+        }
+
         return IdempotencyRecordResponse.builder()
                 .key(key)
                 .action(record.getActionType())

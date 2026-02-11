@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -43,35 +44,53 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponse createApplication(@RequestBody ApplicationCreateRequest createRequest) {
+    public ApplicationResponse createApplication(
+            @RequestBody ApplicationCreateRequest createRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
 
-        return commandService.createApplication(createRequest);
+        String key = idempotencyKey != null ? idempotencyKey : UUID.randomUUID().toString();
+        return commandService.createApplication(createRequest, key);
     }
 
     // PATCH Requests
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplication(@PathVariable Long id, @RequestBody ApplicationUpdateRequest updateRequest) {
-        return commandService.updateApplication(id, updateRequest);
+    public ApplicationResponse updateApplication(
+            @PathVariable Long id,
+            @RequestBody ApplicationUpdateRequest updateRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String key = idempotencyKey != null ? idempotencyKey : UUID.randomUUID().toString();
+        return commandService.updateApplication(id, updateRequest, key);
     }
 
     @PatchMapping("{id}/status")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplicationStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest updateStatusRequest) {
-        return commandService.updateApplicationStatus(id, updateStatusRequest.getApplicationStatus());
+    public ApplicationResponse updateApplicationStatus(
+            @PathVariable Long id,
+            @RequestBody UpdateStatusRequest updateStatusRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String key = idempotencyKey != null ? idempotencyKey : UUID.randomUUID().toString();
+        return commandService.updateApplicationStatus(id, updateStatusRequest.getApplicationStatus(), key);
     }
 
     @PatchMapping("/{id}/notes")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplicationNotes(@PathVariable long id, @RequestBody UpdateNotesRequest updateNotesRequest) {
-        return commandService.updateApplicationNotes(id, updateNotesRequest.getNotes());
+    public ApplicationResponse updateApplicationNotes(
+            @PathVariable long id,
+            @RequestBody UpdateNotesRequest updateNotesRequest,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String key = idempotencyKey != null ? idempotencyKey : UUID.randomUUID().toString();
+        return commandService.updateApplicationNotes(id, updateNotesRequest.getNotes(), key);
     }
 
     // DELETE Requests
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteApplication(@PathVariable Long id) {
-        commandService.deleteApplication(id);
+    public void deleteApplication(
+            @PathVariable Long id,
+            @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey) {
+        String key = idempotencyKey != null ? idempotencyKey : UUID.randomUUID().toString();
+        commandService.deleteApplication(id, key);
     }
 }
