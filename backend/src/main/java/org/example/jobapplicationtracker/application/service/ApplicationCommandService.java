@@ -26,7 +26,6 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +41,6 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request, String idempotencyKey) {
-        String key = idempotencyKey;
         ActionType action = ActionType.CREATE_APPLICATION;
         log.info(
                 "Creating application: company='{}', jobTitle='{}'",
@@ -54,7 +52,7 @@ public class ApplicationCommandService {
         String payloadHash = HashingUtil.sha256(canonicalPayload);
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
-                .key(key)
+                .key(idempotencyKey)
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(null)
@@ -97,7 +95,6 @@ public class ApplicationCommandService {
 
     @Transactional
     public void deleteApplication(Long id, String idempotencyKey) {
-        String key = idempotencyKey;
         ActionType action = ActionType.DELETE_APPLICATION;
         log.info("Deleting application id={}", id);
 
@@ -105,7 +102,7 @@ public class ApplicationCommandService {
         String payloadHash = HashingUtil.sha256(canonicalPayload);
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
-                .key(key)
+                .key(idempotencyKey)
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -151,7 +148,6 @@ public class ApplicationCommandService {
     @Transactional
     public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest, String idempotencyKey) {
 
-        String key = idempotencyKey;
         ActionType action = ActionType.UPDATE_APPLICATION;
 
         log.info("Updating application id={}", id);
@@ -159,7 +155,7 @@ public class ApplicationCommandService {
         String payloadHash = HashingUtil.sha256(canonicalPayload);
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
-                .key(key)
+                .key(idempotencyKey)
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -215,7 +211,6 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status, String idempotencyKey) {
-        String key = idempotencyKey;
         ActionType action = ActionType.CHANGE_APPLICATION_STATUS;
 
         log.info("Updating status for application id={} to {}", id, status);
@@ -224,7 +219,7 @@ public class ApplicationCommandService {
         String payloadHash = HashingUtil.sha256(canonicalPayload);
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
-                .key(key)
+                .key(idempotencyKey)
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -249,14 +244,13 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse updateApplicationNotes(long id, String notes, String idempotencyKey) {
-        String key = idempotencyKey;
         ActionType action = ActionType.CHANGE_APPLICATION_NOTES;
 
         String canonicalPayload = generateCanonicalPayload(id, notes, action);
         String payloadHash = HashingUtil.sha256(canonicalPayload);
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
-                .key(key)
+                .key(idempotencyKey)
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
