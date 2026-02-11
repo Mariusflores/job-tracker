@@ -14,19 +14,23 @@ import java.util.Optional;
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
     @Query("SELECT a FROM Application a  " +
-            "WHERE " +
-            "(a.appliedDate < :appliedDate) " +
-            "OR (a.appliedDate = :appliedDate AND a.id < :applicationId) " +
+            "WHERE a.user.id = :userId " +
+            "AND (" +
+            "    a.appliedDate < :appliedDate\n" +
+            "    OR (a.appliedDate = :appliedDate AND a.id < :applicationId)" +
+            ")" +
             "ORDER BY a.appliedDate desc, a.id desc")
     List<Application> findNextApplicationsByCursor(
+            @Param("userId") Long userId,
             @Param("appliedDate") LocalDate appliedDate,
             @Param("applicationId") Long applicationId,
             Pageable pageable
     );
 
     @Query("SELECT a FROM Application a  " +
+            "WHERE a.user.id = :userId " +
             "ORDER BY a.appliedDate desc, a.id desc")
-    List<Application> findApplicationsInCanonicalOrder(Pageable pageable);
+    List<Application> findApplicationsInCanonicalOrder(@Param("userId") Long userId, Pageable pageable);
 
     boolean existsByIdAndUserId(@NotNull Long id, @NotNull Long userId);
 

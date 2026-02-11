@@ -49,6 +49,10 @@ public class ApplicationQueryService {
                 log.debug("Using cursor token: {}", c)
         );
 
+        if (limit <= 0 || limit > 100) {
+            throw new IllegalArgumentException("Limit must be between 1 and 100");
+        }
+
 
         // Limit + 1 (+1 is evidence for further pages existing)
         Pageable pageable = PageRequest.of(0, limit + 1);
@@ -60,9 +64,9 @@ public class ApplicationQueryService {
             // Decode request
             ApplicationCursor cursor = ApplicationCursor.Decode(currentCursor.get());
 
-            applications = applicationRepository.findNextApplicationsByCursor(cursor.getAppliedDate(), cursor.getApplicationId(), pageable);
+            applications = applicationRepository.findNextApplicationsByCursor(user.getId(), cursor.getAppliedDate(), cursor.getApplicationId(), pageable);
         } else {
-            applications = applicationRepository.findApplicationsInCanonicalOrder(pageable);
+            applications = applicationRepository.findApplicationsInCanonicalOrder(user.getId(), pageable);
 
         }
 
@@ -89,7 +93,7 @@ public class ApplicationQueryService {
         boolean hasMore = applications.size() > limit;
 
         // Remove evidence from content
-        applications.removeLast();
+        if (hasMore) applications.removeLast();
 
         // Encode nextCursor
         String nextCursor = null;
@@ -126,14 +130,17 @@ public class ApplicationQueryService {
     }
 
     public List<StatusChangeResponse> getStatusHistory(Long applicationId) {
-        if (!applicationRepository.existsById(applicationId)) {
-            throw new ApplicationNotFoundException(
-                    "Could not find application with id: " + applicationId
-            );
-        }
+        User user = userProvider.getCurrentUser();
+
+        Application application = applicationRepository.findByIdAndUserId(applicationId, user.getId())
+                .orElseThrow(() ->
+                        new ApplicationNotFoundException(
+                                "Could not find application with id: " + applicationId
+                        )
+                );
 
 
-        List<ApplicationStatusChange> statusChanges = statusChangeRepository.findByApplicationIdOrderByChangedAtDesc(applicationId);
+        List<ApplicationStatusChange> statusChanges = statusChangeRepository.findByApplicationIdOrderByChangedAtDesc(application.getId());
 
         log.debug("Fetched {} applications", statusChanges.size());
 
