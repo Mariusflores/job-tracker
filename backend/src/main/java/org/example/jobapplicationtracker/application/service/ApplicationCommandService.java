@@ -23,6 +23,7 @@ import org.example.jobapplicationtracker.infrastructure.idempotency.service.Idem
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
@@ -356,7 +357,10 @@ public class ApplicationCommandService {
     private ApplicationResponse convertFromSnapshot(String responseSnapshot) {
 
         try {
-            Map<String, Object> snapshot = objectMapper.readValue(responseSnapshot, Map.class);
+            Map<String, Object> snapshot =
+                    objectMapper.readValue(responseSnapshot, new TypeReference<Map<String, Object>>() {
+                    });
+
 
             if (snapshot.containsKey("deleted")) {
                 throw new IllegalStateException("Delete snapshot cannot be converted to ApplicationResponse");
