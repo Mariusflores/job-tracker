@@ -13,6 +13,7 @@ export async function getApplications(
     limit: number,
     cursor: string | null): Promise<PagedResponse<Application>> {
 
+
     const params: Record<string, string | number> = {limit};
 
     if (cursor) {
@@ -34,14 +35,34 @@ export async function getStatusHistoryApi(applicationId: number) {
 
 // POST
 export async function createApplicationApi(request: CreateApplicationRequest) {
-    const response = await api.post<Application>("/application", request);
+    const idempotencyKey = crypto.randomUUID();
+    const response =
+        await api.post<Application>(
+            "/application",
+            request,
+            {
+                headers: {
+                    "Idempotency-Key": idempotencyKey
+                }
+            }
+        );
     return response.data;
 }
 
 // DELETE
 
 export async function deleteApplicationApi(applicationId: number) {
-    const response = await api.delete("/application/" + applicationId);
+    const idempotencyKey = crypto.randomUUID();
+
+    const response
+        = await api.delete(
+        "/application/" + applicationId,
+        {
+            headers: {
+                "Idempotency-Key": idempotencyKey
+            }
+        }
+    );
     return response.data;
 }
 
@@ -49,7 +70,18 @@ export async function deleteApplicationApi(applicationId: number) {
 // PATCH
 
 export async function updateApplicationApi(applicationId: number, request: UpdateApplicationRequest) {
-    const response = await api.patch("/application/" + applicationId, request)
+    const idempotencyKey = crypto.randomUUID();
+
+    const response =
+        await api.patch(
+            "/application/" + applicationId,
+            request,
+            {
+                headers: {
+                    "Idempotency-Key": idempotencyKey
+                }
+            }
+        );
     return response.data;
 }
 
@@ -57,10 +89,18 @@ export async function updateApplicationStatusApi(
     applicationId: number,
     status: ApplicationStatus
 ): Promise<Application> {
-    const response = await api.patch<Application>(
-        `/application/${applicationId}/status`,
-        {applicationStatus: status}
-    );
+    const idempotencyKey = crypto.randomUUID();
+
+    const response =
+        await api.patch<Application>(
+            `/application/${applicationId}/status`,
+            {applicationStatus: status},
+            {
+                headers: {
+                    "Idempotency-Key": idempotencyKey
+                }
+            }
+        );
     return response.data;
 }
 
@@ -68,9 +108,16 @@ export async function updateApplicationNotesApi(
     applicationId: number,
     notes: string
 ): Promise<Application> {
+    const idempotencyKey = crypto.randomUUID();
+
     const response = await api.patch<Application>(
         `/application/${applicationId}/notes`,
-        {notes}
+        {notes: notes},
+        {
+            headers: {
+                "Idempotency-Key": idempotencyKey
+            }
+        }
     );
     return response.data;
 }

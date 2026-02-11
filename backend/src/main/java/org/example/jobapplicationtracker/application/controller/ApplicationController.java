@@ -43,35 +43,49 @@ public class ApplicationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ApplicationResponse createApplication(@RequestBody ApplicationCreateRequest createRequest) {
+    public ApplicationResponse createApplication(
+            @RequestBody ApplicationCreateRequest createRequest,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
 
-        return commandService.createApplication(createRequest);
+        return commandService.createApplication(createRequest, idempotencyKey);
     }
 
     // PATCH Requests
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplication(@PathVariable Long id, @RequestBody ApplicationUpdateRequest updateRequest) {
-        return commandService.updateApplication(id, updateRequest);
+    public ApplicationResponse updateApplication(
+            @PathVariable Long id,
+            @RequestBody ApplicationUpdateRequest updateRequest,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+
+        return commandService.updateApplication(id, updateRequest, idempotencyKey);
     }
 
     @PatchMapping("{id}/status")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplicationStatus(@PathVariable Long id, @RequestBody UpdateStatusRequest updateStatusRequest) {
-        return commandService.updateApplicationStatus(id, updateStatusRequest.getApplicationStatus());
+    public ApplicationResponse updateApplicationStatus(
+            @PathVariable Long id,
+            @RequestBody UpdateStatusRequest updateStatusRequest,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        return commandService.updateApplicationStatus(id, updateStatusRequest.getApplicationStatus(), idempotencyKey);
     }
 
     @PatchMapping("/{id}/notes")
     @ResponseStatus(HttpStatus.OK)
-    public ApplicationResponse updateApplicationNotes(@PathVariable long id, @RequestBody UpdateNotesRequest updateNotesRequest) {
-        return commandService.updateApplicationNotes(id, updateNotesRequest.getNotes());
+    public ApplicationResponse updateApplicationNotes(
+            @PathVariable long id,
+            @RequestBody UpdateNotesRequest updateNotesRequest,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        return commandService.updateApplicationNotes(id, updateNotesRequest.getNotes(), idempotencyKey);
     }
 
     // DELETE Requests
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteApplication(@PathVariable Long id) {
-        commandService.deleteApplication(id);
+    public void deleteApplication(
+            @PathVariable Long id,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+        commandService.deleteApplication(id, idempotencyKey);
     }
 }
