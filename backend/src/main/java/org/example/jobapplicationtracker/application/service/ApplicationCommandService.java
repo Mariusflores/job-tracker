@@ -358,7 +358,7 @@ public class ApplicationCommandService {
 
         try {
             Map<String, Object> snapshot =
-                    objectMapper.readValue(responseSnapshot, new TypeReference<Map<String, Object>>() {
+                    objectMapper.readValue(responseSnapshot, new TypeReference<>() {
                     });
 
 
