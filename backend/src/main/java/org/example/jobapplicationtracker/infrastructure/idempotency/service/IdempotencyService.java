@@ -38,6 +38,7 @@ public class IdempotencyService {
                 .build();
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void tryReserve(IdempotencyIntent intent) {
 
         IdempotencyRecord record = IdempotencyRecord.builder()
