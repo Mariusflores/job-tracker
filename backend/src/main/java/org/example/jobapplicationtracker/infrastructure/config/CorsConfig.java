@@ -1,4 +1,4 @@
-package org.example.jobapplicationtracker.config;
+package org.example.jobapplicationtracker.infrastructure.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
