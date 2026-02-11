@@ -1,4 +1,4 @@
-package org.example.jobapplicationtracker.config;
+package org.example.jobapplicationtracker.infrastructure.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;

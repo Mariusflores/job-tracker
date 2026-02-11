@@ -70,10 +70,10 @@ export default function App() {
     }
 
     async function createApplication(request: CreateApplicationRequest) {
-        await createApplicationApi(request);
-        setCursor("");
-        await loadApps(true);
+        const newApp = await createApplicationApi(request);
 
+        // Add to beginning of list immediately
+        setBackendApps(prev => [newApp, ...prev]);
     }
 
     async function deleteApplication(id: number) {
