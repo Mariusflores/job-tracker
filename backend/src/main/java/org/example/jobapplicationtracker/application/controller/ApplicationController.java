@@ -29,8 +29,7 @@ public class ApplicationController {
     @GetMapping
     public ApplicationPageResponse getApplicationsByCursor(
             @RequestParam(defaultValue = "10") int limit,
-            @RequestParam(required = false) String cursor
-    ) {
+            @RequestParam(required = false) String cursor) {
         return queryService.getNextApplicationsByCursor(limit, Optional.ofNullable(cursor));
     }
 

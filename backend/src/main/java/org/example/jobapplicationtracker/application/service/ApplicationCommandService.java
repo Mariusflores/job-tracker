@@ -13,6 +13,8 @@ import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.model.ApplicationStatusChange;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
 import org.example.jobapplicationtracker.application.repository.StatusChangeRepository;
+import org.example.jobapplicationtracker.infrastructure.auth.context.SecurityContextCurrentUserProvider;
+import org.example.jobapplicationtracker.infrastructure.auth.model.User;
 import org.example.jobapplicationtracker.infrastructure.idempotency.dto.IdempotencyIntent;
 import org.example.jobapplicationtracker.infrastructure.idempotency.dto.IdempotencyRecordResponse;
 import org.example.jobapplicationtracker.infrastructure.idempotency.hashing.HashingUtil;
@@ -21,6 +23,7 @@ import org.example.jobapplicationtracker.infrastructure.idempotency.service.Idem
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.LocalDate;
@@ -37,10 +40,12 @@ public class ApplicationCommandService {
     private final StatusChangeRepository statusChangeRepository;
     private final IdempotencyService idempotencyService;
     private final ObjectMapper objectMapper;
+    private final SecurityContextCurrentUserProvider userProvider;
 
 
     @Transactional
     public ApplicationResponse createApplication(@Valid ApplicationCreateRequest request, String idempotencyKey) {
+        User user = userProvider.getCurrentUser();
         ActionType action = ActionType.CREATE_APPLICATION;
         log.info(
                 "Creating application: company='{}', jobTitle='{}'",
@@ -53,6 +58,7 @@ public class ApplicationCommandService {
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
                 .key(idempotencyKey)
+                .userId(user.getId())
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(null)
@@ -65,6 +71,7 @@ public class ApplicationCommandService {
 
 
             Application application = Application.builder()
+                    .user(user)
                     .jobTitle(request.getJobTitle().trim())
                     .companyName(request.getCompanyName().trim())
                     .descriptionUrl(
@@ -83,7 +90,7 @@ public class ApplicationCommandService {
             String responseSnapshot = generateResponseSnapshot(responseApplication);
 
             // Store Record
-            idempotencyService.complete(intent.getKey(), responseApplication.getId(), responseSnapshot);
+            idempotencyService.complete(intent.getKey(), intent.getUserId(), responseApplication.getId(), responseSnapshot);
 
             return ApplicationMapper.toApplicationResponse(responseApplication);
         } catch (DataIntegrityViolationException ex) {
@@ -95,6 +102,7 @@ public class ApplicationCommandService {
 
     @Transactional
     public void deleteApplication(Long id, String idempotencyKey) {
+        User user = userProvider.getCurrentUser();
         ActionType action = ActionType.DELETE_APPLICATION;
         log.info("Deleting application id={}", id);
 
@@ -103,6 +111,7 @@ public class ApplicationCommandService {
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
                 .key(idempotencyKey)
+                .userId(user.getId())
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -111,29 +120,25 @@ public class ApplicationCommandService {
         try {
             idempotencyService.tryReserve(intent);
 
-            // Idempotent: if already deleted, skip deletion
-            if (!applicationRepository.existsById(id)) {
-                log.info("Application id={} already deleted", id);
-                String responseSnapshot = generateDeleteSnapshot(id);
-                idempotencyService.complete(intent.getKey(), id, responseSnapshot);
-                return;
-            }
+            Application application = applicationRepository.findByIdAndUserId(id, user.getId())
+                    .orElseThrow(() ->
+                            new ApplicationNotFoundException("Application not found with id=" + id));
 
 
             // Manual Deletion of StatusChange items connected to Application
             // Might migrate to Flyway + DB level cascading at a later time
             statusChangeRepository.deleteAllByApplicationId(id);
 
-            applicationRepository.deleteById(id);
+            applicationRepository.delete(application);
 
             String responseSnapshot = generateDeleteSnapshot(id);
 
-            idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+            idempotencyService.complete(intent.getKey(), intent.getUserId(), id, responseSnapshot);
 
 
         } catch (DataIntegrityViolationException ex) {
             IdempotencyRecordResponse existing =
-                    idempotencyService.loadExisting(intent.getKey());
+                    idempotencyService.loadExisting(intent.getKey(), intent.getUserId());
 
             if (!existing.getPayloadHash().equals(intent.getPayloadHash())) {
                 throw new IllegalStateException("Payload Hash Mismatch");
@@ -147,7 +152,7 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse updateApplication(Long id, @Valid ApplicationUpdateRequest applicationRequest, String idempotencyKey) {
-
+        User user = userProvider.getCurrentUser();
         ActionType action = ActionType.UPDATE_APPLICATION;
 
         log.info("Updating application id={}", id);
@@ -156,6 +161,7 @@ public class ApplicationCommandService {
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
                 .key(idempotencyKey)
+                .userId(user.getId())
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -164,7 +170,7 @@ public class ApplicationCommandService {
         try {
             idempotencyService.tryReserve(intent);
 
-            Application application = applicationRepository.findById(id)
+            Application application = applicationRepository.findByIdAndUserId(id, user.getId())
                     .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
             if (applicationRequest.getJobTitle() != null
@@ -197,7 +203,7 @@ public class ApplicationCommandService {
 
             String responseSnapshot = generateResponseSnapshot(application);
 
-            idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+            idempotencyService.complete(intent.getKey(), intent.getUserId(), id, responseSnapshot);
 
 
             return ApplicationMapper.toApplicationResponse(application);
@@ -211,6 +217,7 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse updateApplicationStatus(Long id, ApplicationStatus status, String idempotencyKey) {
+        User user = userProvider.getCurrentUser();
         ActionType action = ActionType.CHANGE_APPLICATION_STATUS;
 
         log.info("Updating status for application id={} to {}", id, status);
@@ -220,6 +227,7 @@ public class ApplicationCommandService {
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
                 .key(idempotencyKey)
+                .userId(user.getId())
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -228,13 +236,13 @@ public class ApplicationCommandService {
         try {
             idempotencyService.tryReserve(intent);
 
-            Application application = applicationRepository.findById(id)
+            Application application = applicationRepository.findByIdAndUserId(id, user.getId())
                     .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
 
             changeStatus(application, status);
             String responseSnapshot = generateResponseSnapshot(application);
-            idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+            idempotencyService.complete(intent.getKey(), intent.getUserId(), id, responseSnapshot);
 
             return ApplicationMapper.toApplicationResponse(application);
         } catch (DataIntegrityViolationException ex) {
@@ -244,6 +252,7 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationResponse updateApplicationNotes(long id, String notes, String idempotencyKey) {
+        User user = userProvider.getCurrentUser();
         ActionType action = ActionType.CHANGE_APPLICATION_NOTES;
 
         String canonicalPayload = generateCanonicalPayload(id, notes, action);
@@ -251,6 +260,7 @@ public class ApplicationCommandService {
 
         IdempotencyIntent intent = IdempotencyIntent.builder()
                 .key(idempotencyKey)
+                .userId(user.getId())
                 .action(action)
                 .payloadHash(payloadHash)
                 .targetId(id)
@@ -260,14 +270,14 @@ public class ApplicationCommandService {
         try {
             idempotencyService.tryReserve(intent);
 
-            Application application = applicationRepository.findById(id)
+            Application application = applicationRepository.findByIdAndUserId(id, user.getId())
                     .orElseThrow(() -> new ApplicationNotFoundException("Could not find application with id: " + id));
 
 
             if (notes == null || notes.isBlank()) {
                 log.warn("Ignored empty notes update for application id={}", id);
                 String responseSnapshot = generateResponseSnapshot(application);
-                idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+                idempotencyService.complete(intent.getKey(), intent.getUserId(), id, responseSnapshot);
                 return ApplicationMapper.toApplicationResponse(application);
 
             }
@@ -276,13 +286,14 @@ public class ApplicationCommandService {
 
             application.setNotes(notes.trim());
             String responseSnapshot = generateResponseSnapshot(application);
-            idempotencyService.complete(intent.getKey(), id, responseSnapshot);
+            idempotencyService.complete(intent.getKey(), intent.getUserId(), id, responseSnapshot);
 
             return ApplicationMapper.toApplicationResponse(application);
         } catch (DataIntegrityViolationException ex) {
             return handleIdempotentReplay(intent);
         }
     }
+
 
     private void changeStatus(Application application, ApplicationStatus newStatus) {
         ApplicationStatus oldStatus = application.getStatus();
@@ -313,7 +324,7 @@ public class ApplicationCommandService {
 
     private ApplicationResponse handleIdempotentReplay(IdempotencyIntent intent) {
         IdempotencyRecordResponse existing =
-                idempotencyService.loadExisting(intent.getKey());
+                idempotencyService.loadExisting(intent.getKey(), intent.getUserId());
 
         if (!existing.getPayloadHash().equals(intent.getPayloadHash())) {
             throw new IllegalStateException("Payload Hash Mismatch");
@@ -346,7 +357,10 @@ public class ApplicationCommandService {
     private ApplicationResponse convertFromSnapshot(String responseSnapshot) {
 
         try {
-            Map<String, Object> snapshot = objectMapper.readValue(responseSnapshot, Map.class);
+            Map<String, Object> snapshot =
+                    objectMapper.readValue(responseSnapshot, new TypeReference<>() {
+                    });
+
 
             if (snapshot.containsKey("deleted")) {
                 throw new IllegalStateException("Delete snapshot cannot be converted to ApplicationResponse");

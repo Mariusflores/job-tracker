@@ -26,6 +26,7 @@ public class IdempotencyRecord {
     @NotNull
     @Column(name = "idempotencyKey", nullable = false, unique = true)
     private String key;
+    private Long userId;
     private ActionType actionType;
     @Column
     private Long targetId;

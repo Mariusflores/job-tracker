@@ -23,8 +23,11 @@ import {
 import {STATUSES} from "./constants/status.ts";
 import type {Enrichment} from "./types/enrichment.ts";
 import {fetchJobPostingEnrichmentApi} from "./api/enrichment.ts";
+import {LoginPage} from "./pages/LoginPage.tsx";
+import {ProtectedRoute} from "./components/routing/ProtectedRoute.tsx";
+import {RegisterPage} from "./pages/RegisterPage.tsx";
 
-export default function App() {
+export function App() {
     const [backendApps, setBackendApps] = useState<Application[]>([]);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -161,34 +164,56 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <Layout>
-                <Routes>
-                    <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
-                    <Route path="/dashboard"
-                           element={<DashboardPage
-                               backendApps={backendApps}
-                               handleSubmit={createApplication}
-                               handleEdit={updateApplication}
-                               handleDelete={deleteApplication}
-                               handleUpdateNotes={updateApplicationNotes}
-                               isLoading={isLoading} onAutofill={fetchJobPostEnrichment}
-                               getStatusHistory={getStatusHistory}
-                               onLoadMore={loadMore}
-                               hasMore={hasMore}
-                           />
+            <Routes>
 
-                           }/>
-                    <Route path="/pipeline" element={
-                        <PipelinePage backendApps={backendApps}
-                                      onStatusChange={updateApplicationStatus}
-                                      onUpdateNotes={updateApplicationNotes}
-                                      getStatusHistory={getStatusHistory}
-                        />}
-                    />
-                    {/*<Route path="/settings" element={<SettingsPage/>}/>*/}
-                </Routes>
-            </Layout>
+                {/* Public route */}
+                <Route path="/login" element={<LoginPage/>}/>
+                <Route path="/register" element={<RegisterPage/>}/>
+
+                {/* Protected routes */}
+                <Route element={<ProtectedRoute/>}>
+
+                    {/* Layout wrapper */}
+                    <Route element={<Layout/>}>
+
+                        <Route path="/" element={<Navigate to="/dashboard" replace/>}/>
+
+                        <Route
+                            path="/dashboard"
+                            element={
+                                <DashboardPage
+                                    backendApps={backendApps}
+                                    handleSubmit={createApplication}
+                                    handleEdit={updateApplication}
+                                    handleDelete={deleteApplication}
+                                    handleUpdateNotes={updateApplicationNotes}
+                                    isLoading={isLoading}
+                                    onAutofill={fetchJobPostEnrichment}
+                                    getStatusHistory={getStatusHistory}
+                                    onLoadMore={loadMore}
+                                    hasMore={hasMore}
+                                />
+                            }
+                        />
+
+                        <Route
+                            path="/pipeline"
+                            element={
+                                <PipelinePage
+                                    backendApps={backendApps}
+                                    onStatusChange={updateApplicationStatus}
+                                    onUpdateNotes={updateApplicationNotes}
+                                    getStatusHistory={getStatusHistory}
+                                />
+                            }
+                        />
+
+                    </Route>
+                </Route>
+
+            </Routes>
         </BrowserRouter>
+
     );
 }
 

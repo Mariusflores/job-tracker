@@ -1,5 +1,6 @@
 package org.example.jobapplicationtracker.infrastructure.idempotency.repository;
 
+import jakarta.validation.constraints.NotNull;
 import org.example.jobapplicationtracker.infrastructure.idempotency.model.IdempotencyRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,5 +19,7 @@ public interface IdempotencyRepository extends JpaRepository<IdempotencyRecord, 
             """)
     void deleteExpired(@Param("now") LocalDateTime now);
 
-    IdempotencyRecord findByKey(String key);
+    IdempotencyRecord findByKeyAndUserId(@NotNull String key, @NotNull Long userId);
+
+
 }

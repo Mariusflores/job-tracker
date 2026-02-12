@@ -20,8 +20,8 @@ public class IdempotencyService {
     private final static Long EXPIRATION_TIME_MINUTES = 45L;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public IdempotencyRecordResponse loadExisting(String key) {
-        IdempotencyRecord record = repository.findByKey(key);
+    public IdempotencyRecordResponse loadExisting(String key, Long userId) {
+        IdempotencyRecord record = repository.findByKeyAndUserId(key, userId);
 
         if (record == null) {
             throw new IllegalStateException(
@@ -43,6 +43,7 @@ public class IdempotencyService {
 
         IdempotencyRecord record = IdempotencyRecord.builder()
                 .key(intent.getKey())
+                .userId(intent.getUserId())
                 .actionType(intent.getAction())
                 .targetId(intent.getTargetId())
                 .payloadHash(intent.getPayloadHash())
@@ -53,8 +54,8 @@ public class IdempotencyService {
         repository.save(record);
     }
 
-    public void complete(String key, Long targetId, String responseSnapshot) {
-        IdempotencyRecord record = repository.findByKey(key);
+    public void complete(String key, Long userId, Long targetId, String responseSnapshot) {
+        IdempotencyRecord record = repository.findByKeyAndUserId(key, userId);
 
         if (record == null) {
             throw new IllegalStateException(
