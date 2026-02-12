@@ -1,6 +1,7 @@
 package org.example.jobapplicationtracker.infrastructure.auth.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.jobapplicationtracker.infrastructure.auth.dto.AuthResponse;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.LoginRequest;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.RegisterRequest;
 import org.example.jobapplicationtracker.infrastructure.auth.service.AuthService;
@@ -15,13 +16,13 @@ public class AuthController {
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public String registerUser(@RequestBody RegisterRequest request) {
+    public AuthResponse registerUser(@RequestBody RegisterRequest request) {
         return authService.register(request);
     }
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public String login(@RequestBody LoginRequest request) {
+    public AuthResponse login(@RequestBody LoginRequest request) {
         return authService.login(request);
     }
 }
