@@ -29,6 +29,13 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
