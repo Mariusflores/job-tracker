@@ -69,10 +69,12 @@ public class AuthService {
     }
 
     private boolean userExists(String email) {
-        return userRepository.existsByEmail(email);
+        return userRepository.existsByEmailAndDeletedFalse(email);
     }
 
     private String hashPassword(String password) {
         return passwordEncoder.encode(password);
     }
+
+
 }
