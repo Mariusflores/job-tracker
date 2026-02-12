@@ -2,6 +2,7 @@ package org.example.jobapplicationtracker.infrastructure.auth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.jobapplicationtracker.infrastructure.auth.dto.AuthResponse;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.LoginRequest;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.RegisterRequest;
 import org.example.jobapplicationtracker.infrastructure.auth.model.User;
@@ -24,7 +25,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
 
     @Transactional
-    public String register(RegisterRequest registerRequest) {
+    public AuthResponse register(RegisterRequest registerRequest) {
         log.info("Register request for: {}", registerRequest.getEmail());
 
         if (registerRequest.getEmail() == null || registerRequest.getPassword() == null) {
@@ -46,14 +47,18 @@ public class AuthService {
         } else {
             throw new IllegalArgumentException("User already exists");
         }
-        return jwtUtil.generateToken(registerRequest.getEmail());
+        return AuthResponse.builder()
+                .token(jwtUtil.generateToken(registerRequest.getEmail()))
+                .build();
     }
 
-    public String login(LoginRequest loginRequest) {
+    public AuthResponse login(LoginRequest loginRequest) {
         UserDetails userDetails = userDetailsService.loadUserByEmail(loginRequest.getEmail());
 
         if (authenticate(loginRequest.getPassword(), userDetails.getPassword())) {
-            return jwtUtil.generateToken(loginRequest.getEmail());
+            return AuthResponse.builder()
+                    .token(jwtUtil.generateToken(loginRequest.getEmail()))
+                    .build();
         } else {
             throw new BadCredentialsException("Incorrect email or password");
         }
