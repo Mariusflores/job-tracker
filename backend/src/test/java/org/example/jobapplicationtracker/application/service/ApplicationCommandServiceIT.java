@@ -5,6 +5,7 @@ import org.example.jobapplicationtracker.application.dto.request.ApplicationUpda
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
+import org.example.jobapplicationtracker.infrastructure.auth.model.Role;
 import org.example.jobapplicationtracker.infrastructure.auth.model.User;
 import org.example.jobapplicationtracker.infrastructure.auth.repository.UserRepository;
 import org.example.jobapplicationtracker.infrastructure.idempotency.repository.IdempotencyRepository;
@@ -50,6 +51,7 @@ class ApplicationCommandServiceIT {
                         .password("dummy") // password irrelevant for @WithMockUser
                         .firstName("Test")
                         .lastName("User")
+                        .role(Role.USER)
                         .build()
         );
     }
@@ -74,9 +76,9 @@ class ApplicationCommandServiceIT {
         ApplicationResponse response2 = service.createApplication(request, idempotencyKey);
 
         // Assert
-        assertThat(response1.getId()).isEqualTo(response2.getId());
-        assertThat(response1.getJobTitle()).isEqualTo(response2.getJobTitle());
-        assertThat(response1.getCompanyName()).isEqualTo(response2.getCompanyName());
+        assertThat(response1.id()).isEqualTo(response2.id());
+        assertThat(response1.jobTitle()).isEqualTo(response2.jobTitle());
+        assertThat(response1.companyName()).isEqualTo(response2.companyName());
 
         // Only one record in database
         assertThat(applicationRepository.count()).isEqualTo(1);
@@ -128,7 +130,7 @@ class ApplicationCommandServiceIT {
                 .build();
 
         ApplicationResponse created = service.createApplication(createRequest, "test-key-3-create");
-        Long applicationId = created.getId();
+        Long applicationId = created.id();
 
         String deleteIdempotencyKey = "test-key-3-delete";
 
@@ -153,7 +155,7 @@ class ApplicationCommandServiceIT {
                 .build();
 
         ApplicationResponse created = service.createApplication(createRequest, "test-key-4-create");
-        Long applicationId = created.getId();
+        Long applicationId = created.id();
 
         String notesIdempotencyKey = "test-key-4-notes";
 
@@ -163,9 +165,9 @@ class ApplicationCommandServiceIT {
         ApplicationResponse r2 = service.updateApplicationNotes(applicationId, notes, notesIdempotencyKey);
 
         // Assert
-        assertThat(r1.getNotes()).isEqualTo(notes);
-        assertThat(r2.getNotes()).isEqualTo(notes);
-        assertThat(r1.getId()).isEqualTo(r2.getId());
+        assertThat(r1.notes()).isEqualTo(notes);
+        assertThat(r2.notes()).isEqualTo(notes);
+        assertThat(r1.id()).isEqualTo(r2.id());
     }
 
     // 🧪 Test 5: UPDATE notes with empty/blank should be no-op
@@ -180,7 +182,7 @@ class ApplicationCommandServiceIT {
                 .build();
 
         ApplicationResponse created = service.createApplication(createRequest, "test-key-5-create");
-        Long applicationId = created.getId();
+        Long applicationId = created.id();
 
         // First add some notes
         service.updateApplicationNotes(applicationId, "Initial notes", "test-key-5-notes-1");
@@ -190,8 +192,8 @@ class ApplicationCommandServiceIT {
         ApplicationResponse r2 = service.updateApplicationNotes(applicationId, "", "test-key-5-notes-3");
 
         // Assert - notes should remain unchanged
-        assertThat(r1.getNotes()).isEqualTo("Initial notes");
-        assertThat(r2.getNotes()).isEqualTo("Initial notes");
+        assertThat(r1.notes()).isEqualTo("Initial notes");
+        assertThat(r2.notes()).isEqualTo("Initial notes");
     }
 
     // 🧪 Test 6: UPDATE is idempotent
@@ -206,7 +208,7 @@ class ApplicationCommandServiceIT {
                 .build();
 
         ApplicationResponse created = service.createApplication(createRequest, "test-key-6-create");
-        Long applicationId = created.getId();
+        Long applicationId = created.id();
 
         ApplicationUpdateRequest updateRequest = ApplicationUpdateRequest.builder()
                 .jobTitle("Senior Data Engineer")
@@ -221,10 +223,9 @@ class ApplicationCommandServiceIT {
         ApplicationResponse r2 = service.updateApplication(applicationId, updateRequest, updateIdempotencyKey);
 
         // Assert
-        assertThat(r1.getId()).isEqualTo(r2.getId());
-        assertThat(r1.getJobTitle()).isEqualTo("Senior Data Engineer");
-        assertThat(r2.getJobTitle()).isEqualTo("Senior Data Engineer");
-        assertThat(r1.getStatus()).isEqualTo(ApplicationStatus.INTERVIEW);
+        assertThat(r1.id()).isEqualTo(r2.id());
+        assertThat(r1.jobTitle()).isEqualTo("Senior Data Engineer");
+        assertThat(r1.status()).isEqualTo(ApplicationStatus.INTERVIEW);
     }
 
     // 🧪 Test 7: Status update is idempotent
@@ -239,7 +240,7 @@ class ApplicationCommandServiceIT {
                 .build();
 
         ApplicationResponse created = service.createApplication(createRequest, "test-key-7-create");
-        Long applicationId = created.getId();
+        Long applicationId = created.id();
 
         String statusIdempotencyKey = "test-key-7-status";
 
@@ -248,8 +249,8 @@ class ApplicationCommandServiceIT {
         ApplicationResponse r2 = service.updateApplicationStatus(applicationId, ApplicationStatus.OFFER, statusIdempotencyKey);
 
         // Assert
-        assertThat(r1.getStatus()).isEqualTo(ApplicationStatus.OFFER);
-        assertThat(r2.getStatus()).isEqualTo(ApplicationStatus.OFFER);
-        assertThat(r1.getId()).isEqualTo(r2.getId());
+        assertThat(r1.status()).isEqualTo(ApplicationStatus.OFFER);
+        assertThat(r2.status()).isEqualTo(ApplicationStatus.OFFER);
+        assertThat(r1.id()).isEqualTo(r2.id());
     }
 }

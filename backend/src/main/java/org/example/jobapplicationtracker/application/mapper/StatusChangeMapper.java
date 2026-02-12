@@ -5,12 +5,12 @@ import org.example.jobapplicationtracker.application.model.ApplicationStatusChan
 
 public class StatusChangeMapper {
     public static StatusChangeResponse toStatusChangeResponse(ApplicationStatusChange applicationStatusChange) {
-        return StatusChangeResponse.builder()
-                .id(applicationStatusChange.getId())
-                .applicationId(applicationStatusChange.getApplicationId())
-                .fromStatus(applicationStatusChange.getFromStatus())
-                .toStatus(applicationStatusChange.getToStatus())
-                .changedAt(applicationStatusChange.getChangedAt())
-                .build();
+        return new StatusChangeResponse(
+                applicationStatusChange.getId(),
+                applicationStatusChange.getApplicationId(),
+                applicationStatusChange.getFromStatus(),
+                applicationStatusChange.getToStatus(),
+                applicationStatusChange.getChangedAt()
+        );
     }
 }

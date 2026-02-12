@@ -10,15 +10,16 @@ public class ApplicationMapper {
 
     public static ApplicationResponse toApplicationResponse(Application application) {
 
-        return ApplicationResponse.builder()
-                .id(application.getId())
-                .jobTitle(application.getJobTitle())
-                .companyName(application.getCompanyName())
-                .descriptionUrl(application.getDescriptionUrl())
-                .appliedDate(application.getAppliedDate())
-                .status(application.getStatus())
-                .notes(application.getNotes())
-                .build();
+        return new ApplicationResponse(
+                application.getId(),
+                application.getJobTitle(),
+                application.getCompanyName(),
+                application.getDescriptionUrl(),
+                application.getStatus(),
+                application.getAppliedDate(),
+                application.getNotes()
+        );
+
 
     }
 }

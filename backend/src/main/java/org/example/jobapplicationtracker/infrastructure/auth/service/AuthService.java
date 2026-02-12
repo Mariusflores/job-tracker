@@ -47,18 +47,15 @@ public class AuthService {
         } else {
             throw new IllegalArgumentException("User already exists");
         }
-        return AuthResponse.builder()
-                .token(jwtUtil.generateToken(registerRequest.getEmail()))
-                .build();
+        return new AuthResponse(jwtUtil.generateToken(registerRequest.getEmail()));
+
     }
 
     public AuthResponse login(LoginRequest loginRequest) {
         UserDetails userDetails = userDetailsService.loadUserByEmail(loginRequest.getEmail());
 
         if (authenticate(loginRequest.getPassword(), userDetails.getPassword())) {
-            return AuthResponse.builder()
-                    .token(jwtUtil.generateToken(loginRequest.getEmail()))
-                    .build();
+            return new AuthResponse(jwtUtil.generateToken(loginRequest.getEmail()));
         } else {
             throw new BadCredentialsException("Incorrect email or password");
         }
