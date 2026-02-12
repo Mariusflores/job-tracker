@@ -1,9 +1,11 @@
 FRONTEND_URL: http://localhost:3000
 
 jwt:
-  secret: testsecretkeytestsecretkeytestsecretkey
-  expiration: 3600000
+  secret: test-secret-key-12345678901234567890
 
+app:
+  cors:
+    allowed-origins: http://localhost:3000
 
 spring:
   datasource:
