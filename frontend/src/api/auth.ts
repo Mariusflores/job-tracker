@@ -1,17 +1,7 @@
 import {api} from "./client.ts";
 import type {AxiosResponse} from "axios";
+import type {AuthResponse, RegisterRequest} from "../types/auth.ts";
 
-type AuthResponse = {
-    token: string
-}
-
-
-type RegisterRequest = {
-    email: string,
-    password: string,
-    firstName: string,
-    lastName: string
-}
 
 export async function loginApi(email: string, password: string) {
     const response = await api.post<AuthResponse>("/auth/login", {
@@ -32,7 +22,6 @@ export async function registerApi(request: RegisterRequest) {
 function setToken(response: AxiosResponse<AuthResponse>) {
     const {token} = response.data;
 
-    localStorage.setItem("token", token)
 
     return token;
 }
