@@ -1,10 +1,12 @@
 import {NavLink, useNavigate} from "react-router-dom";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 export function Navbar() {
     const navigate = useNavigate();
+    const auth = useAuth();
 
     function handleLogout() {
-        localStorage.removeItem("token");
+        auth.logout();
         navigate("/login");
     }
 

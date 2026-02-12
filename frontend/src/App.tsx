@@ -26,8 +26,10 @@ import {fetchJobPostingEnrichmentApi} from "./api/enrichment.ts";
 import {LoginPage} from "./pages/LoginPage.tsx";
 import {ProtectedRoute} from "./components/routing/ProtectedRoute.tsx";
 import {RegisterPage} from "./pages/RegisterPage.tsx";
+import {useAuth} from "./context/AuthContext.tsx";
 
 export function App() {
+    const {isAuthenticated} = useAuth();
     const [backendApps, setBackendApps] = useState<Application[]>([]);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -35,9 +37,17 @@ export function App() {
     const [limit] = useState(10); // fixed for now
     const [hasMore, setHasMore] = useState(false);
 
+
     useEffect(() => {
-        loadApps(true);
-    }, []);
+        if (isAuthenticated) {
+            initializeData();
+        } else {
+            // Clear feature state when logged out
+            setBackendApps([]);
+            setCursor("");
+            setHasMore(false);
+        }
+    }, [isAuthenticated]);
 
 
     useEffect(() => {
@@ -51,20 +61,31 @@ export function App() {
 
     }, [backendApps]);
 
+    async function initializeData() {
+        await loadApps(true);
+    }
+
 
     async function loadApps(reset = false) {
-        setIsLoading(true);
+        try {
+            setIsLoading(true);
 
-        const data = await getApplications(limit, cursor);
+            const effectiveCursor = reset ? "" : cursor
 
-        setCursor(data.nextCursor)
-        setHasMore(data.hasMore)
+            const data = await getApplications(limit, effectiveCursor);
 
-        setBackendApps(prev =>
-            reset ? data.content : [...prev, ...data.content]
-        );
+            setCursor(data.nextCursor)
+            setHasMore(data.hasMore)
 
-        setIsLoading(false);
+            setBackendApps(prev =>
+                reset ? data.content : [...prev, ...data.content]
+            );
+
+        } finally {
+            setIsLoading(false);
+
+        }
+
     }
 
 
@@ -85,7 +106,7 @@ export function App() {
         try {
             await deleteApplicationApi(id);
         } catch (error) {
-            await loadApps();
+            await initializeData()
         }
     }
 
@@ -213,7 +234,6 @@ export function App() {
 
             </Routes>
         </BrowserRouter>
-
     );
 }
 

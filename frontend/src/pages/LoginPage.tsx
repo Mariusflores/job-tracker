@@ -1,19 +1,22 @@
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {loginApi} from "../api/auth";
+import {useAuth} from "../context/AuthContext.tsx";
 
 export function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const auth = useAuth();
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
 
         try {
-            await loginApi(email, password);
+            const token = await loginApi(email, password);
+            auth.login(token)
             navigate("/dashboard");
         } catch (err) {
             setError("Invalid credentials");
