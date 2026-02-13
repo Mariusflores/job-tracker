@@ -62,7 +62,7 @@ public class NavClient {
 
             return new EnrichedJobData(title, company, SOURCE);
         } catch (Exception e) {
-            log.error("Finn enrichment failed for url={}", url, e);
+            log.error("Nav enrichment failed for url={}", url, e);
             return new EnrichedJobData(null, null, SOURCE);
         }
     }
