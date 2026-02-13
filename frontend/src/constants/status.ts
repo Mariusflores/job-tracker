@@ -17,12 +17,12 @@ export const STATUS_UI = {
         label: "Rejected",
         classes: "bg-red-700 text-red-100",
     },
-    DEFAULT: {
-        label: "Unknown",
+    DRAFT: {
+        label: "Draft",
         classes: "bg-gray-700 text-gray-200",
     },
 } as const;
 
 export const STATUSES: readonly ApplicationStatus[] = [
-    "APPLIED", "INTERVIEW", "OFFER", "REJECTED"
+    "DRAFT", "APPLIED", "INTERVIEW", "OFFER", "REJECTED"
 ] as const;
