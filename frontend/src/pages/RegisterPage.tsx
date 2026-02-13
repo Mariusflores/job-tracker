@@ -33,8 +33,10 @@ export function RegisterPage() {
             const token = await registerApi({email, password, firstName, lastName});
             auth.login(token);
             navigate("/dashboard");
-        } catch (err) {
-            setError("Registration failed");
+        } catch (err: any) {
+            const message =
+                err.response?.data?.message || "Something went wrong. Please try again.";
+            setError(message);
         } finally {
             setIsSubmitting(false);
         }

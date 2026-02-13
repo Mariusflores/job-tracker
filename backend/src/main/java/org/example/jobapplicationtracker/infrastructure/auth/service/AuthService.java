@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.AuthResponse;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.LoginRequest;
 import org.example.jobapplicationtracker.infrastructure.auth.dto.RegisterRequest;
+import org.example.jobapplicationtracker.infrastructure.auth.error.InvalidAuthRequestException;
+import org.example.jobapplicationtracker.infrastructure.auth.error.UserAlreadyExistsException;
 import org.example.jobapplicationtracker.infrastructure.auth.model.User;
 import org.example.jobapplicationtracker.infrastructure.auth.repository.UserRepository;
 import org.example.jobapplicationtracker.infrastructure.auth.security.JwtUtil;
@@ -29,7 +31,7 @@ public class AuthService {
         log.info("Register request for: {}", registerRequest.getEmail());
 
         if (registerRequest.getEmail() == null || registerRequest.getPassword() == null) {
-            throw new IllegalArgumentException("Email or password is null");
+            throw new InvalidAuthRequestException("Email or password is null");
         }
 
         String hashedPassword = hashPassword(registerRequest.getPassword());
@@ -45,7 +47,7 @@ public class AuthService {
             log.info("Registering..");
             userRepository.save(user);
         } else {
-            throw new IllegalArgumentException("User already exists");
+            throw new UserAlreadyExistsException("Email used by another account");
         }
         return new AuthResponse(jwtUtil.generateToken(registerRequest.getEmail()));
 
