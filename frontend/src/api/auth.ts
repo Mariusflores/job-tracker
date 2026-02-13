@@ -13,8 +13,8 @@ export async function loginApi(email: string, password: string) {
 }
 
 export async function registerApi(request: RegisterRequest) {
-    console.log(request)
     const response = await api.post<AuthResponse>("/auth/register", request)
+    console.log(response.status)
 
     return setToken(response)
 }
