@@ -24,6 +24,7 @@ export type UpdateApplicationRequest =
     Partial<Omit<Application, "id">>;
 
 export type ApplicationStatus =
+    | "DRAFT"
     | "APPLIED"
     | "INTERVIEW"
     | "OFFER"
