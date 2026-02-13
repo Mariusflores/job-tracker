@@ -24,7 +24,7 @@ public class SecurityContextCurrentUserProvider implements CurrentUserProvider {
             throw new AuthenticationCredentialsNotFoundException("Authentication required");
         }
         String email = authentication.getName();
-        return userRepository.findByEmail(email)
+        return userRepository.findByEmailAndDeletedFalse(email)
                 .orElseThrow(() -> new IllegalStateException("Authenticated user not found"));
     }
 }

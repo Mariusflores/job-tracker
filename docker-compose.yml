@@ -25,6 +25,8 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       # if your backend connects to postgres inside docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_PROFILES_ACTIVE: local,dev
+
     ports:
       - "8080:8080"
     depends_on:

@@ -140,7 +140,7 @@ public class ApplicationCommandService {
             IdempotencyRecordResponse existing =
                     idempotencyService.loadExisting(intent.getKey(), intent.getUserId());
 
-            if (!existing.getPayloadHash().equals(intent.getPayloadHash())) {
+            if (!existing.payloadHash().equals(intent.getPayloadHash())) {
                 throw new IllegalStateException("Payload Hash Mismatch");
             }
             log.info("Delete already processed for id={}", id);
@@ -326,10 +326,10 @@ public class ApplicationCommandService {
         IdempotencyRecordResponse existing =
                 idempotencyService.loadExisting(intent.getKey(), intent.getUserId());
 
-        if (!existing.getPayloadHash().equals(intent.getPayloadHash())) {
+        if (!existing.payloadHash().equals(intent.getPayloadHash())) {
             throw new IllegalStateException("Payload Hash Mismatch");
         }
-        return convertFromSnapshot(existing.getResponseSnapshot());
+        return convertFromSnapshot(existing.responseSnapshot());
     }
     // Edit Data methods
 
@@ -366,15 +366,16 @@ public class ApplicationCommandService {
                 throw new IllegalStateException("Delete snapshot cannot be converted to ApplicationResponse");
             }
 
-            return ApplicationResponse.builder()
-                    .id(((Number) snapshot.get("id")).longValue())
-                    .jobTitle((String) snapshot.get("jobTitle"))
-                    .companyName((String) snapshot.get("companyName"))
-                    .descriptionUrl((String) snapshot.get("descriptionUrl"))
-                    .status(ApplicationStatus.valueOf((String) snapshot.get("status")))
-                    .appliedDate(LocalDate.parse((String) snapshot.get("appliedDate")))
-                    .notes((String) snapshot.get("notes"))
-                    .build();
+            return new ApplicationResponse(
+                    ((Number) snapshot.get("id")).longValue(),
+                    (String) snapshot.get("jobTitle"),
+                    (String) snapshot.get("companyName"),
+                    (String) snapshot.get("descriptionUrl"),
+                    ApplicationStatus.valueOf((String) snapshot.get("status")),
+                    LocalDate.parse((String) snapshot.get("appliedDate")),
+                    (String) snapshot.get("notes")
+            );
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to deserialize response snapshot", e);
         }

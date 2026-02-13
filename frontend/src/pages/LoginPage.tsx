@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {loginApi} from "../api/auth";
 import {useAuth} from "../context/AuthContext.tsx";
@@ -9,6 +9,15 @@ export function LoginPage() {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const auth = useAuth();
+
+    useEffect(() => {
+        if (import.meta.env.DEV) {
+            console.log("Prefilling")
+            setEmail("admin@test.com")
+            setPassword("password")
+        }
+    }, []);
+
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

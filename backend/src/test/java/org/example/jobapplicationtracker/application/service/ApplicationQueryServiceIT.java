@@ -5,6 +5,7 @@ import org.example.jobapplicationtracker.application.dto.request.ApplicationCrea
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 import org.example.jobapplicationtracker.application.model.ApplicationStatus;
 import org.example.jobapplicationtracker.application.repository.ApplicationRepository;
+import org.example.jobapplicationtracker.infrastructure.auth.model.Role;
 import org.example.jobapplicationtracker.infrastructure.auth.model.User;
 import org.example.jobapplicationtracker.infrastructure.auth.repository.UserRepository;
 import org.example.jobapplicationtracker.infrastructure.idempotency.repository.IdempotencyRepository;
@@ -57,6 +58,7 @@ public class ApplicationQueryServiceIT {
                         .password("dummy") // password irrelevant for @WithMockUser
                         .firstName("Test")
                         .lastName("User")
+                        .role(Role.USER)
                         .build()
         );
     }
@@ -131,6 +133,7 @@ public class ApplicationQueryServiceIT {
                         .password("dummy")
                         .firstName("Other")
                         .lastName("User")
+                        .role(Role.USER)
                         .build()
         );
 
@@ -155,6 +158,7 @@ public class ApplicationQueryServiceIT {
                         .password("dummy")
                         .firstName("Other")
                         .lastName("User")
+                        .role(Role.USER)
                         .build()
         );
 
@@ -234,7 +238,7 @@ public class ApplicationQueryServiceIT {
         // Extract dates
         List<LocalDate> dates = page.getContent()
                 .stream()
-                .map(ApplicationResponse::getAppliedDate)
+                .map(ApplicationResponse::appliedDate)
                 .toList();
 
         // Should be sorted descending
@@ -243,7 +247,7 @@ public class ApplicationQueryServiceIT {
         // Verify ID tie-breaker on same date
         List<Long> ids = page.getContent()
                 .stream()
-                .map(ApplicationResponse::getId)
+                .map(ApplicationResponse::id)
                 .toList();
 
         // If two items share same date (2024-01-01),

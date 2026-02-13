@@ -2,13 +2,13 @@ package org.example.jobapplicationtracker.application.dto.pagination;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.jobapplicationtracker.application.dto.response.ApplicationResponse;
 
 import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

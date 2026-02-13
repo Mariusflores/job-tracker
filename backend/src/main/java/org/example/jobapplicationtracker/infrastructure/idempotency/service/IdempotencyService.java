@@ -29,13 +29,12 @@ public class IdempotencyService {
             );
         }
 
-        return IdempotencyRecordResponse.builder()
-                .key(key)
-                .action(record.getActionType())
-                .targetId(record.getTargetId())
-                .payloadHash(record.getPayloadHash())
-                .responseSnapshot(record.getResponseSnapshot())
-                .build();
+        return new IdempotencyRecordResponse(
+                key,
+                record.getActionType(),
+                record.getTargetId(),
+                record.getPayloadHash(),
+                record.getResponseSnapshot());
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
