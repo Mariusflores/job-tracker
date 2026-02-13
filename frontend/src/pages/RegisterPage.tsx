@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import {registerApi} from "../api/auth";
+import {useAuth} from "../context/AuthContext.tsx";
 
 export function RegisterPage() {
     const [lastName, setLastName] = useState("");
@@ -12,19 +13,25 @@ export function RegisterPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const navigate = useNavigate();
+    const auth = useAuth();
+
+    const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
+    const passwordsDoNotMatch = confirmPassword.length > 0 && password !== confirmPassword;
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
 
-        if (password !== confirmPassword) {
+
+        if (passwordsDoNotMatch) {
             setError("Passwords do not match");
             return;
         }
 
         try {
             setIsSubmitting(true);
-            await registerApi({email, password, firstName, lastName});
+            const token = await registerApi({email, password, firstName, lastName});
+            auth.login(token);
             navigate("/dashboard");
         } catch (err) {
             setError("Registration failed");
@@ -77,15 +84,37 @@ export function RegisterPage() {
                     className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
                 />
+                <div className="relative mb-4">
+                    <input
+                        type="password"
+                        placeholder="Confirm Password"
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        className={`w-full px-4 py-2 border rounded-lg 
+                        bg-white text-gray-800 placeholder-gray-500 
+                        focus:outline-none focus:ring-2 transition-all duration-200
+        ${
+                            passwordsMatch
+                                ? "border-green-500 focus:ring-green-500"
+                                : passwordsDoNotMatch
+                                    ? "border-red-500 focus:ring-red-500"
+                                    : "border-gray-300 focus:ring-blue-500"
+                        }`}
+                        required
+                    />
 
-                <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={e => setConfirmPassword(e.target.value)}
-                    className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    required
-                />
+                    {passwordsMatch && (
+                        <span className="absolute right-3 top-2.5 text-green-500 text-lg">
+                            ✓
+                        </span>
+                    )}
+
+                    {passwordsDoNotMatch && (
+                        <span className="absolute right-3 top-2.5 text-red-500 text-lg">
+                            ✕
+                        </span>
+                    )}
+                </div>
 
                 {error && (
                     <div className="text-red-500 text-sm mb-4">

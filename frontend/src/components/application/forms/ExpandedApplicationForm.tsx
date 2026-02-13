@@ -31,8 +31,6 @@ export function ExpandedApplicationForm({
         await updateNotes(notes, application.id);
     }
 
-    console.log(statusHistory)
-
 
     return (
         <div className="relative p-6 space-y-8">
