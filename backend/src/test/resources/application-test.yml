@@ -24,6 +24,9 @@ spring:
     init:
       mode: never
 
+  flyway:
+    enabled: false
+
 logging:
   level:
     org.example.jobapplicationtracker: DEBUG
