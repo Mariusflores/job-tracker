@@ -302,6 +302,11 @@ public class ApplicationCommandService {
             return;
         }
 
+        // Prevent reverting back to draft.
+        if (oldStatus != ApplicationStatus.DRAFT && newStatus == ApplicationStatus.DRAFT) {
+            throw new IllegalStateException("Cannot revert application back to DRAFT once submitted");
+        }
+
         application.setStatus(newStatus);
 
         log.debug(
@@ -311,14 +316,16 @@ public class ApplicationCommandService {
                 newStatus
         );
 
+        if (oldStatus != ApplicationStatus.DRAFT) {
+            statusChangeRepository.save(
+                    ApplicationStatusChange.builder()
+                            .applicationId(application.getId())
+                            .fromStatus(oldStatus)
+                            .toStatus(newStatus)
+                            .build()
+            );
+        }
 
-        statusChangeRepository.save(
-                ApplicationStatusChange.builder()
-                        .applicationId(application.getId())
-                        .fromStatus(oldStatus)
-                        .toStatus(newStatus)
-                        .build()
-        );
 
     }
 
