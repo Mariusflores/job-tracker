@@ -8,7 +8,7 @@ This project is built as a learning experience **and** a production-ready MVP, f
 
 ## 🚀 Live Demo
 
-- **Frontend:** [https://<your-frontend-domain>.up.railway.app  ](https://frontend-production-770b8.up.railway.app/dashboard)
+- **Frontend:** [JobTracker  ](https://frontend-production-b1385.up.railway.app/)
 
 > API is publicly reachable for the frontend.
 
