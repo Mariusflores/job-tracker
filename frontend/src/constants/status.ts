@@ -26,3 +26,7 @@ export const STATUS_UI = {
 export const STATUSES: readonly ApplicationStatus[] = [
     "DRAFT", "APPLIED", "INTERVIEW", "OFFER", "REJECTED"
 ] as const;
+
+export const PIPELINE_STATUSES: readonly ApplicationStatus[] = [
+    "APPLIED", "INTERVIEW", "OFFER", "REJECTED"
+] as const;

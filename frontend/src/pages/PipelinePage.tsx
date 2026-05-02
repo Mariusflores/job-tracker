@@ -6,7 +6,7 @@ import {arrayMove} from "@dnd-kit/sortable";
 import type {Application, ApplicationStatus, StatusChange} from "../types/application.ts";
 import {ExpandedApplicationCard} from "../components/application/modals/ExpandedApplicationCard.tsx";
 import {mergeBackendApps, moveAppToBottomOfStatus, resolveTargetStatus} from "../utils/pipeline/pipelineOrder.ts";
-import {STATUSES} from "../constants/status.ts";
+import {PIPELINE_STATUSES} from "../constants/status.ts";
 
 
 export function PipelinePage({backendApps, onStatusChange, onUpdateNotes, getStatusHistory}: {
@@ -117,11 +117,11 @@ export function PipelinePage({backendApps, onStatusChange, onUpdateNotes, getSta
             >
                 {/* COLUMNS */}
                 <div className="grid grid-cols-4 gap-4">
-                    {STATUSES.map(status => (
+                    {PIPELINE_STATUSES.map(status => (
                         <Column
                             key={status}
                             status={status}
-                            cards={columns[status as keyof typeof columns]}
+                            cards={columns[status as keyof typeof columns] ?? []}
                             onOpenDetails={openDetails}
                         />
 
