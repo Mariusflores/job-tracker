@@ -5,7 +5,7 @@ A full-stack web application for tracking job applications, built with Spring Bo
 This project is built as a learning experience **and** a production-ready MVP, featuring a Spring Boot backend, a React + TypeScript + Vite frontend, and a PostgreSQL database. The application is deployed and runs securely in the cloud.
 
 
-- **Deployed on Railway :** [Live Demo](https://frontend-production-b1385.up.railway.app/)
+- Taken down from deployment to reduce personal cost.
 
 ---
 
